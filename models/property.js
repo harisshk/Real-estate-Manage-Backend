@@ -41,6 +41,7 @@ const propertySchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
+		// location : {} ,
 	},
 	{timestamps: true},
 );

@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema(
 
 		role: {
 			type: String,
-			default: "visitor",
+			default: "tenant",
 		},
 	},
 	{timestamps: true},
