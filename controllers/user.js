@@ -116,7 +116,6 @@ exports.login = (req, res) => {
 
 					userInfoWithToken.jwtToken = token;
 
-
 					return res.status(StatusCodes.ACCEPTED).json({
 						error: false,
 						message: "Successfully Logged in",

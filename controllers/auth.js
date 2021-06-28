@@ -2,6 +2,8 @@
 
 const {StatusCodes} = require("http-status-codes");
 
+const User = require("../models/user");
+
 // @desc To set userInfo to the req.user
 exports.setUser = (req, res, next, id) => {
 	if (!id) {

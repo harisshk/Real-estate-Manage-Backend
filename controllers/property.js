@@ -1,24 +1,23 @@
 const {StatusCodes} = require("http-status-codes");
 const Property = require("../models/property");
 
-exports.addProperty = (req, res) => {
-	req.body.user = req.user._id;
-	let newProperty = new Property(req.body);
-	newProperty
-		.save()
-		.then((response) => {
-			return res.status(StatusCodes.ACCEPTED).json({
-				message: "Property added",
-				error: false,
-			});
-		})
-		.catch((error) =>
-			res.status(StatusCodes.BAD_REQUEST).json({
-				message: "Error in adding the property ",
-				error: true,
-				err: error,
-			}),
-		);
+exports.addProperty = async (req, res) => {
+	try {
+		req.body.user = req.user._id;
+		let newProperty = await new Property(req.body).save();
+
+		return res.status(StatusCodes.ACCEPTED).json({
+			message: "Property added",
+			error: false,
+			property: newProperty,
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			message: "Error in adding the property ",
+			error: true,
+			err: error.message,
+		});
+	}
 };
 
 exports.updateProperty = (req, res) => {
