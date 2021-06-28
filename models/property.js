@@ -37,9 +37,13 @@ const propertySchema = new mongoose.Schema(
 			type: Boolean,
 			default: true,
 		},
-		isDelete: {
+		isDeleted: {
 			type: Boolean,
 			default: false,
+		},
+		deletedBy: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
 		},
 		// location : {} ,
 	},

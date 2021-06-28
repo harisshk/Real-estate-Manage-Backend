@@ -7,7 +7,7 @@ const {
 	approveProperty,
 	disApproveProperty,
 } = require("../controllers/property");
-const {isSignedIn, setUser, isOwner, isAdmin} = require("../controllers/user");
+const {isSignedIn, setUser, isOwner, isAdmin} = require("../controllers/auth");
 const router = express.Router();
 
 router.param("userId", setUser);
@@ -43,6 +43,5 @@ router.post(
 	isAdmin,
 	disApproveProperty,
 );
-
 
 module.exports = router;

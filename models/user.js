@@ -7,7 +7,6 @@ const userSchema = new mongoose.Schema(
 		name: {
 			type: String,
 			trim: true,
-			required: true,
 		},
 		email: {
 			type: String,
@@ -20,7 +19,6 @@ const userSchema = new mongoose.Schema(
 		},
 		password: {
 			type: String,
-			required: true,
 		},
 		jwtToken: {
 			type: String,
@@ -32,11 +30,10 @@ const userSchema = new mongoose.Schema(
 			type: Boolean,
 			default: true,
 		},
-		isDelete: {
+		isDeleted: {
 			type: Boolean,
 			default: false,
 		},
-
 		role: {
 			type: String,
 			default: "tenant",
