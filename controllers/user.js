@@ -8,38 +8,19 @@ exports.register = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
 		let preUser = await User.findOne({email: req.body.email});
-		if (preUser || error) {
+		if (preUser) {
 			return res.status(StatusCodes.CONFLICT).json({
 				error: true,
 				message: "DUPLICATE_USER",
 			});
 		}
-		try {
-			let user = new User(req.body);
-			let newUser = await user.save();
-			newUser.password = undefined;
-			try {
-				let newUserProfile = new Profile({user: newUser._id});
-				await newUserProfile.save();
-				return res.status(StatusCodes.ACCEPTED).json({
-					error: false,
-					message: "Account is created Successfully, Login to Continue .. ",
-					user: newUser,
-				});
-			} catch (error) {
-				return res.status(StatusCodes.BAD_REQUEST).json({
-					error: false,
-					message: "Error in creating user profile",
-					err: error.message,
-				});
-			}
-		} catch (error) {
-			return res.status(StatusCodes.BAD_REQUEST).json({
-				message: "Error in creating the Account",
-				error: true,
-				err: error.message,
-			});
-		}
+		let newUser = await new User(req.body).save();
+		newUser.password = undefined;
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "Account is created Successfully",
+			user: newUser,
+		});
 	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			message: "Error in creating the Account",
@@ -47,10 +28,6 @@ exports.register = async (req, res) => {
 			err: error.message,
 		});
 	}
-	// , (error, preUser) => {
-	//
-
-	// });
 };
 
 exports.verifyAccount = (req, res) => {
@@ -139,8 +116,6 @@ exports.login = (req, res) => {
 
 					userInfoWithToken.jwtToken = token;
 
-					//Setting req.user = logged in user Info
-					req.user = userInfoWithToken;
 
 					return res.status(StatusCodes.ACCEPTED).json({
 						error: false,
@@ -303,7 +278,7 @@ exports.updateNewPasswordViaOTP = (req, res) => {
 
 exports.loginUsingOTP = (req, res) => {};
 
-exports.createAccountBySuperAdmin = (req, res) => {
+exports.createAccountBySuperAdmin = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
 		let preUser = await User.findOne({email: req.body.email});
@@ -317,21 +292,13 @@ exports.createAccountBySuperAdmin = (req, res) => {
 			let user = new User(req.body);
 			let newUser = await user.save();
 			if (newUser.password) newUser.password = undefined;
-			try {
-				let newUserProfile = new Profile({user: newUser._id});
-				await newUserProfile.save();
-				return res.status(StatusCodes.ACCEPTED).json({
-					error: false,
-					message: "Account is created Successfully",
-					user: newUser,
-				});
-			} catch (error) {
-				return res.status(StatusCodes.BAD_REQUEST).json({
-					error: false,
-					message: "Error in creating user profile",
-					err: error.message,
-				});
-			}
+			let newUserProfile = new Profile({user: newUser._id});
+			await newUserProfile.save();
+			return res.status(StatusCodes.ACCEPTED).json({
+				error: false,
+				message: "Account is created Successfully",
+				user: newUser,
+			});
 		} catch (error) {
 			return res.status(StatusCodes.BAD_REQUEST).json({
 				message: "Error in creating the profile ",
