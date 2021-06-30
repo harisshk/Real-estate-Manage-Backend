@@ -7,6 +7,7 @@ var app = express();
 
 const userRoute = require("./routes/user");
 const propertyRoute = require("./routes/property");
+const authRoute = require("./routes/auth")
 
 const PORT = process.env.PORT || 5050;
 
@@ -37,5 +38,6 @@ app.get("/", (req, res) => {
 
 app.use("/api", userRoute);
 app.use("/api", propertyRoute);
+app.use("/api", authRoute);
 
 app.listen(PORT, () => console.log(`Server is running at PORT ${PORT}`));
