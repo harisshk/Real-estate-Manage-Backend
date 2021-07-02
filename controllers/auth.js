@@ -6,7 +6,11 @@ const {mailer} = require("../methods/nodemailer");
 const jwt = require("jsonwebtoken");
 
 exports.generateOTP = async (req, res) => {
-	OTPAuth.findOne({user: req.body.user})
+	User.findOne({email:req.body.user})
+	.then((userExists)=>{
+		console.log(userExists)
+		if(userExists){
+			OTPAuth.findOne({user: req.body.user})
 		.then((user) => {
 			const otp = generateRandom4DigitOTP();
 			let otpStoreError = false;
@@ -35,6 +39,7 @@ exports.generateOTP = async (req, res) => {
 			mailer(req.body.user, otp);
 			res.status(StatusCodes.OK).send({
 				success: true,
+				userExists:true,
 				message: "OTP successsfully sent",
 			});
 		})
@@ -42,9 +47,26 @@ exports.generateOTP = async (req, res) => {
 			res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
 				error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
 				success: false,
-				message: "OTP successsfully sent",
+				message: error,
 			});
 		});
+		}
+		else{
+			res.status(StatusCodes.OK).send({
+				success: true,
+				userExists:false,
+				message: "User doesn't Exist",
+			});
+		}
+	})
+	.catch((error) => {
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+			error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
+			success: false,
+			message: error,
+		});
+	});
+
 };
 
 exports.validateOTP = (req, res) => {
