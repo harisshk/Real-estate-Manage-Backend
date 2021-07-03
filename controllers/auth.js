@@ -6,42 +6,60 @@ const {mailer} = require("../methods/nodemailer");
 const jwt = require("jsonwebtoken");
 
 exports.generateOTP = async (req, res) => {
-	User.findOne({email:req.body.user})
-	.then((userExists)=>{
-		console.log(userExists)
-		if(userExists){
-			OTPAuth.findOne({user: req.body.user})
-		.then((user) => {
-			const otp = generateRandom4DigitOTP();
-			let otpStoreError = false;
-			if (user) {
-				OTPAuth.findOneAndUpdate({user: req.body.user}, {$set: {otp: otp}})
-					.then((updateResponse) => {
-						otpStoreError = false;
+	User.findOne({email: req.body.user})
+		.then((userExists) => {
+			console.log(userExists);
+			if (userExists) {
+				OTPAuth.findOne({user: req.body.user})
+					.then((user) => {
+						const otp = generateRandom4DigitOTP();
+						let otpStoreError = false;
+						if (user) {
+							OTPAuth.findOneAndUpdate(
+								{user: req.body.user},
+								{$set: {otp: otp}},
+							)
+								.then((updateResponse) => {
+									otpStoreError = false;
+								})
+								.catch(() => {
+									otpStoreError = true;
+								});
+						} else {
+							let newOTP = new OTPAuth({
+								user: req.body.user,
+								otp: otp,
+							});
+							newOTP
+								.save()
+								.then((updateResponse) => {
+									otpStoreError = false;
+								})
+								.catch(() => {
+									otpStoreError = true;
+								});
+						}
+						mailer(req.body.user, otp);
+						res.status(StatusCodes.OK).send({
+							success: true,
+							userExists: true,
+							message: "OTP successsfully sent",
+						});
 					})
-					.catch(() => {
-						otpStoreError = true;
+					.catch((error) => {
+						res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+							error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
+							success: false,
+							message: error,
+						});
 					});
 			} else {
-				let newOTP = new OTPAuth({
-					user: req.body.user,
-					otp: otp,
+				res.status(StatusCodes.OK).send({
+					success: true,
+					userExists: false,
+					message: "User doesn't Exist",
 				});
-				newOTP
-					.save()
-					.then((updateResponse) => {
-						otpStoreError = false;
-					})
-					.catch(() => {
-						otpStoreError = true;
-					});
 			}
-			mailer(req.body.user, otp);
-			res.status(StatusCodes.OK).send({
-				success: true,
-				userExists:true,
-				message: "OTP successsfully sent",
-			});
 		})
 		.catch((error) => {
 			res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
@@ -50,23 +68,6 @@ exports.generateOTP = async (req, res) => {
 				message: error,
 			});
 		});
-		}
-		else{
-			res.status(StatusCodes.OK).send({
-				success: true,
-				userExists:false,
-				message: "User doesn't Exist",
-			});
-		}
-	})
-	.catch((error) => {
-		res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-			error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
-			success: false,
-			message: error,
-		});
-	});
-
 };
 
 exports.validateOTP = (req, res) => {
@@ -175,7 +176,7 @@ exports.isOwner = (req, res, next) => {
 };
 
 exports.isRegionalAdmin = (req, res, next) => {
-	if (!req.body || !req.user || req.user.role !== "regionalAdmin") {
+	if (!req.body || !req.user || req.user.role !== "regional-admin") {
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			error: true,
 			message: "UnAuthorized Access",

@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const User = require("../models/user");
+const Profile = require("../models/profile");
 const {StatusCodes} = require("http-status-codes");
 
 exports.register = async (req, res) => {
@@ -281,30 +282,20 @@ exports.createAccountBySuperAdmin = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
 		let preUser = await User.findOne({email: req.body.email});
-		if (preUser || error) {
+		if (preUser) {
 			return res.status(StatusCodes.CONFLICT).json({
 				error: true,
 				message: "DUPLICATE_USER",
 			});
 		}
-		try {
-			let user = new User(req.body);
-			let newUser = await user.save();
-			if (newUser.password) newUser.password = undefined;
-			let newUserProfile = new Profile({user: newUser._id});
-			await newUserProfile.save();
-			return res.status(StatusCodes.ACCEPTED).json({
-				error: false,
-				message: "Account is created Successfully",
-				user: newUser,
-			});
-		} catch (error) {
-			return res.status(StatusCodes.BAD_REQUEST).json({
-				message: "Error in creating the profile ",
-				error: true,
-				err: error.message,
-			});
-		}
+		let newUser = await new User(req.body).save();
+		if (newUser.password) newUser.password = undefined;
+		await new Profile({user: newUser._id}).save();
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "Account is created Successfully",
+			user: newUser,
+		});
 	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			message: "Error in creating the Account",
@@ -313,10 +304,35 @@ exports.createAccountBySuperAdmin = async (req, res) => {
 		});
 	}
 };
-
+exports.createAccountByRegionalAdmin = async (req, res) => {
+	try {
+		//Checking for a user with same email Id
+		let preUser = await User.findOne({email: req.body.email});
+		if (preUser) {
+			return res.status(StatusCodes.CONFLICT).json({
+				error: true,
+				message: "DUPLICATE_USER",
+			});
+		}
+		let newUser = await new User(req.body).save();
+		if (newUser.password) newUser.password = undefined;
+		await new Profile({user: newUser._id}).save();
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "Account is created Successfully",
+			user: newUser,
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			message: "Error in creating the Account",
+			error: true,
+			err: error.message,
+		});
+	}
+};
 exports.logout = (req, res) => {
 	User.findOneAndUpdate(
-		{_id: req.body._id},
+		{_id: req.user._id},
 		{jwtToken: null},
 		(error, user) => {
 			if (!user) {

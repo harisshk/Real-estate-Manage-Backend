@@ -38,6 +38,7 @@ const userSchema = new mongoose.Schema(
 			type: String,
 			default: "tenant",
 		},
+		regions: [],
 	},
 	{timestamps: true},
 );

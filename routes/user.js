@@ -11,9 +11,17 @@ const {
 	updateNewPasswordViaOTP,
 	verifyAccount,
 	createAccountBySuperAdmin,
+	createAccountByRegionalAdmin,
 } = require("../controllers/user");
 
-const {isSignedIn, isAdmin} = require("../controllers/auth");
+const {
+	isSignedIn,
+	isAdmin,
+	setUser,
+	isRegionalAdmin,
+} = require("../controllers/auth");
+
+router.param("userId", setUser);
 
 // @type POST
 // @route /auth/:createAccount
@@ -33,7 +41,7 @@ router.post("/user/login", login);
 // @route /auth/logout
 // @desc Logging out
 // @access PUBLIC
-router.get("/user/logout", logout);
+router.get("/user/logout/:userId", isSignedIn, logout);
 
 // @type POST
 // @route /update/newPassword
@@ -54,10 +62,17 @@ router.post("/user/forgot/password", getOTPforPassword);
 router.post("/user/update/newPassword/viaOTP", updateNewPasswordViaOTP);
 
 router.post(
-	"/user/createAccount/:userId",
+	"/user/admin/createAccount/:userId",
 	isSignedIn,
 	isAdmin,
 	createAccountBySuperAdmin,
+);
+
+router.post(
+	"/user/regionalAdmin/createAccount/:userId",
+	isSignedIn,
+	isRegionalAdmin,
+	createAccountByRegionalAdmin,
 );
 
 module.exports = router;

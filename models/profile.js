@@ -11,7 +11,6 @@ const userSchema = new mongoose.Schema(
 		idProof: {
 			type: String,
 			trim: true,
-			unique: true,
 		},
 
 		bankAccount: {
