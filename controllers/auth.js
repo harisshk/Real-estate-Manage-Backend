@@ -8,7 +8,6 @@ const jwt = require("jsonwebtoken");
 exports.generateOTP = async (req, res) => {
 	User.findOne({email: req.body.user})
 		.then((userExists) => {
-			console.log(userExists);
 			if (userExists) {
 				OTPAuth.findOne({user: req.body.user})
 					.then((user) => {
@@ -29,6 +28,7 @@ exports.generateOTP = async (req, res) => {
 							let newOTP = new OTPAuth({
 								user: req.body.user,
 								otp: otp,
+								userId:userExists._id,
 							});
 							newOTP
 								.save()
@@ -43,7 +43,7 @@ exports.generateOTP = async (req, res) => {
 						res.status(StatusCodes.OK).send({
 							success: true,
 							userExists: true,
-							message: "OTP successsfully sent",
+							message: "OTP successfully sent",
 						});
 					})
 					.catch((error) => {
@@ -75,8 +75,10 @@ exports.validateOTP = (req, res) => {
 		.then((userOTP) => {
 			if (userOTP) {
 				if (userOTP.otp === req.body.otp) {
-					let token = jwt.sign({_id: userOTP._id}, "secretCode");
-					OTPAuth.findOneAndRemove({user: req.body.user})
+					User.findOne({email:req.body.email})
+					.then((userInfo)=>{
+						let token = jwt.sign({_id: userInfo._id,role:userInfo.role}, "secretCode");
+						OTPAuth.findOneAndRemove({user: req.body.user})
 						.then(() =>
 							res.status(StatusCodes.OK).send({
 								success: true,
@@ -90,6 +92,14 @@ exports.validateOTP = (req, res) => {
 								success: false,
 							});
 						});
+					})
+					.catch((error)=>{
+						res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+							error: error,
+							success: false,
+						});
+					})
+					
 				} else {
 					res.status(StatusCodes.OK).send({
 						success: false,
