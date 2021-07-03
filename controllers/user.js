@@ -100,7 +100,10 @@ exports.login = (req, res) => {
 				});
 			}
 
-			let token = jwt.sign({_id: userInfo._id}, "secretCode");
+			let token = jwt.sign(
+				{_id: userInfo._id, role: userInfo.role},
+				"secretCode",
+			);
 
 			User.findOneAndUpdate(
 				{_id: userInfo._id},
