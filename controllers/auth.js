@@ -126,7 +126,7 @@ exports.validateOTP = (req, res) => {
 exports.isAdmin = (req, res, next) => {
 	console.log(req.user);
 	if (!req.body || !req.user || req.user.role !== "admin") {
-		return res.status(StatusCodes.BAD_REQUEST).json({
+		return res.status(StatusCodes.FORBIDDEN).json({
 			error: true,
 			message: "UnAuthorized Access",
 		});
@@ -164,7 +164,7 @@ exports.isSignedIn = (req, res, next) => {
 		const bearer = bearerHeader.split(" ");
 		const bearerToken = bearer[1];
 		if (!req.user || bearerToken !== req.user.jwtToken) {
-			return res.status(400).json({
+			return res.status(StatusCodes.UNAUTHORIZED).json({
 				error: true,
 				message: "Un authorized access",
 			});
@@ -180,7 +180,7 @@ exports.isSignedIn = (req, res, next) => {
 
 exports.isOwner = (req, res, next) => {
 	if (!req.body || !req.user || req.user.role !== "owner") {
-		return res.status(StatusCodes.BAD_REQUEST).json({
+		return res.status(StatusCodes.FORBIDDEN).json({
 			error: true,
 			message: "UnAuthorized Access",
 		});
@@ -190,7 +190,7 @@ exports.isOwner = (req, res, next) => {
 
 exports.isRegionalAdmin = (req, res, next) => {
 	if (!req.body || !req.user || req.user.role !== "regional-admin") {
-		return res.status(StatusCodes.BAD_REQUEST).json({
+		return res.status(StatusCodes.FORBIDDEN).json({
 			error: true,
 			message: "UnAuthorized Access",
 		});
