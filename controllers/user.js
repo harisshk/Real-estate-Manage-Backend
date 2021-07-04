@@ -333,6 +333,44 @@ exports.createAccountByRegionalAdmin = async (req, res) => {
 		});
 	}
 };
+exports.getAllUsersByRoles = async (req, res) => {
+	try {
+		const page = parseInt(req.query.page);
+		const limit = parseInt(req.query.limit);
+		const startIndex = (page - 1) * limit;
+		const endIndex = page * limit;
+
+		const results = {};
+		if (endIndex < (await User.countDocuments().exec())) {
+			results.next = {
+				page: page + 1,
+				limit: limit,
+			};
+		}
+
+		if (startIndex > 0) {
+			results.previous = {
+				page: page - 1,
+				limit: limit,
+			};
+		}
+
+		results.users = await User.find({
+			isDeleted: false,
+			_id: {$nin: req.user._id},
+			role: req.query.role,
+		});
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "user fetched successfully",
+			results: results,
+		});
+	} catch (error) {
+		return res
+			.status(StatusCodes.BAD_REQUEST)
+			.json({error: false, err: error.message, message: "Error finding users"});
+	}
+};
 exports.logout = (req, res) => {
 	User.findOneAndUpdate(
 		{_id: req.user._id},

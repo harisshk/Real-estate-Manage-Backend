@@ -28,7 +28,7 @@ exports.generateOTP = async (req, res) => {
 							let newOTP = new OTPAuth({
 								user: req.body.user,
 								otp: otp,
-								userId:userExists._id,
+								userId: userExists._id,
 							});
 							newOTP
 								.save()
@@ -75,31 +75,33 @@ exports.validateOTP = (req, res) => {
 		.then((userOTP) => {
 			if (userOTP) {
 				if (userOTP.otp === req.body.otp) {
-					User.findOne({email:req.body.email})
-					.then((userInfo)=>{
-						let token = jwt.sign({_id: userInfo._id,role:userInfo.role}, "secretCode");
-						OTPAuth.findOneAndRemove({user: req.body.user})
-						.then(() =>
-							res.status(StatusCodes.OK).send({
-								success: true,
-								token: token,
-								message: "OTP is verified",
-							}),
-						)
+					User.findOne({email: req.body.email})
+						.then((userInfo) => {
+							let token = jwt.sign(
+								{_id: userInfo._id, role: userInfo.role},
+								"secretCode",
+							);
+							OTPAuth.findOneAndRemove({user: req.body.user})
+								.then(() =>
+									res.status(StatusCodes.OK).send({
+										success: true,
+										token: token,
+										message: "OTP is verified",
+									}),
+								)
+								.catch((error) => {
+									res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+										error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
+										success: false,
+									});
+								});
+						})
 						.catch((error) => {
 							res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-								error: getReasonPhrase(StatusCodes.INTERNAL_SERVER_ERROR),
+								error: error,
 								success: false,
 							});
 						});
-					})
-					.catch((error)=>{
-						res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-							error: error,
-							success: false,
-						});
-					})
-					
 				} else {
 					res.status(StatusCodes.OK).send({
 						success: false,
@@ -122,6 +124,7 @@ exports.validateOTP = (req, res) => {
 };
 
 exports.isAdmin = (req, res, next) => {
+	console.log(req.user);
 	if (!req.body || !req.user || req.user.role !== "admin") {
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			error: true,

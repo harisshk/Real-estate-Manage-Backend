@@ -12,6 +12,7 @@ const {
 	verifyAccount,
 	createAccountBySuperAdmin,
 	createAccountByRegionalAdmin,
+	getAllUsersByRoles,
 } = require("../controllers/user");
 
 const {
@@ -73,6 +74,13 @@ router.post(
 	isSignedIn,
 	isRegionalAdmin,
 	createAccountByRegionalAdmin,
+);
+
+router.post(
+	"/user/getUserByRole/:userId",
+	isSignedIn,
+	isAdmin,
+	getAllUsersByRoles,
 );
 
 module.exports = router;

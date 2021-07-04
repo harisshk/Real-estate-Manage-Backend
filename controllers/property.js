@@ -88,11 +88,12 @@ exports.getProperties = async (req, res) => {
 			.limit(limit)
 			.skip(startIndex)
 			.exec();
-		res
+
+		return res
 			.status(StatusCodes.BAD_REQUEST)
 			.json({error: false, properties: results});
 	} catch (error) {
-		res
+		return res
 			.status(StatusCodes.BAD_REQUEST)
 			.json({error: true, message: error.message});
 	}
