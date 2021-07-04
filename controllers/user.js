@@ -293,7 +293,7 @@ exports.createAccountBySuperAdmin = async (req, res) => {
 		}
 		let newUser = await new User(req.body).save();
 		if (newUser.password) newUser.password = undefined;
-		await new Profile({user: newUser._id}).save();
+		// await new Profile({user: newUser._id}).save();
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Account is created Successfully",
