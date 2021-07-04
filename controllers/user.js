@@ -393,4 +393,20 @@ exports.logout = (req, res) => {
 			});
 		},
 	);
-};
+}
+
+exports.updateUser = (req,res) =>{
+	User.findByIdAndUpdate({_id:req.body.userId},{$set:req.body})
+	.then(()=>{
+		res.status(StatusCodes.OK).json({
+			error:false,
+			message:"User updated successfully"
+		})
+	})
+	.catch((error)=>{
+		res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			error:true,
+			errorMessage:error
+		})
+	})
+}

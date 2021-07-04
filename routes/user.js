@@ -13,6 +13,7 @@ const {
 	createAccountBySuperAdmin,
 	createAccountByRegionalAdmin,
 	getAllUsersByRoles,
+	updateUser,
 } = require("../controllers/user");
 
 const {
@@ -82,5 +83,19 @@ router.post(
 	isAdmin,
 	getAllUsersByRoles,
 );
+router.post(
+	"/user/update/admin/:userId",
+	isSignedIn,
+	isAdmin,
+	updateUser,
+);
+
+router.post(
+	"/user/update/regionalAdmin/:userId",
+	isSignedIn,
+	isRegionalAdmin,
+	updateUser,
+);
+
 
 module.exports = router;
