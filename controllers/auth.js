@@ -124,7 +124,6 @@ exports.validateOTP = (req, res) => {
 };
 
 exports.isAdmin = (req, res, next) => {
-	console.log(req.body);
 	if (!req.user || req.user.role !== "admin") {
 		return res.status(StatusCodes.FORBIDDEN).json({
 			error: true,

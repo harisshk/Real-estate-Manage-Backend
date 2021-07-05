@@ -48,4 +48,4 @@ const sendPasswordMailer = (email,password) => {
   });
 };
 
-module.exports = {mailer}
+module.exports = {mailer,sendPasswordMailer}

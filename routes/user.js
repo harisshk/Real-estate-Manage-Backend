@@ -10,10 +10,9 @@ const {
 	getOTPforPassword,
 	updateNewPasswordViaOTP,
 	verifyAccount,
-	createAccountBySuperAdmin,
-	createAccountByRegionalAdmin,
 	getAllUsersByRoles,
 	updateUser,
+	createAccountByAdmins,
 } = require("../controllers/user");
 
 const {
@@ -67,14 +66,14 @@ router.post(
 	"/user/admin/createAccount/:userId",
 	isSignedIn,
 	isAdmin,
-	createAccountBySuperAdmin,
+	createAccountByAdmins,
 );
 
 router.post(
 	"/user/regionalAdmin/createAccount/:userId",
 	isSignedIn,
 	isRegionalAdmin,
-	createAccountByRegionalAdmin,
+	createAccountByAdmins,
 );
 
 router.post(
