@@ -293,8 +293,7 @@ exports.createAccountByAdmins = async (req, res) => {
 			});
 		}
 		const password = await generatePassword(8,false)
-		const salt = await bcrypt.genSalt(10);
-   		const hashPassword = await bcrypt.hash(password, salt);
+   		const hashPassword = await bcrypt.hash(password, 10);
 		let user ={
 			...req.body,
 			password:hashPassword
