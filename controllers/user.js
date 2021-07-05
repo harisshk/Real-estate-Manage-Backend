@@ -4,7 +4,8 @@ const nodemailer = require("nodemailer");
 const User = require("../models/user");
 const Profile = require("../models/profile");
 const {StatusCodes} = require("http-status-codes");
-
+const  generatePassword = require("password-generator");
+const {sendPasswordMailer} = require("../methods/nodemailer")
 exports.register = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
@@ -281,7 +282,7 @@ exports.updateNewPasswordViaOTP = (req, res) => {
 
 exports.loginUsingOTP = (req, res) => {};
 
-exports.createAccountBySuperAdmin = async (req, res) => {
+exports.createAccountByAdmins = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
 		let preUser = await User.findOne({email: req.body.email});
@@ -291,9 +292,15 @@ exports.createAccountBySuperAdmin = async (req, res) => {
 				message: "DUPLICATE_USER",
 			});
 		}
-		let newUser = await new User(req.body).save();
-		if (newUser.password) newUser.password = undefined;
-		// await new Profile({user: newUser._id}).save();
+		const password = await generatePassword(8,false)
+		const salt = await bcrypt.genSalt(10);
+   		const hashPassword = await bcrypt.hash(password, salt);
+		let user ={
+			...req.body,
+			password:hashPassword
+		}
+		let newUser = await new User(user).save();
+		sendPasswordMailer(req.body.email,password)
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Account is created Successfully",
@@ -307,32 +314,7 @@ exports.createAccountBySuperAdmin = async (req, res) => {
 		});
 	}
 };
-exports.createAccountByRegionalAdmin = async (req, res) => {
-	try {
-		//Checking for a user with same email Id
-		let preUser = await User.findOne({email: req.body.email});
-		if (preUser) {
-			return res.status(StatusCodes.CONFLICT).json({
-				error: true,
-				message: "DUPLICATE_USER",
-			});
-		}
-		let newUser = await new User(req.body).save();
-		if (newUser.password) newUser.password = undefined;
-		await new Profile({user: newUser._id}).save();
-		return res.status(StatusCodes.ACCEPTED).json({
-			error: false,
-			message: "Account is created Successfully",
-			user: newUser,
-		});
-	} catch (error) {
-		return res.status(StatusCodes.BAD_REQUEST).json({
-			message: "Error in creating the Account",
-			error: true,
-			err: error.message,
-		});
-	}
-};
+
 exports.getAllUsersByRoles = async (req, res) => {
 	try {
 		const page = parseInt(req.query.page);
