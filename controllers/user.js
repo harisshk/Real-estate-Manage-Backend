@@ -292,11 +292,10 @@ exports.createAccountByAdmins = async (req, res) => {
 				message: "DUPLICATE_USER",
 			});
 		}
-		generatePassword(8, false).then((password) => {
-			const hashPassword = await bcrypt.hash(password, 10);
+		const password = generatePassword(8, false)
 			let user = {
 				...req.body,
-				password: hashPassword,
+				password: password,
 			};
 			let newUser = await new User(user).save();
 			sendPasswordMailer(req.body.email, password);
@@ -305,7 +304,6 @@ exports.createAccountByAdmins = async (req, res) => {
 				message: "Account is created Successfully",
 				user: newUser,
 			});
-		});
 	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			message: "Error in creating the Account",
