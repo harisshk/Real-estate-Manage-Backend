@@ -292,6 +292,7 @@ exports.createAccountByAdmins = async (req, res) => {
 				message: "DUPLICATE_USER",
 			});
 		}
+		
 		const password = generatePassword(8, false)
 			let user = {
 				...req.body,
