@@ -4,7 +4,8 @@ const nodemailer = require("nodemailer");
 const User = require("../models/user");
 const Profile = require("../models/profile");
 const {StatusCodes} = require("http-status-codes");
-
+const generatePassword = require("password-generator");
+const {sendPasswordMailer} = require("../methods/nodemailer");
 exports.register = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
@@ -281,7 +282,7 @@ exports.updateNewPasswordViaOTP = (req, res) => {
 
 exports.loginUsingOTP = (req, res) => {};
 
-exports.createAccountBySuperAdmin = async (req, res) => {
+exports.createAccountByAdmins = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
 		let preUser = await User.findOne({email: req.body.email});
@@ -291,6 +292,42 @@ exports.createAccountBySuperAdmin = async (req, res) => {
 				message: "DUPLICATE_USER",
 			});
 		}
+		const password = generatePassword(8, false)
+			let user = {
+				...req.body,
+				password: password,
+			};
+			let newUser = await new User(user).save();
+			sendPasswordMailer(req.body.email, password);
+			return res.status(StatusCodes.ACCEPTED).json({
+				error: false,
+				message: "Account is created Successfully",
+				user: newUser,
+			});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			message: "Error in creating the Account",
+			error: true,
+			err: error.message,
+		});
+	}
+};
+
+exports.getAllUsersByRoles = async (req, res) => {
+	try {
+		const page = parseInt(req.query.page);
+		const limit = parseInt(req.query.limit);
+		const startIndex = (page - 1) * limit;
+		const endIndex = page * limit;
+
+		const results = {};
+		if (endIndex < (await User.countDocuments().exec()) - 1) {
+			results.next = {
+				page: page + 1,
+				limit: limit,
+			};
+		}
+
 		if (startIndex > 0) {
 			results.previous = {
 				page: page - 1,
@@ -304,6 +341,7 @@ exports.createAccountBySuperAdmin = async (req, res) => {
 			role: req.query.role,
 		});
 		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
 			message: "user fetched successfully",
 			results: results,
 		});
