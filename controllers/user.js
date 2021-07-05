@@ -4,8 +4,8 @@ const nodemailer = require("nodemailer");
 const User = require("../models/user");
 const Profile = require("../models/profile");
 const {StatusCodes} = require("http-status-codes");
-const  generatePassword = require("password-generator");
-const {sendPasswordMailer} = require("../methods/nodemailer")
+const generatePassword = require("password-generator");
+const {sendPasswordMailer} = require("../methods/nodemailer");
 exports.register = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
@@ -292,18 +292,19 @@ exports.createAccountByAdmins = async (req, res) => {
 				message: "DUPLICATE_USER",
 			});
 		}
-		const password = await generatePassword(8,false)
-   		const hashPassword = await bcrypt.hash(password, 10);
-		let user ={
-			...req.body,
-			password:hashPassword
-		}
-		let newUser = await new User(user).save();
-		sendPasswordMailer(req.body.email,password)
-		return res.status(StatusCodes.ACCEPTED).json({
-			error: false,
-			message: "Account is created Successfully",
-			user: newUser,
+		generatePassword(8, false).then((password) => {
+			const hashPassword = await bcrypt.hash(password, 10);
+			let user = {
+				...req.body,
+				password: hashPassword,
+			};
+			let newUser = await new User(user).save();
+			sendPasswordMailer(req.body.email, password);
+			return res.status(StatusCodes.ACCEPTED).json({
+				error: false,
+				message: "Account is created Successfully",
+				user: newUser,
+			});
 		});
 	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
