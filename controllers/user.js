@@ -291,63 +291,6 @@ exports.createAccountBySuperAdmin = async (req, res) => {
 				message: "DUPLICATE_USER",
 			});
 		}
-		let newUser = await new User(req.body).save();
-		if (newUser.password) newUser.password = undefined;
-		// await new Profile({user: newUser._id}).save();
-		return res.status(StatusCodes.ACCEPTED).json({
-			error: false,
-			message: "Account is created Successfully",
-			user: newUser,
-		});
-	} catch (error) {
-		return res.status(StatusCodes.BAD_REQUEST).json({
-			message: "Error in creating the Account",
-			error: true,
-			err: error.message,
-		});
-	}
-};
-exports.createAccountByRegionalAdmin = async (req, res) => {
-	try {
-		//Checking for a user with same email Id
-		let preUser = await User.findOne({email: req.body.email});
-		if (preUser) {
-			return res.status(StatusCodes.CONFLICT).json({
-				error: true,
-				message: "DUPLICATE_USER",
-			});
-		}
-		let newUser = await new User(req.body).save();
-		if (newUser.password) newUser.password = undefined;
-		await new Profile({user: newUser._id}).save();
-		return res.status(StatusCodes.ACCEPTED).json({
-			error: false,
-			message: "Account is created Successfully",
-			user: newUser,
-		});
-	} catch (error) {
-		return res.status(StatusCodes.BAD_REQUEST).json({
-			message: "Error in creating the Account",
-			error: true,
-			err: error.message,
-		});
-	}
-};
-exports.getAllUsersByRoles = async (req, res) => {
-	try {
-		const page = parseInt(req.query.page);
-		const limit = parseInt(req.query.limit);
-		const startIndex = (page - 1) * limit;
-		const endIndex = page * limit;
-
-		const results = {};
-		if (endIndex < (await User.countDocuments().exec()) - 1) {
-			results.next = {
-				page: page + 1,
-				limit: limit,
-			};
-		}
-
 		if (startIndex > 0) {
 			results.previous = {
 				page: page - 1,
@@ -361,7 +304,6 @@ exports.getAllUsersByRoles = async (req, res) => {
 			role: req.query.role,
 		});
 		return res.status(StatusCodes.ACCEPTED).json({
-			error: false,
 			message: "user fetched successfully",
 			results: results,
 		});
