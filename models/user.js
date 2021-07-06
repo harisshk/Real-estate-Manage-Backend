@@ -26,6 +26,10 @@ const userSchema = new mongoose.Schema(
 		fcmToken: {
 			type: String,
 		},
+		phoneNumber:{
+			type: String,
+			required:true
+		},
 		isActive: {
 			type: Boolean,
 			default: true,
