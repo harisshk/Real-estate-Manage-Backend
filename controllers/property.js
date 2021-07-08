@@ -1,35 +1,35 @@
+const {StatusCodes} = require("http-status-codes");
 const Property = require("../models/property");
 
-exports.addProperty = (req, res) => {
-	req.body.user = req.user._id;
-	let newProperty = new Property(req.body);
-	newProperty
-		.save()
-		.then((response) => {
-			return res.status(200).json({
-				message: "Property added",
-				error: false,
-			});
-		})
-		.catch((error) =>
-			res.status(400).json({
-				message: "Error in adding the property ",
-				error: true,
-				err: error,
-			}),
-		);
+exports.addProperty = async (req, res) => {
+	try {
+		req.body.user = req.user._id;
+		let newProperty = await new Property(req.body).save();
+
+		return res.status(StatusCodes.ACCEPTED).json({
+			message: "Property added",
+			error: false,
+			property: newProperty,
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			message: "Error in adding the property ",
+			error: true,
+			err: error.message,
+		});
+	}
 };
 
 exports.updateProperty = (req, res) => {
 	Property.findOne({_id: req.params.propertyId}, {$set: req.body})
 		.then((response) => {
-			return res.status(200).json({
+			return res.status(StatusCodes.ACCEPTED).json({
 				message: "Property updated",
 				error: false,
 			});
 		})
 		.catch((error) =>
-			res.status(400).json({
+			res.status(StatusCodes.BAD_REQUEST).json({
 				message: "Error in updating the property ",
 				error: true,
 				err: error,
@@ -38,15 +38,18 @@ exports.updateProperty = (req, res) => {
 };
 
 exports.deleteProperty = (req, res) => {
-	Property.findOne({_id: req.params.propertyId}, {$set: {isDelete: true}})
+	Property.findOne(
+		{_id: req.params.propertyId},
+		{$set: {isDelete: true, deletedBy: req.user._id}},
+	)
 		.then((response) => {
-			return res.status(200).json({
+			return res.status(StatusCodes.ACCEPTED).json({
 				message: "Property deleted",
 				error: false,
 			});
 		})
 		.catch((error) =>
-			res.status(400).json({
+			res.status(StatusCodes.BAD_REQUEST).json({
 				message: "Error in deleting the property ",
 				error: true,
 				err: error,
@@ -85,9 +88,14 @@ exports.getProperties = async (req, res) => {
 			.limit(limit)
 			.skip(startIndex)
 			.exec();
-		res.status(200).json({error: false, properties: results});
+
+		return res
+			.status(StatusCodes.BAD_REQUEST)
+			.json({error: false, properties: results});
 	} catch (error) {
-		res.status(400).json({error: true, message: error.message});
+		return res
+			.status(StatusCodes.BAD_REQUEST)
+			.json({error: true, message: error.message});
 	}
 };
 
@@ -99,9 +107,13 @@ exports.approveProperty = async (req, res) => {
 			{$set: update},
 			{new: true},
 		).exec();
-		return res.status(200).json({error: false, message: "Property Approved"});
+		return res
+			.status(StatusCodes.ACCEPTED)
+			.json({error: false, message: "Property Approved"});
 	} catch (error) {
-		return res.status(400).json({error: true, message: error.message});
+		return res
+			.status(StatusCodes.BAD_REQUEST)
+			.json({error: true, message: error.message});
 	}
 };
 
@@ -114,10 +126,11 @@ exports.disApproveProperty = async (req, res) => {
 			{new: true},
 		).exec();
 		return res
-			.status(200)
+			.status(StatusCodes.ACCEPTED)
 			.json({error: false, message: "Property Dis-Approved"});
 	} catch (error) {
-		return res.status(400).json({error: true, message: error.message});
+		return res
+			.status(StatusCodes.BAD_REQUEST)
+			.json({error: true, message: error.message});
 	}
 };
-

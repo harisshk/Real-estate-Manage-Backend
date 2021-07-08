@@ -7,17 +7,14 @@ const userSchema = new mongoose.Schema(
 		fullName: {
 			type: String,
 			trim: true,
-			required: true,
 		},
 		idProof: {
 			type: String,
 			trim: true,
-			unique: true,
 		},
 
 		bankAccount: {
 			type: String,
-			required: true,
 		},
 		mobile: {
 			type: String,
@@ -26,7 +23,7 @@ const userSchema = new mongoose.Schema(
 			type: Boolean,
 			default: true,
 		},
-		isDelete: {
+		isDeleted: {
 			type: Boolean,
 			default: false,
 		},

@@ -7,10 +7,26 @@ const {
 	login,
 	logout,
 	updateNewPassword,
-	getOTPforPassword,
+	getOTPForPassword,
 	updateNewPasswordViaOTP,
 	verifyAccount,
+	getAllUsersByRoles,
+	updateUser,
+	createAccountByAdmins,
+	generateOTP,
+	validateLoginOTP,
+	validateForgotPasswordOTP,
+	updateUserInfo,
 } = require("../controllers/user");
+
+const {
+	isSignedIn,
+	isAdmin,
+	setUser,
+	isRegionalAdmin,
+} = require("../controllers/auth");
+
+router.param("userId", setUser);
 
 // @type POST
 // @route /auth/:createAccount
@@ -30,24 +46,66 @@ router.post("/user/login", login);
 // @route /auth/logout
 // @desc Logging out
 // @access PUBLIC
-router.get("/user/logout", logout);
+router.get("/user/logout/:userId", isSignedIn, logout);
 
 // @type POST
 // @route /update/newPassword
 // @desc Update new Password
 // @access PUBLIC
-router.post("/update/newPassword", updateNewPassword);
+router.post("/user/update/newPassword", updateNewPassword);
 
 // @type POST
 // @route /forgot/password
 // @desc Send OTP
 // @access PUBLIC
-router.post("/forgot/password", getOTPforPassword);
+router.post("/user/forgot/password", getOTPForPassword);
 
 // @type POST
 // @route /update/newPassword/viaOTP
 // @desc Update password after verifying OTP
 // @access PUBLIC
-router.post("/update/newPassword/viaOTP", updateNewPasswordViaOTP);
+router.post("/user/update/newPassword/viaOTP", updateNewPasswordViaOTP);
+
+router.post(
+	"/user/admin/createAccount/:userId",
+	isSignedIn,
+	isAdmin,
+	createAccountByAdmins,
+);
+
+router.post(
+	"/user/regionalAdmin/createAccount/:userId",
+	isSignedIn,
+	isRegionalAdmin,
+	createAccountByAdmins,
+);
+
+router.post(
+	"/user/getUserByRole/:userId",
+	isSignedIn,
+	isAdmin,
+	getAllUsersByRoles,
+);
+router.post(
+	"/user/update/admin/:userId",
+	isSignedIn,
+	isAdmin,
+	updateUser,
+);
+
+router.post(
+	"/user/update/regionalAdmin/:userId",
+	isSignedIn,
+	isRegionalAdmin,
+	updateUser,
+);
+
+router.post("/user/login/otp", generateOTP);
+
+router.post("/user/login/validate", validateLoginOTP);
+
+router.post("/user/forgotPassword/validate",validateForgotPasswordOTP)
+
+route.post('/user/updateUserInfo/:userId' ,updateUserInfo);
 
 module.exports = router;

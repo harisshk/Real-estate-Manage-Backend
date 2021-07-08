@@ -17,7 +17,7 @@ const propertySchema = new mongoose.Schema(
 			type: Number,
 			required: true,
 		},
-		initialDeposite: {
+		initialDeposit: {
 			type: Number,
 			required: true,
 		},
@@ -37,9 +37,13 @@ const propertySchema = new mongoose.Schema(
 			type: Boolean,
 			default: true,
 		},
-		isDelete: {
+		isDeleted: {
 			type: Boolean,
 			default: false,
+		},
+		deletedBy: {
+			type: mongoose.Schema.Types.ObjectId,
+			ref: "User",
 		},
 		// location : {} ,
 	},
