@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const mailer = (email,OTP) => {
+const mailer = (email,OTP,text) => {
   let userNameMail = "hari.jsmith494@gmail.com",
     applicationPassword = "fqcjwpduyiuhwgun";
   var transporter = nodemailer.createTransport({
@@ -14,7 +14,7 @@ const mailer = (email,OTP) => {
     from: "hari.jsmith494@gmail.com",
     to: email,
     subject: `OTP`,
-    html: `<p>your login OTP is ${OTP}</p>`,
+    html: `<p>your ${text} OTP is ${OTP}</p>`,
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {

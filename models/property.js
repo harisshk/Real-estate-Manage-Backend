@@ -17,7 +17,7 @@ const propertySchema = new mongoose.Schema(
 			type: Number,
 			required: true,
 		},
-		initialDeposite: {
+		initialDeposit: {
 			type: Number,
 			required: true,
 		},

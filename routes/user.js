@@ -7,12 +7,16 @@ const {
 	login,
 	logout,
 	updateNewPassword,
-	getOTPforPassword,
+	getOTPForPassword,
 	updateNewPasswordViaOTP,
 	verifyAccount,
 	getAllUsersByRoles,
 	updateUser,
 	createAccountByAdmins,
+	generateOTP,
+	validateLoginOTP,
+	validateForgotPasswordOTP,
+	updateUserInfo,
 } = require("../controllers/user");
 
 const {
@@ -54,7 +58,7 @@ router.post("/user/update/newPassword", updateNewPassword);
 // @route /forgot/password
 // @desc Send OTP
 // @access PUBLIC
-router.post("/user/forgot/password", getOTPforPassword);
+router.post("/user/forgot/password", getOTPForPassword);
 
 // @type POST
 // @route /update/newPassword/viaOTP
@@ -96,5 +100,12 @@ router.post(
 	updateUser,
 );
 
+router.post("/user/login/otp", generateOTP);
+
+router.post("/user/login/validate", validateLoginOTP);
+
+router.post("/user/forgotPassword/validate",validateForgotPasswordOTP)
+
+route.post('/user/updateUserInfo/:userId' ,updateUserInfo);
 
 module.exports = router;
