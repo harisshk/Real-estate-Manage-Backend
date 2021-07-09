@@ -3,181 +3,181 @@ const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const User = require("../models/user");
 const OTP = require("../models/otp");
-const { StatusCodes } = require("http-status-codes");
+const {StatusCodes} = require("http-status-codes");
 const generatePassword = require("password-generator");
-const { sendPasswordMailer, mailer } = require("../methods/nodemailer");
-const { generateRandom4DigitOTP } = require("../methods/otpGenerate");
+const {sendPasswordMailer, mailer} = require("../methods/nodemailer");
+const {generateRandom4DigitOTP} = require("../methods/otpGenerate");
 
 exports.register = async (req, res) => {
-  try {
-    //Checking for a user with same email Id
-    let preUser = await User.findOne({ email: req.body.email });
-    if (preUser) {
-      return res.status(StatusCodes.CONFLICT).json({
-        error: true,
-        message: "DUPLICATE_USER",
-      });
-    }
-    let newUser = await new User(req.body).save();
-    newUser.password = undefined;
-    return res.status(StatusCodes.ACCEPTED).json({
-      error: false,
-      message: "Account is created Successfully",
-      user: newUser,
-    });
-  } catch (error) {
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      message: "Error in creating the Account",
-      error: true,
-      err: error.message,
-    });
-  }
+	try {
+		//Checking for a user with same email Id
+		let preUser = await User.findOne({email: req.body.email});
+		if (preUser) {
+			return res.status(StatusCodes.CONFLICT).json({
+				error: true,
+				message: "DUPLICATE_USER",
+			});
+		}
+		let newUser = await new User(req.body).save();
+		newUser.password = undefined;
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "Account is created Successfully",
+			user: newUser,
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			message: "Error in creating the Account",
+			error: true,
+			err: error.message,
+		});
+	}
 };
 
 exports.verifyAccount = (req, res) => {
-  try {
-    User.find({ email: req.body.email }, (error, result) => {
-      res.statusCode = 200;
-      res.setHeader("Content-Type", "application/json");
-      if (error || result.length !== 0) {
-        return res.status(StatusCodes.CONFLICT).json({
-          message: "ACCOUNT_EXISTS",
-          error: true,
-        });
-      }
-      let userNameMail = process.env.SENDER_EMAIL;
-      let applicationPassword = process.env.SENDER_EMAIL_PASSWORD;
-      var transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: userNameMail,
-          pass: applicationPassword,
-        },
-      });
-      var OTP = generateRandom4DigitOTP();
-      let { email } = req.body;
-      var mailOptions = {
-        from: "hari.jsmith494@gmail.com",
-        to: email,
-        subject: `Verification Mail`,
-        html: `<p>your verification OTP is ${OTP}</p>`,
-      };
-      transporter.sendMail(mailOptions, function (error, info) {
-        if (error) {
-          return res.status(StatusCodes.BAD_REQUEST).json({
-            error: true,
-            err: error,
-            message: "Mail error",
-          });
-        }
-        return res.status(StatusCodes.ACCEPTED).json({
-          error: false,
-          otp: OTP,
-        });
-      });
-    });
-  } catch (error) {
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      message: "Error in sending the OTP",
-      error: true,
-      er: error,
-    });
-  }
+	try {
+		User.find({email: req.body.email}, (error, result) => {
+			res.statusCode = 200;
+			res.setHeader("Content-Type", "application/json");
+			if (error || result.length !== 0) {
+				return res.status(StatusCodes.CONFLICT).json({
+					message: "ACCOUNT_EXISTS",
+					error: true,
+				});
+			}
+			let userNameMail = process.env.SENDER_EMAIL;
+			let applicationPassword = process.env.SENDER_EMAIL_PASSWORD;
+			var transporter = nodemailer.createTransport({
+				service: "gmail",
+				auth: {
+					user: userNameMail,
+					pass: applicationPassword,
+				},
+			});
+			var OTP = generateRandom4DigitOTP();
+			let {email} = req.body;
+			var mailOptions = {
+				from: "hari.jsmith494@gmail.com",
+				to: email,
+				subject: `Verification Mail`,
+				html: `<p>your verification OTP is ${OTP}</p>`,
+			};
+			transporter.sendMail(mailOptions, function (error, info) {
+				if (error) {
+					return res.status(StatusCodes.BAD_REQUEST).json({
+						error: true,
+						err: error,
+						message: "Mail error",
+					});
+				}
+				return res.status(StatusCodes.ACCEPTED).json({
+					error: false,
+					otp: OTP,
+				});
+			});
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			message: "Error in sending the OTP",
+			error: true,
+			er: error,
+		});
+	}
 };
 
 //TODO : Make the Secret Code Private .
 exports.login = (req, res) => {
-  //Finding if an account is created with the provided email .
-  User.findOne({ email: req.body.email }, (error, userInfo) => {
-    if (error || !userInfo) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        error: true,
-        message: "No account found using this email Id",
-      });
-    }
-    bcrypt.compare(req.body.password, userInfo.password, function (err, check) {
-      if (err || !check) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
-          error: true,
-          message: "Mismatch email / password",
-        });
-      }
+	//Finding if an account is created with the provided email .
+	User.findOne({email: req.body.email}, (error, userInfo) => {
+		if (error || !userInfo) {
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				error: true,
+				message: "No account found using this email Id",
+			});
+		}
+		bcrypt.compare(req.body.password, userInfo.password, function (err, check) {
+			if (err || !check) {
+				return res.status(StatusCodes.BAD_REQUEST).json({
+					error: true,
+					message: "Mismatch email / password",
+				});
+			}
 
-      let token = jwt.sign(
-        { _id: userInfo._id, role: userInfo.role },
-        process.env.JWTCODE
-      );
+			let token = jwt.sign(
+				{_id: userInfo._id, role: userInfo.role},
+				process.env.JWTCODE,
+			);
 
-      User.findOneAndUpdate(
-        { _id: userInfo._id },
-        { jwtToken: token },
-        (e, userInfoWithToken) => {
-          if (e) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-              error: true,
-              message: "Error in getting the JWT Tokens",
-            });
-          }
-          //Hiding the password
-          userInfoWithToken.password = undefined;
+			User.findOneAndUpdate(
+				{_id: userInfo._id},
+				{jwtToken: token},
+				(e, userInfoWithToken) => {
+					if (e) {
+						return res.status(StatusCodes.BAD_REQUEST).json({
+							error: true,
+							message: "Error in getting the JWT Tokens",
+						});
+					}
+					//Hiding the password
+					userInfoWithToken.password = undefined;
 
-          userInfoWithToken.jwtToken = token;
+					userInfoWithToken.jwtToken = token;
 
-          return res.status(StatusCodes.ACCEPTED).json({
-            error: false,
-            message: "Successfully Logged in",
-            user: userInfoWithToken,
-          });
-        }
-      );
-    });
-  });
+					return res.status(StatusCodes.ACCEPTED).json({
+						error: false,
+						message: "Successfully Logged in",
+						user: userInfoWithToken,
+					});
+				},
+			);
+		});
+	});
 };
 
 exports.generateOTP = async (req, res) => {
-  User.findOne({ email: req.body.email })
-    .then((userExists) => {
-      console.log(userExists);
-      if (userExists) {
-        const generatedOTP = generateRandom4DigitOTP();
-        let otpDetails = {
-          otp: generatedOTP,
-          user: userExists,
-          username: req.body.email,
-        };
-        let newOtpDetails = new OTP(otpDetails);
-        newOtpDetails
-          .save()
-          .then(() => {
-            mailer(req.body.email, generatedOTP, "login");
-            res.status(StatusCodes.OK).send({
-              success: true,
-              userExists: true,
-              message: "OTP successfully sent",
-            });
-          })
-          .catch((error) => {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-              error: StatusCodes.INTERNAL_SERVER_ERROR,
-              success: false,
-              message: error,
-            });
-          });
-      } else {
-        res.status(StatusCodes.OK).send({
-          success: true,
-          userExists: false,
-          message: "User doesn't Exist",
-        });
-      }
-    })
-    .catch((error) => {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-        error: StatusCodes.INTERNAL_SERVER_ERROR,
-        success: false,
-        message: error,
-      });
-    });
+	User.findOne({email: req.body.email})
+		.then((userExists) => {
+			console.log(userExists);
+			if (userExists) {
+				const generatedOTP = generateRandom4DigitOTP();
+				let otpDetails = {
+					otp: generatedOTP,
+					user: userExists,
+					username: req.body.email,
+				};
+				let newOtpDetails = new OTP(otpDetails);
+				newOtpDetails
+					.save()
+					.then(() => {
+						mailer(req.body.email, generatedOTP, "login");
+						res.status(StatusCodes.OK).send({
+							success: true,
+							userExists: true,
+							message: "OTP successfully sent",
+						});
+					})
+					.catch((error) => {
+						res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+							error: StatusCodes.INTERNAL_SERVER_ERROR,
+							success: false,
+							message: error,
+						});
+					});
+			} else {
+				res.status(StatusCodes.OK).send({
+					success: true,
+					userExists: false,
+					message: "User doesn't Exist",
+				});
+			}
+		})
+		.catch((error) => {
+			res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
+				error: StatusCodes.INTERNAL_SERVER_ERROR,
+				success: false,
+				message: error,
+			});
+		});
 };
 
 /**
@@ -185,311 +185,272 @@ exports.generateOTP = async (req, res) => {
  *
  */
 exports.validateLoginOTP = (req, res) => {
-  const { email, otp } = req.body;
-  OTP.findOne({ username: email })
-    .populate("user", { password: 0, jwtToken: 0 })
-    .sort("-createdAt")
-    .then((userInfo) => {
-      if (userInfo.otp === otp) {
-        let token = jwt.sign(
-          { _id: userInfo._id, role: userInfo.role },
-          process.env.JWTCODE
-        );
-        User.findByIdAndUpdate(
-          { _id: userInfo._id },
-          { $set: { jwtToken: token } }
-        )
-          .then(() => {
-            res.status(StatusCodes.OK).json({
-              message: "OTP validated success",
-              token: token,
-              userInfo: userInfo,
-              error: false,
-            });
-          })
-          .catch((error) => {
-            res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-              errorMessage: error,
-              error: true,
-              message: "OTP cannot be validated",
-            });
-          });
-      } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-          message: "Invalid OTP",
-          error: true,
-        });
-      }
-    })
-    .catch((error) => {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        message: error,
-        error: true,
-      });
-    });
+	const {email, otp} = req.body;
+	OTP.findOne({username: email})
+		.populate("user", {password: 0, jwtToken: 0})
+		.sort("-createdAt")
+		.then((userInfo) => {
+			if (userInfo.otp === otp) {
+				let token = jwt.sign(
+					{_id: userInfo._id, role: userInfo.role},
+					process.env.JWTCODE,
+				);
+				User.findByIdAndUpdate({_id: userInfo._id}, {$set: {jwtToken: token}})
+					.then(() => {
+						res.status(StatusCodes.OK).json({
+							message: "OTP validated success",
+							token: token,
+							userInfo: userInfo,
+							error: false,
+						});
+					})
+					.catch((error) => {
+						res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+							errorMessage: error,
+							error: true,
+							message: "OTP cannot be validated",
+						});
+					});
+			} else {
+				res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+					message: "Invalid OTP",
+					error: true,
+				});
+			}
+		})
+		.catch((error) => {
+			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+				message: error,
+				error: true,
+			});
+		});
 };
 
 exports.validateForgotPasswordOTP = (req, res) => {
-  const { email, otp } = req.body;
-  OTP.findOne({ username: email })
-    .populate("user", { password: 0, jwtToken: 0 })
-    .sort("-createdAt")
-    .then((userInfo) => {
-      if (userInfo.otp === otp) {
-        res.status(StatusCodes.OK).json({
-          message: "OTP validated successfully",
-          error: false,
-          valid: true,
-        });
-      } else {
-        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-          message: "Invalid OTP",
-          error: true,
-          valid: false,
-        });
-      }
-    })
-    .catch((error) => {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        errorMessage: error,
-        message: "Invalid OTP",
-        error: true,
-      });
-    });
+	const {email, otp} = req.body;
+	OTP.findOne({username: email})
+		.populate("user", {password: 0, jwtToken: 0})
+		.sort("-createdAt")
+		.then((userInfo) => {
+			if (userInfo.otp === otp) {
+				res.status(StatusCodes.OK).json({
+					message: "OTP validated successfully",
+					error: false,
+					valid: true,
+					userId: userInfo._id,
+				});
+			} else {
+				res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+					message: "Invalid OTP",
+					error: true,
+					valid: false,
+				});
+			}
+		})
+		.catch((error) => {
+			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+				errorMessage: error,
+				message: "Invalid OTP",
+				error: true,
+			});
+		});
 };
 exports.updateNewPassword = (req, res) => {
-    
-      bcrypt.hash(req.body.newPassword, 10, function (err, hash) {
-        if (err) {
-          return res.status(400).json({
-            error: true,
-            message: `Error in updating the password`,
-          });
-        }
-        User.findByIdAndUpdate(
-          { _id: userInfo._id },
-          { password: hash },
-          (e, updateUserInfo) => {
-            if (e) {
-              return res.status(StatusCodes.BAD_REQUEST).json({
-                error: true,
-                message: "Error in updating the Password",
-              });
-            }
+	bcrypt.hash(req.body.newPassword, 10, function (err, hash) {
+		if (err) {
+			return res.status(400).json({
+				error: true,
+				message: `Error in updating the password`,
+			});
+		}
+		User.findByIdAndUpdate(
+			{_id: req.body.userId},
+			{password: hash},
+			(e, updateUserInfo) => {
+				if (e) {
+					return res.status(StatusCodes.BAD_REQUEST).json({
+						error: true,
+						message: "Error in updating the Password",
+					});
+				}
 
-            //Hiding the password
-            updateUserInfo.password = undefined;
+				//Hiding the password
+				updateUserInfo.password = undefined;
 
-            return res.status(StatusCodes.ACCEPTED).json({
-              error: false,
-              message: "Password updated successfully",
-              user: updateUserInfo,
-            });
-          }
-        );
-    
-  });
+				return res.status(StatusCodes.ACCEPTED).json({
+					error: false,
+					message: "Password updated successfully",
+					user: updateUserInfo,
+				});
+			},
+		);
+	});
 };
 
 exports.getOTPForPassword = async (req, res) => {
-  const { email } = req.body;
-  User.findOne({ email: email })
-    .then((userInfo) => {
-      const generatedOTP = generateRandom4DigitOTP();
-      let otpDetails = {
-        otp: generatedOTP,
-        user: userInfo,
-        username: req.body.email,
-      };
-      let newOtpDetails = new OTP(otpDetails);
-      newOtpDetails
-        .save()
-        .then(() => {
-          mailer(req.body.email, generatedOTP, "forgot password");
-          res.status(StatusCodes.OK).send({
-            success: true,
-            userExists: true,
-            message: "OTP successfully sent",
-          });
-        })
-        .catch((error) => {
-          res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({});
-        });
-    })
-    .catch((error) => {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({});
-    });
+	const {email} = req.body;
+	console.log(req.body);
+	User.findOne({email: email})
+		.then((userInfo) => {
+			const generatedOTP = generateRandom4DigitOTP();
+			let otpDetails = {
+				otp: generatedOTP,
+				user: userInfo,
+				username: req.body.email,
+				
+			};
+			let newOtpDetails = new OTP(otpDetails);
+			newOtpDetails
+				.save()
+				.then(() => {
+					mailer(req.body.email, generatedOTP, "forgot password");
+					res.status(StatusCodes.OK).send({
+						success: true,
+						userExists: true,
+						error: false,
+						message: "OTP successfully sent",
+					});
+				})
+				.catch((error) => {
+					res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+						error: true,
+						err: error.message,
+						message: "Error in sending the OTP",
+					});
+				});
+		})
+		.catch((error) => {
+			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({});
+		});
 };
-
-exports.updateNewPasswordViaOTP = (req, res) => {
-  User.findOne({ _id: req.body.userId }, (error, userInfo) => {
-    if (!userInfo) {
-      return res.status(StatusCodes.BAD_REQUEST).json({
-        error: true,
-        message: "No user found ..",
-      });
-    }
-
-    bcrypt.hash(req.body.newPassword, 10, function (err, hash) {
-      if (err) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
-          error: true,
-          message: `Error in updating the password`,
-        });
-      }
-      User.findByIdAndUpdate(
-        { _id: userInfo._id },
-        { password: hash },
-        (e, updateUserInfo) => {
-          if (e) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
-              error: true,
-              message: "Error in updating the Password",
-            });
-          }
-          //Hiding the password
-          updateUserInfo.password = undefined;
-
-          return res.status(StatusCodes.ACCEPTED).json({
-            error: false,
-            message: "Password updated successfully",
-            user: updateUserInfo,
-          });
-        }
-      );
-    });
-  });
-};
-
-exports.loginUsingOTP = (req, res) => {};
 
 exports.createAccountByAdmins = async (req, res) => {
-  try {
-    //Checking for a user with same email Id
-    let preUser = await User.findOne({ email: req.body.email });
-    if (preUser) {
-      return res.status(StatusCodes.CONFLICT).json({
-        error: true,
-        message: "DUPLICATE_USER",
-      });
-    }
-    const password = generatePassword(8, false);
-    let user = {
-      ...req.body,
-      password: password,
-    };
-    let newUser = await new User(user).save();
-    sendPasswordMailer(req.body.email, password);
-    return res.status(StatusCodes.ACCEPTED).json({
-      error: false,
-      message: "Account is created Successfully",
-      user: newUser,
-    });
-  } catch (error) {
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      message: "Error in creating the Account",
-      error: true,
-      err: error.message,
-    });
-  }
+	try {
+		//Checking for a user with same email Id
+		let preUser = await User.findOne({email: req.body.email});
+		if (preUser) {
+			return res.status(StatusCodes.CONFLICT).json({
+				error: true,
+				message: "DUPLICATE_USER",
+			});
+		}
+		const password = generatePassword(8, false);
+		let user = {
+			...req.body,
+			password: password,
+		};
+		let newUser = await new User(user).save();
+		sendPasswordMailer(req.body.email, password);
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "Account is created Successfully",
+			user: newUser,
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			message: "Error in creating the Account",
+			error: true,
+			err: error.message,
+		});
+	}
 };
 
 exports.getAllUsersByRoles = async (req, res) => {
-  try {
-    const page = parseInt(req.query.page);
-    const limit = parseInt(req.query.limit);
-    const startIndex = (page - 1) * limit;
-    const endIndex = page * limit;
+	try {
+		const page = parseInt(req.query.page);
+		const limit = parseInt(req.query.limit);
+		const startIndex = (page - 1) * limit;
+		const endIndex = page * limit;
 
-    const results = {};
-    if (endIndex < (await User.countDocuments().exec()) - 1) {
-      results.next = {
-        page: page + 1,
-        limit: limit,
-      };
-    }
+		const results = {};
+		if (endIndex < (await User.countDocuments().exec()) - 1) {
+			results.next = {
+				page: page + 1,
+				limit: limit,
+			};
+		}
 
-    if (startIndex > 0) {
-      results.previous = {
-        page: page - 1,
-        limit: limit,
-      };
-    }
+		if (startIndex > 0) {
+			results.previous = {
+				page: page - 1,
+				limit: limit,
+			};
+		}
 
-    results.users = await User.find({
-      isDeleted: false,
-      _id: { $nin: req.user._id },
-      role: req.query.role,
-    });
-    return res.status(StatusCodes.ACCEPTED).json({
-      error: false,
-      message: "user fetched successfully",
-      results: results,
-    });
-  } catch (error) {
-    return res.status(StatusCodes.BAD_REQUEST).json({
-      error: false,
-      err: error.message,
-      message: "Error finding users",
-    });
-  }
+		results.users = await User.find({
+			isDeleted: false,
+			_id: {$nin: req.user._id},
+			role: req.query.role,
+		});
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "user fetched successfully",
+			results: results,
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			error: false,
+			err: error.message,
+			message: "Error finding users",
+		});
+	}
 };
 exports.logout = (req, res) => {
-  User.findOneAndUpdate(
-    { _id: req.user._id },
-    { jwtToken: null },
-    (error, user) => {
-      if (!user) {
-        return res
-          .status(StatusCodes.BAD_REQUEST)
-          .json({ error: true, message: "Error in finding the user Id" });
-      }
-      if (error) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
-          error: true,
-          message: "Error in Logging out",
-        });
-      }
-      res.status(StatusCodes.ACCEPTED).json({
-        error: false,
-        message: "Sign Out Successfully",
-      });
-    }
-  );
+	User.findOneAndUpdate(
+		{_id: req.user._id},
+		{jwtToken: null},
+		(error, user) => {
+			if (!user) {
+				return res
+					.status(StatusCodes.BAD_REQUEST)
+					.json({error: true, message: "Error in finding the user Id"});
+			}
+			if (error) {
+				return res.status(StatusCodes.BAD_REQUEST).json({
+					error: true,
+					message: "Error in Logging out",
+				});
+			}
+			res.status(StatusCodes.ACCEPTED).json({
+				error: false,
+				message: "Sign Out Successfully",
+			});
+		},
+	);
 };
 
 exports.updateUser = (req, res) => {
-  User.findByIdAndUpdate({ _id: req.body.userId }, { $set: req.body })
-    .then(() => {
-      res.status(StatusCodes.OK).json({
-        error: false,
-        message: "User updated successfully",
-      });
-    })
-    .catch((error) => {
-      res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
-        error: true,
-        errorMessage: error,
-      });
-    });
+	User.findByIdAndUpdate({_id: req.body.userId}, {$set: req.body})
+		.then(() => {
+			res.status(StatusCodes.OK).json({
+				error: false,
+				message: "User updated successfully",
+			});
+		})
+		.catch((error) => {
+			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+				error: true,
+				errorMessage: error,
+			});
+		});
 };
 
-export const updateUserInfo = async (req, res) => {
-    try {
-        let updatedUser = await User.findByIdAndUpdate(
-            {_id: req.user._id},
-            {$set: req.body},
-        );
-        return res.status(StatusCodes.ACCEPTED).json({
-            error: false,
-            message: "Updated Info Successfully",
-            user: updatedUser,
-        });
-    } catch (error) {
-        return res.status(StatusCodes.BAD_REQUEST).json({
-            error: true,
-            message: "Error in updating the User Info ",
-            err: error.message,
-        });
-    }
+exports.updateUserInfo = async (req, res) => {
+	try {
+		let updatedUser = await User.findByIdAndUpdate(
+			{_id: req.user._id},
+			{$set: req.body},
+		);
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "Updated Info Successfully",
+			user: updatedUser,
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			error: true,
+			message: "Error in updating the User Info ",
+			err: error.message,
+		});
+	}
 };

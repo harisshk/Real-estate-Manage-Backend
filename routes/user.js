@@ -60,12 +60,6 @@ router.post("/user/update/newPassword", updateNewPassword);
 // @access PUBLIC
 router.post("/user/forgot/password", getOTPForPassword);
 
-// @type POST
-// @route /update/newPassword/viaOTP
-// @desc Update password after verifying OTP
-// @access PUBLIC
-router.post("/user/update/newPassword/viaOTP", updateNewPasswordViaOTP);
-
 router.post(
 	"/user/admin/createAccount/:userId",
 	isSignedIn,
@@ -86,12 +80,7 @@ router.post(
 	isAdmin,
 	getAllUsersByRoles,
 );
-router.post(
-	"/user/update/admin/:userId",
-	isSignedIn,
-	isAdmin,
-	updateUser,
-);
+router.post("/user/update/admin/:userId", isSignedIn, isAdmin, updateUser);
 
 router.post(
 	"/user/update/regionalAdmin/:userId",
@@ -104,8 +93,8 @@ router.post("/user/login/otp", generateOTP);
 
 router.post("/user/login/validate", validateLoginOTP);
 
-router.post("/user/forgotPassword/validate",validateForgotPasswordOTP)
+router.post("/user/forgotPassword/validate", validateForgotPasswordOTP);
 
-route.post('/user/updateUserInfo/:userId' ,updateUserInfo);
+router.post("/user/updateUserInfo/:userId", updateUserInfo);
 
 module.exports = router;
