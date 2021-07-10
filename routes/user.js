@@ -24,6 +24,7 @@ const {
 	isAdmin,
 	setUser,
 	isRegionalAdmin,
+	isOwner,
 } = require("../controllers/auth");
 
 router.param("userId", setUser);
@@ -71,6 +72,12 @@ router.post(
 	"/user/regionalAdmin/createAccount/:userId",
 	isSignedIn,
 	isRegionalAdmin,
+	createAccountByAdmins,
+);
+router.post(
+	"/user/houseOwner/createAccount/:userId",
+	isSignedIn,
+	isOwner,
 	createAccountByAdmins,
 );
 
