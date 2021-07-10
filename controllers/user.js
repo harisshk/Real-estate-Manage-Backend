@@ -292,7 +292,8 @@ exports.getOTPForPassword = async (req, res) => {
 	console.log(req.body);
 	User.findOne({email: email})
 		.then((userInfo) => {
-			const generatedOTP = generateRandom4DigitOTP();
+			if(userInfo){
+				const generatedOTP = generateRandom4DigitOTP();
 			let otpDetails = {
 				otp: generatedOTP,
 				user: userInfo,
@@ -305,7 +306,6 @@ exports.getOTPForPassword = async (req, res) => {
 				.then(() => {
 					mailer(req.body.email, generatedOTP, "forgot password");
 					res.status(StatusCodes.OK).send({
-						success: true,
 						userExists: true,
 						error: false,
 						message: "OTP successfully sent",
@@ -318,9 +318,22 @@ exports.getOTPForPassword = async (req, res) => {
 						message: "Error in sending the OTP",
 					});
 				});
+			}
+			else{
+				res.status(StatusCodes.OK).send({
+					userExists: false,
+					error: false,
+					message: "User doesn't exist",
+				});
+			}
+			
 		})
 		.catch((error) => {
-			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({});
+			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+				userExists: false,
+					error: true,
+					message: "Internal server error",
+			});
 		});
 };
 
