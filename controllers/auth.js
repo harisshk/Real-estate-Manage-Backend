@@ -12,6 +12,15 @@ exports.isAdmin = (req, res, next) => {
 	next();
 };
 
+exports.isOwner = (req, res, next) => {
+	if (!req.user || req.user.role !== "owner") {
+		return res.status(StatusCodes.FORBIDDEN).json({
+			error: true,
+			message: "UnAuthorized Access",
+		});
+	}
+	next();
+};
 // @desc To set userInfo to the req.user
 exports.setUser = (req, res, next, id) => {
 	if (!id) {
