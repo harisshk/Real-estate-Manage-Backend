@@ -88,6 +88,7 @@ router.post(
 	getAllUsersByRoles,
 );
 router.post("/user/update/admin/:userId", isSignedIn, isAdmin, updateUser);
+router.post("/user/update/owner/:userId", isSignedIn, isOwner, updateUser);
 
 router.post(
 	"/user/update/regionalAdmin/:userId",

@@ -137,7 +137,6 @@ exports.login = (req, res) => {
 exports.generateOTP = async (req, res) => {
 	User.findOne({email: req.body.email})
 		.then((userExists) => {
-			console.log(userExists);
 			if (userExists) {
 				const generatedOTP = generateRandom4DigitOTP();
 				let otpDetails = {
@@ -289,7 +288,6 @@ exports.updateNewPassword = (req, res) => {
 
 exports.getOTPForPassword = async (req, res) => {
 	const {email} = req.body;
-	console.log(req.body);
 	User.findOne({email: email})
 		.then((userInfo) => {
 			if(userInfo){
@@ -444,6 +442,7 @@ exports.updateUser = (req, res) => {
 			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
 				error: true,
 				errorMessage: error,
+				message:"User not updated"
 			});
 		});
 };
