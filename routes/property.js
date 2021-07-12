@@ -4,46 +4,46 @@ const {
 	addProperty,
 	updateProperty,
 	getProperties,
-	approveProperty,
-	disApproveProperty,
+	
 } = require("../controllers/property");
-const {isSignedIn, setUser, isOwner, isAdmin} = require("../controllers/auth");
+const {isSignedIn, setUser, isOwner, isAdmin, isRegionalAdmin} = require("../controllers/auth");
 const router = express.Router();
 
 router.param("userId", setUser);
 
 // router.post("/owner/add/property/:userId", isSignedIn, isOwner, addProperty);
 
-router.post("/admin/add/property/:userId", isSignedIn, isAdmin, addProperty);
+router.post("/property/admin/add/:userId", isSignedIn, isAdmin, addProperty);
+
+router.post("/property/regionalAdmin/add/:userId", isSignedIn, isRegionalAdmin, addProperty);
+
+// router.post(
+// 	"/owner/delete/property/:propertyId/:userId",
+// 	isSignedIn,
+// 	isOwner,
+// 	deleteProperty,
+// );
+
+// router.post(
+// 	"/owner/update/property/:propertyId/:userId",
+// 	isSignedIn,
+// 	isOwner,
+// 	updateProperty,
+// );
+
+router.get("/property/view/:isVerified/:userId", isSignedIn, getProperties);
 
 router.post(
-	"/owner/delete/property/:propertyId/:userId",
-	isSignedIn,
-	isOwner,
-	deleteProperty,
-);
-
-router.post(
-	"/owner/update/property/:propertyId/:userId",
-	isSignedIn,
-	isOwner,
-	updateProperty,
-);
-
-router.get("/view/properties/:isVerified/:userId", isSignedIn, getProperties);
-
-router.post(
-	"/admin/approve/property/:propertyId/:userId",
-	isSignedIn,
-	isAdmin,
-	approveProperty,
-);
-
-router.post(
-	"/admin/disapprove/property/:propertyId/:userId",
+	"/property/admin/update/:propertyId/:userId",
 	isSignedIn,
 	isAdmin,
-	disApproveProperty,
+	updateProperty
+);
+router.post(
+	"/property/regionalAdmin/update/:propertyId/:userId",
+	isSignedIn,
+	isRegionalAdmin,
+	updateProperty
 );
 
 module.exports = router;

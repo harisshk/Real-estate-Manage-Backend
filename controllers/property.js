@@ -98,39 +98,3 @@ exports.getProperties = async (req, res) => {
 			.json({error: true, message: error.message});
 	}
 };
-
-exports.approveProperty = async (req, res) => {
-	let update = {isVerified: true, verifiedBy: req.user._id};
-	try {
-		await Property.findOneAndUpdate(
-			{_id: req.params.propertyId},
-			{$set: update},
-			{new: true},
-		).exec();
-		return res
-			.status(StatusCodes.ACCEPTED)
-			.json({error: false, message: "Property Approved"});
-	} catch (error) {
-		return res
-			.status(StatusCodes.BAD_REQUEST)
-			.json({error: true, message: error.message});
-	}
-};
-
-exports.disApproveProperty = async (req, res) => {
-	let update = {isVerified: false, verifiedBy: req.user._id};
-	try {
-		await Property.findOneAndUpdate(
-			{_id: req.params.propertyId},
-			{$set: update},
-			{new: true},
-		).exec();
-		return res
-			.status(StatusCodes.ACCEPTED)
-			.json({error: false, message: "Property Dis-Approved"});
-	} catch (error) {
-		return res
-			.status(StatusCodes.BAD_REQUEST)
-			.json({error: true, message: error.message});
-	}
-};
