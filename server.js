@@ -1,3 +1,4 @@
+require("dotenv").config();
 var express = require("express");
 var cors = require("cors");
 var mongoose = require("mongoose");
@@ -6,7 +7,6 @@ var app = express();
 
 const userRoute = require("./routes/user");
 const propertyRoute = require("./routes/property");
-const authRoute = require("./routes/auth")
 
 const PORT = process.env.PORT || 5050;
 
@@ -16,8 +16,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cors());
 
 //TODO : Make MongoURI Private
-let mongoDB_URI =
-	"mongodb+srv://hari:harikanna@cluster0.h9jtq.mongodb.net/myFirstDatabase?retryWrites=true&w=majority";
+let mongoDB_URI = process.env.MONGODB_URI;
 
 //Mongoose Connection
 mongoose
@@ -37,6 +36,5 @@ app.get("/", (req, res) => {
 
 app.use("/api", userRoute);
 app.use("/api", propertyRoute);
-app.use("/api", authRoute);
 
 app.listen(PORT, () => console.log(`Server is running at PORT ${PORT}`));
