@@ -19,7 +19,11 @@
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.13",
     "nodemailer": "^6.6.1",
+<<<<<<< HEAD
+    "nodemon": "^2.0.11"
+=======
     "nodemon": "^2.0.11",
     "password-generator": "^2.3.2"
+>>>>>>> db0eb78aa032d9c099e3ac81885e03c7fd68cd6d
   }
 }
