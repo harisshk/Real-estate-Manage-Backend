@@ -27,6 +27,7 @@ const propertySchema = new mongoose.Schema(
       trim: true,
     },
     size: { type: Number, required: true },
+	
     description: { type: String, trim: true, required: true },
     isVerified: { type: Boolean, default: false },
     verifiedBy: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
