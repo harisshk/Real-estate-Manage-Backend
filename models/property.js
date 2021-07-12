@@ -8,7 +8,7 @@ const propertySchema = new mongoose.Schema(
       trim: true,
       required: true,
     },
-    user: {
+    createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
