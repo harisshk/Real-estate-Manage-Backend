@@ -1,6 +1,5 @@
 const express = require("express");
 const { StatusCodes } = require("http-status-codes");
-const { distinct } = require("../models/property");
 const router = express() ;
 
 router.get('/assets/amenities',(req,res)=>{
