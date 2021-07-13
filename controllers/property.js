@@ -1,9 +1,19 @@
 const {StatusCodes} = require("http-status-codes");
 const Property = require("../models/property");
+const User = require("../models/user");
 
 exports.addProperty = async (req, res) => {
+	console.log(req.body)
 	try {
-		req.body.user = req.user._id;
+		let user = await User.findOne({email : req.body.owner}) ;
+		if(!user){
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				error : true ,
+				message : "Owner email not found , create account with email ID first" ,
+
+			})
+		}
+		req.body.owner = user._id ;
 		let newProperty = await new Property(req.body).save();
 
 		return res.status(StatusCodes.ACCEPTED).json({
@@ -12,6 +22,7 @@ exports.addProperty = async (req, res) => {
 			property: newProperty,
 		});
 	} catch (error) {
+		console.log(error)
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			message: "Error in adding the property ",
 			error: true,
