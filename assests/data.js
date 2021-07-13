@@ -3,7 +3,7 @@ const { StatusCodes } = require("http-status-codes");
 const { distinct } = require("../models/property");
 const router = express() ;
 
-router.get('/assests/amenities',(req,res)=>{
+router.get('/assets/amenities',(req,res)=>{
     return res.status(StatusCodes.ACCEPTED).json({
         amenities : [
             {label : "Car Parking" , value : "car-parking"},
@@ -12,11 +12,11 @@ router.get('/assests/amenities',(req,res)=>{
             {label : "Garden" , value : "garden"},
         ]
         ,error : false ,
-        message : "Amentites fetched successfully."
+        message : "Amenities fetched successfully."
     })
 })
 
-router.get('/assests/districts/TN',(req,res)=>{
+router.get('/assets/districts/TN',(req,res)=>{
     const districts = ['Ariyalur',
     'Chengalpattu',
     'Chennai',
