@@ -72,6 +72,20 @@ const propertySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
     },
+    propertyType : {
+      type : String ,
+      enum : ["House" , "Hotel"] ,
+      default : "House"
+    },
+    bedRooms : {
+      type : Number ,
+    },
+    restRooms : {
+      type : Number ,
+    },
+    kitchens: {
+      type : Number ,
+    }
   },
   { timestamps: true }
 );
