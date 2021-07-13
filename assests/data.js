@@ -57,7 +57,7 @@ router.get('/assets/districts/TN',(req,res)=>{
     return res.status(StatusCodes.ACCEPTED).json({
         error : false ,
         message : "Districts fetched successfully",
-        districts : districts.map(district => {return{label:district , value : distinct}})
+        districts : districts.map(district => {return{label:district , value : district}})
     })
 })
 
