@@ -77,13 +77,13 @@ const propertySchema = new mongoose.Schema(
       enum : ["House" , "Hotel"] ,
       default : "House"
     },
-    bedRooms : {
+    bedRoom : {
       type : Number ,
     },
-    restRooms : {
+    restRoom : {
       type : Number ,
     },
-    kitchens: {
+    kitchen: {
       type : Number ,
     }
   },
