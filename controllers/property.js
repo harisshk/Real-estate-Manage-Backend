@@ -109,3 +109,38 @@ exports.getProperties = async (req, res) => {
 			.json({error: true, message: error.message});
 	}
 };
+
+exports.getPropertiesByAdmin = async(req,res)=>{
+	try{
+		let properties = await Property.find({isDeleted : false}) ;
+		return res.status(StatusCodes.ACCEPTED).json({
+			error : false ,
+			message : "Properties Fetched Successfully",
+			properties : properties ,
+		})
+	}
+	catch((error) =>
+	res.status(StatusCodes.BAD_REQUEST).json({
+		message: "Error in deleting the property ",
+		error: true,
+		err: error,
+	}),
+}
+
+
+exports.getPropertiesByRegionalAdmin = async(req,res)=>{
+	try{
+		let properties = await Property.find({isDeleted : false },{$in:[region : req.user.regions]}) ;
+		return res.status(StatusCodes.ACCEPTED).json({
+			error : false ,
+			message : "Properties Fetched Successfully",
+			properties : properties ,
+		})
+	}
+	catch((error) =>
+	res.status(StatusCodes.BAD_REQUEST).json({
+		message: "Error in deleting the property ",
+		error: true,
+		err: error,
+	}),
+}

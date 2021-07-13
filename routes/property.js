@@ -3,6 +3,8 @@ const {
 	addProperty,
 	updateProperty,
 	getProperties,
+	getPropertiesByRegionalAdmin,
+	getPropertiesByAdmin,
 	
 } = require("../controllers/property");
 const {isSignedIn, setUser, isOwner, isAdmin, isRegionalAdmin} = require("../controllers/auth");
@@ -29,6 +31,11 @@ router.post("/property/regionalAdmin/add/:userId", isSignedIn, isRegionalAdmin, 
 // 	isOwner,
 // 	updateProperty,
 // );
+
+router.get("/property/view/admin/:userId",isSignedIn,isAdmin,getPropertiesByAdmin)
+
+router.get("/property/view/regionalAdmin/:userId",isSignedIn,isRegionalAdmin,getPropertiesByRegionalAdmin)
+
 
 router.get("/property/view/:isVerified/:userId", isSignedIn, getProperties);
 
