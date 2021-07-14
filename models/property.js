@@ -85,6 +85,10 @@ const propertySchema = new mongoose.Schema(
     },
     kitchen: {
       type : Number ,
+    },
+    isOccupied : {
+      type : Boolean,
+      default : false
     }
   },
   { timestamps: true }

@@ -3,7 +3,6 @@ const Property = require("../models/property");
 const User = require("../models/user");
 
 exports.addProperty = async (req, res) => {
-	console.log(req.body)
 	try {
 		let user = await User.findOne({email : req.body.owner}) ;
 		if(!user){
@@ -14,6 +13,7 @@ exports.addProperty = async (req, res) => {
 			})
 		}
 		req.body.owner = user._id ;
+		console.log(req.body)
 		let newProperty = await new Property(req.body).save();
 
 		return res.status(StatusCodes.ACCEPTED).json({
