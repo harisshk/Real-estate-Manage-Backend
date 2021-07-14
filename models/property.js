@@ -88,7 +88,7 @@ const propertySchema = new mongoose.Schema(
     },
     isOccupied : {
       type : Boolean,
-      default : false
+      default : true
     }
   },
   { timestamps: true }
