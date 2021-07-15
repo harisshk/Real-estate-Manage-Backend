@@ -88,7 +88,11 @@ const propertySchema = new mongoose.Schema(
     },
     isOccupied : {
       type : Boolean,
-      default : false
+      default : true
+    },
+    tenant : {
+      type : mongoose.Schema.Types.ObjectId ,
+      ref : "tenant"
     }
   },
   { timestamps: true }
