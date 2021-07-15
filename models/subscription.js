@@ -1,12 +1,11 @@
 //Import Module's
 const mongoose = require("mongoose");
 
-const tenantSchema = new mongoose.Schema(
+const subscriptionSchema = new mongoose.Schema(
 	{
 		property: {type: mongoose.SchemaTypes.ObjectId, ref: "Property"},
-		users : [{type : mongoose.SchemaType.ObjectId , ref : "User"}], 
-		currUser: {
-			type:User,
+		tenant: {
+			type:mongoose.SchemaTypes.ObjectId,
 			ref: "User",
 		},
 		isActive: {
@@ -21,4 +20,4 @@ const tenantSchema = new mongoose.Schema(
 	{timestamps: true},
 );
 // Export the Schema with the name User.
-module.exports = mongoose.model("Tenant", tenantSchema);
+module.exports = mongoose.model("Subscription", subscriptionSchema);
