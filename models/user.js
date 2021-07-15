@@ -43,6 +43,10 @@ const userSchema = new mongoose.Schema(
 			default: "tenant",
 		},
 		regions: [],
+		subscription : {
+			type : mongoose.SchemaTypes.ObjectId,
+			ref : "Subscription"
+		}
 	},
 	{timestamps: true},
 );
