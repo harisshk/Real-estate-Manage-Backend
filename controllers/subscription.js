@@ -6,18 +6,19 @@ exports.newSubscription = async (req, res) => {
     try {
         const { tenant } = req.body;
         let checkTenant = await User.findOne({ email: tenant, role: "tenant" });
-        if(!checkTenant){
+        if (!checkTenant) {
             return res.status(StatusCodes.BAD_REQUEST).json({
-                error : true ,
-                message : "user not found or role mismatch",
+                error: true,
+                message: "user not found or role mismatch",
             })
         }
-        let newSubscription = new Subscription(req.body);
 
-        await newSubscription.save();
+        let newSubscription = await new Subscription(req.body).save();
+        await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id });
+
         return res.status(StatusCodes.OK).json({
             error: false,
-            message: "Subscription successfull",
+            message: "Subscription successful",
         })
     } catch (error) {
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -32,11 +33,12 @@ exports.newSubscription = async (req, res) => {
 exports.updateSubscription = async (req, res) => {
     let { tenantId } = req.params;
     try {
-       await Subscription.findOneAndUpdate({_id : tenantId},{$set : req.body}) ;
-       return res.status(StatusCodes.OK).json({
-           error : false ,
-           message : "Subscription updated" ,
-       })
+        let subscription = await Subscription.findOneAndUpdate({ _id: tenantId }, { $set: req.body });
+        await User.find({ _id: subscription._id }, { subscription: null })
+        return res.status(StatusCodes.OK).json({
+            error: false,
+            message: "Subscription updated",
+        })
     } catch (error) {
         return res.status(StatusCodes.BAD_REQUEST).json({
             error: false,
