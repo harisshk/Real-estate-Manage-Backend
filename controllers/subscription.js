@@ -1,24 +1,27 @@
 const Subscription = require("../models/subscription");
 const User = require('../models/user')
 const { StatusCodes } = require('http-status-codes');
+const Property = require("../models/property");
 
 exports.newSubscription = async (req, res) => {
     try {
-        const { tenant } = req.body;
+        const { tenant  , property} = req.body;
         let checkTenant = await User.findOne({ email: tenant, role: "tenant" });
         if (!checkTenant) {
-            return res.status(StatusCodes.BAD_REQUEST).json({
+            return res.status(StatusCodes.UNAUTHORIZED).json({
                 error: true,
                 message: "user not found or role mismatch",
             })
-        }
-
+          }
+     req.body.tenant = checkTenant._id ;
         let newSubscription = await new Subscription(req.body).save();
-        await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id });
-
+        console.log(newSubscription);
+        await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id },{new : true});
+        await Property.findOneAndUpdate({_id : property} , {subscription : newSubscription._id},{new : true})
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "Subscription successful",
+            property : property,
         })
     } catch (error) {
         return res.status(StatusCodes.BAD_REQUEST).json({
@@ -34,7 +37,8 @@ exports.updateSubscription = async (req, res) => {
     let { tenantId } = req.params;
     try {
         let subscription = await Subscription.findOneAndUpdate({ _id: tenantId }, { $set: req.body });
-        await User.find({ _id: subscription._id }, { subscription: null })
+        await User.findOneAndUpdate({ _id: subscription._id }, { subscription: null })
+        await Property.findOneAndUpdate({_id : subscription._id} , {subscription : newSubscription._id})
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "Subscription updated",

@@ -466,3 +466,25 @@ exports.updateUserInfo = async (req, res) => {
 		});
 	}
 };
+
+exports.getSubscribtionInfo = async (req,res) => {
+	try{
+
+		let userInfo = await User.findOne({_id :req.user._id}).populate('subscription').populate({path : "subscription" , populate :'property'}) ;
+		console.log(userInfo)
+		return res.status(StatusCodes.OK).json({
+			error : false ,
+			message : "Success" ,
+			user : userInfo 
+		})
+	}
+	catch(error){
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			error : true ,
+			err : error.message ,
+			message :"Subscription Info error"
+		})
+	}
+
+
+}

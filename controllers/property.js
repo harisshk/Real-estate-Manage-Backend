@@ -113,6 +113,7 @@ exports.getProperties = async (req, res) => {
 exports.getPropertiesByAdmin = async(req,res)=>{
 	try{
 		let properties = await Property.find({isDeleted : false}).populate("owner",{jwtToken:0,password:0})
+		console.log(properties,'-----')
 		return res.status(StatusCodes.ACCEPTED).json({
 			error : false ,
 			message : "Properties Fetched Successfully",
@@ -147,3 +148,13 @@ exports.getPropertiesByRegionalAdmin = async(req,res)=>{
 		});
 	}
 };
+
+exports.getPropetyById = async(req,res) => {
+	const {propertyId} = req.params ;
+	try{
+
+		let propertyInfo = await Property.findOne({_id : propertyId}).populate('subscription').populate('createdBy').populate('owner')
+		return res.status(400).json({error : false , message : "Success" , property : propertyInfo})
+	}catch(error){return res.status(StatusCodes.BAD_REQUEST).json({error : true ,message : "Error in getting Property Info",err : error})}
+
+}

@@ -17,6 +17,7 @@ const {
 	validateLoginOTP,
 	validateForgotPasswordOTP,
 	updateUserInfo,
+	getSubscribtionInfo,
 } = require("../controllers/user");
 
 const {
@@ -104,5 +105,7 @@ router.post("/user/login/validate", validateLoginOTP);
 router.post("/user/forgotPassword/validate", validateForgotPasswordOTP);
 
 router.post("/user/updateUserInfo/:userId", updateUserInfo);
+
+router.get('/user/subscriptionInfo/:userId',getSubscribtionInfo)
 
 module.exports = router;
