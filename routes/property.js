@@ -37,7 +37,7 @@ router.get("/property/view/admin/:userId",isSignedIn,isAdmin,getPropertiesByAdmi
 router.get("/property/view/regionalAdmin/:userId",isSignedIn,isRegionalAdmin,getPropertiesByRegionalAdmin)
 
 
-router.get("/property/view/owner/:userId",isSignedIn,isOwner,getPropertiesByHouseOwner)
+router.get("/property/view/owner/:userId",isSignedIn,isOwner, getPropertiesByHouseOwner)
 
 
 router.get("/property/view/:isVerified/:userId", isSignedIn, getProperties);

@@ -194,12 +194,12 @@ exports.validateLoginOTP = (req, res) => {
 					{_id: userInfo._id, role: userInfo.role},
 					process.env.JWTCODE,
 				);
-				User.findByIdAndUpdate({_id: userInfo._id}, {$set: {jwtToken: token}})
-					.then(() => {
-						res.status(StatusCodes.OK).json({
+				User.findOneAndUpdate({email : email}, {$set: {jwtToken: token}} ,{new : true} )
+					.then((updatedUser) => {
+						return res.status(StatusCodes.OK).json({
 							message: "OTP validated success",
 							token: token,
-							userInfo: userInfo,
+							userInfo: updatedUser,
 							error: false,
 						});
 					})
