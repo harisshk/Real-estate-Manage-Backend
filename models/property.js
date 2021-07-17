@@ -90,9 +90,9 @@ const propertySchema = new mongoose.Schema(
       type : Boolean,
       default : true
     },
-    tenant : {
+    subscription : {
       type : mongoose.Schema.Types.ObjectId ,
-      ref : "tenant"
+      ref : "Subscription"
     }
   },
   { timestamps: true }
