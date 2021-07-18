@@ -19,7 +19,8 @@ const {
 	updateUserInfo,
 	getSubscribtionInfo,
 	getAdminDashboardInfo,
-	getRegionalAdminInfo
+	getRegionalAdminInfo,
+	getOwnerDashboardInfo
 } = require("../controllers/user");
 
 const {
@@ -114,6 +115,6 @@ router.get('/user/admin/dashboardInfo/:userId',isSignedIn,isAdmin,getAdminDashbo
 
 router.get('/user/regionalAdmin/dashboard/:userId',isSignedIn , isRegionalAdmin , getRegionalAdminInfo) ;
 
-router.get('/user/owner/dashboardInfo/:userId',isSignedIn , getOwnerDashboardInfo)
+router.get('/user/owner/dashboardInfo/:userId',isSignedIn ,isOwner, getOwnerDashboardInfo)
 
 module.exports = router;
