@@ -91,6 +91,12 @@ router.post(
 	isAdmin,
 	getAllUsersByRoles,
 );
+router.post(
+	"/user/getUserByRole/regionalAdmin/:userId",
+	isSignedIn,
+	isRegionalAdmin,
+	getAllUsersByRoles,
+);
 router.post("/user/update/admin/:userId", isSignedIn, isAdmin, updateUser);
 router.post("/user/update/owner/:userId", isSignedIn, isOwner, updateUser);
 
