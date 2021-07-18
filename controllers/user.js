@@ -472,7 +472,6 @@ exports.getSubscribtionInfo = async (req,res) => {
 	try{
 
 		let userInfo = await User.findOne({_id :req.user._id}).populate('subscription').populate({path : "subscription" , populate :'property'}) ;
-		console.log(userInfo)
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "Success" ,
@@ -494,13 +493,13 @@ exports.getAdminDashboardInfo = async(req,res) => {
 	try{
 		let tenantCount = await User.find({isDeleted : false  , role : "tenant"}).countDocuments() ;
 		let adminCount = await User.find({isDeleted : false , role :"admin"}).countDocuments() ;
-		let regionalAdminCount = await User.find({isDeleted : false  ,role : "regionalAdmin"}).countDocuments() ;
+		let regionalAdminCount = await User.find({isDeleted : false  ,role : "regional-admin"}).countDocuments() ;
 		let ownerCount = await User.find({isDeleted : false , role : "owner" }).countDocuments() ;
 		let propertyCount = await Property.find({isDeleted : false }).countDocuments() ;
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "Admin Count" , count : adminCount},{title : "Regional Admin Count" , count : regionalAdminCount},{title : "House Owner Count" , count : ownerCount},{title : "Tenant Count" , count : tenantCount},{title : "Property Count" , count : propertyCount }]
+			result : [{title : "Admin's" , count : adminCount},{title : "Regional Admin's" , count : regionalAdminCount},{title : "House Owner's" , count : ownerCount},{title : "Tenant's" , count : tenantCount},{title : "Properties" ,count  : propertyCount }]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
@@ -514,13 +513,13 @@ exports.getAdminDashboardInfo = async(req,res) => {
 
 exports.getRegionalAdminInfo = async (req,res) => {
 	try{
-		let tenantCount = await User.find({isDeleted : false  , role : "tenant" , regions : [req.user.regions[0]]}).countDocuments() ;
-		let ownerCount = await User.find({isDeleted : false , role : "owner" ,regions : [req.user.regions[0]]}).countDocuments() ;
-		let propertyCount = await Property.find({isDeleted : false , region : [req.user.regions[0]]}).countDocuments();
+		let tenantCount = await User.find({isDeleted : false  , role : "tenant" },{$in : {regions : req.user.regions[0]}}).countDocuments() ;
+		let ownerCount = await User.find({isDeleted : false , role : "owner"},{$in : {regions : req.user.regions[0]}}).countDocuments() ;
+		let propertyCount = await Property.find({isDeleted : false , region : req.user.regions[0]}).countDocuments();
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "House Owner Count" , count : ownerCount},{title : "Tenant Count" , count : tenantCount},{title : "Property Count" , count : propertyCount}]
+			result : [{title : "House Owner's" , count : ownerCount},{title : "Tenant's" , count : tenantCount},{title : "Properties" , count : propertyCount}]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
@@ -534,10 +533,11 @@ exports.getRegionalAdminInfo = async (req,res) => {
 exports.getOwnerDashboardInfo = async (req,res) => {
 	try{
 		let propertyCount = await Property.find({isDeleted : false , owner : req.user._id}).countDocuments();
+		
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "House Owner Count" , count : ownerCount},{title : "Tenant Count" , count : tenantCount},{title : "Property Count" , count : propertyCount}]
+			result : [{title : "Properties" , count : propertyCount}]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({

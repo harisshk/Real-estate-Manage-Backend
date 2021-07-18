@@ -13,8 +13,7 @@ exports.addProperty = async (req, res) => {
 			})
 		}
 		req.body.owner = user._id ;
-		console.log(req.body)
-		let newProperty = await new Property(req.body).save();
+			let newProperty = await new Property(req.body).save();
 
 		return res.status(StatusCodes.ACCEPTED).json({
 			message: "Property added",
@@ -113,8 +112,7 @@ exports.getProperties = async (req, res) => {
 exports.getPropertiesByAdmin = async(req,res)=>{
 	try{
 		let properties = await Property.find({isDeleted : false}).populate("owner",{jwtToken:0,password:0})
-		console.log(properties,'-----')
-		return res.status(StatusCodes.ACCEPTED).json({
+			return res.status(StatusCodes.ACCEPTED).json({
 			error : false ,
 			message : "Properties Fetched Successfully",
 			properties : properties ,
@@ -132,7 +130,7 @@ exports.getPropertiesByAdmin = async(req,res)=>{
 
 exports.getPropertiesByRegionalAdmin = async(req,res)=>{
 	try{
-		let properties = await Property.find({isDeleted : false },{$in:{region : req.user.regions}}) ;
+		let properties = await Property.find({isDeleted : false , region : req.user.regions[0] }) ;
 		return res.status(StatusCodes.ACCEPTED).json({
 			error : false ,
 			message : "Properties Fetched Successfully",

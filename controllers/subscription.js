@@ -15,7 +15,6 @@ exports.newSubscription = async (req, res) => {
           }
      req.body.tenant = checkTenant._id ;
         let newSubscription = await new Subscription(req.body).save();
-        console.log(newSubscription);
         await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id },{new : true});
         await Property.findOneAndUpdate({_id : property} , {subscription : newSubscription._id},{new : true})
         return res.status(StatusCodes.OK).json({
