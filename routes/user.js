@@ -113,7 +113,7 @@ router.get('/user/subscriptionInfo/:userId',getSubscribtionInfo)
 
 router.get('/user/admin/dashboardInfo/:userId',isSignedIn,isAdmin,getAdminDashboardInfo);
 
-router.get('/user/regionalAdmin/dashboard/:userId',isSignedIn , isRegionalAdmin , getRegionalAdminInfo) ;
+router.get('/user/regionalAdmin/dashboardInfo/:userId',isSignedIn , isRegionalAdmin , getRegionalAdminInfo) ;
 
 router.get('/user/owner/dashboardInfo/:userId',isSignedIn ,isOwner, getOwnerDashboardInfo)
 
