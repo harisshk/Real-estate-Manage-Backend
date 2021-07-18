@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const User = require("../models/user");
+const Property = require('../models/property')
 const OTP = require("../models/otp");
 const {StatusCodes} = require("http-status-codes");
 const generatePassword = require("password-generator");
@@ -487,4 +488,62 @@ exports.getSubscribtionInfo = async (req,res) => {
 	}
 
 
+}
+
+exports.getAdminDashboardInfo = async(req,res) => {
+	try{
+		let tenantCount = await User.find({isDeleted : false  , role : "tenant"}).countDocuments() ;
+		let adminCount = await User.find({isDeleted : false , role :"admin"}).countDocuments() ;
+		let regionalAdminCount = await User.find({isDeleted : false  ,role : "regionalAdmin"}).countDocuments() ;
+		let ownerCount = await User.find({isDeleted : false , role : "owner" }).countDocuments() ;
+		let propertyCount = await Property.find({isDeleted : false }).countDocuments() ;
+		return res.status(StatusCodes.OK).json({
+			error : false ,
+			message : "success" ,
+			result : [{title : "Admin Count" , count : adminCount},{title : "Regional Admin Count" , count : regionalAdminCount},{title : "House Owner Count" , count : ownerCount},{title : "Tenant Count" , count : tenantCount},{title : "Property Count" , count : propertyCount }]
+		})
+	}catch(error){
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			error : true ,
+			err : error.message ,
+			message : "Error in getting dashboard Info"
+		})
+	}
+	
+}
+
+exports.getRegionalAdminInfo = async (req,res) => {
+	try{
+		let tenantCount = await User.find({isDeleted : false  , role : "tenant" , regions : [req.user.regions[0]]}).countDocuments() ;
+		let ownerCount = await User.find({isDeleted : false , role : "owner" ,regions : [req.user.regions[0]]}).countDocuments() ;
+		let propertyCount = await Property.find({isDeleted : false , region : [req.user.regions[0]]}).countDocuments();
+		return res.status(StatusCodes.OK).json({
+			error : false ,
+			message : "success" ,
+			result : [{title : "House Owner Count" , count : ownerCount},{title : "Tenant Count" , count : tenantCount},{title : "Property Count" , count : propertyCount}]
+		})
+	}catch(error){
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			error : true ,
+			err : error.message ,
+			message : "Error in getting dashboard Info"
+		})
+	}
+}
+
+exports.getOwnerDashboardInfo = async (req,res) => {
+	try{
+		let propertyCount = await Property.find({isDeleted : false , owner : req.user._id}).countDocuments();
+		return res.status(StatusCodes.OK).json({
+			error : false ,
+			message : "success" ,
+			result : [{title : "House Owner Count" , count : ownerCount},{title : "Tenant Count" , count : tenantCount},{title : "Property Count" , count : propertyCount}]
+		})
+	}catch(error){
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			error : true ,
+			err : error.message ,
+			message : "Error in getting dashboard Info"
+		})
+	}
 }
