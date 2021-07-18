@@ -499,7 +499,7 @@ exports.getAdminDashboardInfo = async(req,res) => {
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "Admin's" , count : adminCount},{title : "Regional Admin's" , count : regionalAdminCount},{title : "House Owner's" , count : ownerCount},{title : "Tenant's" , count : tenantCount},{title : "Properties" ,count  : propertyCount }]
+			result : [{title : "Admins" , count : adminCount},{title : "Regional Admins" , count : regionalAdminCount},{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" ,count  : propertyCount }]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
@@ -519,7 +519,7 @@ exports.getRegionalAdminInfo = async (req,res) => {
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "House Owner's" , count : ownerCount},{title : "Tenant's" , count : tenantCount},{title : "Properties" , count : propertyCount}]
+			result : [{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" , count : propertyCount}]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
