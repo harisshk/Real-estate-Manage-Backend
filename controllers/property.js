@@ -111,7 +111,7 @@ exports.getProperties = async (req, res) => {
 
 exports.getPropertiesByAdmin = async(req,res)=>{
 	try{
-		let properties = await Property.find({isDeleted : false}).populate("owner",{jwtToken:0,password:0})
+		let properties = await Property.find({isDeleted : false}).populate('subscription').populate({path : "subscription" , populate :'tenant'}).populate("owner",{jwtToken:0,password:0})
 			return res.status(StatusCodes.ACCEPTED).json({
 			error : false ,
 			message : "Properties Fetched Successfully",
@@ -130,7 +130,7 @@ exports.getPropertiesByAdmin = async(req,res)=>{
 
 exports.getPropertiesByRegionalAdmin = async(req,res)=>{
 	try{
-		let properties = await Property.find({isDeleted : false , region : req.user.regions[0] }).populate("owner",{jwtToken:0,password:0}) ;
+		let properties = await Property.find({isDeleted : false , region : req.user.regions[0] }).populate('subscription').populate({path : "subscription" , populate :'tenant'}).populate("owner",{jwtToken:0,password:0}) ;
 		return res.status(StatusCodes.ACCEPTED).json({
 			error : false ,
 			message : "Properties Fetched Successfully",
@@ -150,7 +150,7 @@ exports.getPropetyById = async(req,res) => {
 	const {propertyId} = req.params ;
 	try{
 
-		let propertyInfo = await Property.findOne({_id : propertyId}).populate('subscription').populate('createdBy').populate('owner')
+		let propertyInfo = await Property.findOne({_id : propertyId}).populate('subscription').populate({path : "subscription" , populate :'tenant'}).populate('createdBy').populate('owner')
 		return res.status(400).json({error : false , message : "Success" , property : propertyInfo})
 	}catch(error){return res.status(StatusCodes.BAD_REQUEST).json({error : true ,message : "Error in getting Property Info",err : error})}
 
@@ -158,7 +158,7 @@ exports.getPropetyById = async(req,res) => {
 
 exports.getPropertiesByHouseOwner = async(req,res) => {
 	try{
-		let properties = await Property.find({owner : req.user._id , isDeleted : false} ) ;
+		let properties = await Property.find({owner : req.user._id , isDeleted : false} ).populate('subscription').populate({path : "subscription" , populate :'tenant'}) ;
 		return res.status(StatusCodes.ACCEPTED).json({
 			error : false ,
 			message : "Properties Fetched Successfully",
