@@ -130,7 +130,7 @@ exports.getPropertiesByAdmin = async(req,res)=>{
 
 exports.getPropertiesByRegionalAdmin = async(req,res)=>{
 	try{
-		let properties = await Property.find({isDeleted : false , region : req.user.regions[0] }) ;
+		let properties = await Property.find({isDeleted : false , region : req.user.regions[0] }).populate("owner",{jwtToken:0,password:0}) ;
 		return res.status(StatusCodes.ACCEPTED).json({
 			error : false ,
 			message : "Properties Fetched Successfully",
