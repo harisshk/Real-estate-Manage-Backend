@@ -140,7 +140,6 @@ exports.getPropertiesByRegionalAdmin = async(req,res)=>{
 		})
 	}
 	catch (error) {
-		console.log(error)
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			message: "Error fetching property ",
 			error: true,
@@ -157,4 +156,22 @@ exports.getPropetyById = async(req,res) => {
 		return res.status(400).json({error : false , message : "Success" , property : propertyInfo})
 	}catch(error){return res.status(StatusCodes.BAD_REQUEST).json({error : true ,message : "Error in getting Property Info",err : error})}
 
+}
+
+exports.getPropertiesByHouseOwner = async(req,res) => {
+	try{
+		let properties = await Property.find({owner : req.user._id , isDeleted : false} ) ;
+		return res.status(StatusCodes.ACCEPTED).json({
+			error : false ,
+			message : "Properties Fetched Successfully",
+			properties : properties ,
+		})
+	}catch(error){
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			message: "Error fetching property ",
+			error: true,
+			err: error.message,
+		});
+	}
+	
 }

@@ -13,6 +13,7 @@ exports.isAdmin = (req, res, next) => {
 };
 
 exports.isOwner = (req, res, next) => {
+	console.log(req.user,'----------------asa')
 	if (!req.user || req.user.role !== "owner") {
 		return res.status(StatusCodes.FORBIDDEN).json({
 			error: true,
@@ -50,10 +51,11 @@ exports.isSignedIn = (req, res, next) => {
 	if (bearerHeader) {
 		const bearer = bearerHeader.split(" ");
 		const bearerToken = bearer[1];
+		console.log(bearerToken , req.user.jwtToken , '-----')
 		if (!req.user || bearerToken !== req.user.jwtToken) {
 			return res.status(StatusCodes.UNAUTHORIZED).json({
 				error: true,
-				message: "Un authorized access",
+				message: "Un authorized access ---",
 			});
 		}
 		next();
@@ -66,7 +68,7 @@ exports.isSignedIn = (req, res, next) => {
 };
 
 exports.isOwner = (req, res, next) => {
-	if (!req.body || !req.user || req.user.role !== "owner") {
+	if (!req.user || req.user.role !== "owner") {
 		return res.status(StatusCodes.FORBIDDEN).json({
 			error: true,
 			message: "UnAuthorized Access",
@@ -76,7 +78,7 @@ exports.isOwner = (req, res, next) => {
 };
 
 exports.isRegionalAdmin = (req, res, next) => {
-	if (!req.body || !req.user || req.user.role !== "regional-admin") {
+	if (!req.user || req.user.role !== "regional-admin") {
 		return res.status(StatusCodes.FORBIDDEN).json({
 			error: true,
 			message: "UnAuthorized Access",

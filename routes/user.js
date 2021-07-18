@@ -18,6 +18,9 @@ const {
 	validateForgotPasswordOTP,
 	updateUserInfo,
 	getSubscribtionInfo,
+	getAdminDashboardInfo,
+	getRegionalAdminInfo,
+	getOwnerDashboardInfo
 } = require("../controllers/user");
 
 const {
@@ -107,5 +110,11 @@ router.post("/user/forgotPassword/validate", validateForgotPasswordOTP);
 router.post("/user/updateUserInfo/:userId", updateUserInfo);
 
 router.get('/user/subscriptionInfo/:userId',getSubscribtionInfo)
+
+router.get('/user/admin/dashboardInfo/:userId',isSignedIn,isAdmin,getAdminDashboardInfo);
+
+router.get('/user/regionalAdmin/dashboard/:userId',isSignedIn , isRegionalAdmin , getRegionalAdminInfo) ;
+
+router.get('/user/owner/dashboardInfo/:userId',isSignedIn ,isOwner, getOwnerDashboardInfo)
 
 module.exports = router;
