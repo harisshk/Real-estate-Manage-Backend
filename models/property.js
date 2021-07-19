@@ -93,7 +93,7 @@ const propertySchema = new mongoose.Schema(
     subscription : {
       type : mongoose.Schema.Types.ObjectId ,
       ref : "Subscription"
-    }
+    },
   },
   { timestamps: true }
 );
