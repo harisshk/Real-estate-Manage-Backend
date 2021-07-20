@@ -17,10 +17,11 @@ const {
 	validateLoginOTP,
 	validateForgotPasswordOTP,
 	updateUserInfo,
-	getSubscribtionInfo,
+	getSubscriptionInfo,
 	getAdminDashboardInfo,
 	getRegionalAdminInfo,
-	getOwnerDashboardInfo
+	getOwnerDashboardInfo,
+	tenantDashboardInfo
 } = require("../controllers/user");
 
 const {
@@ -113,14 +114,16 @@ router.post("/user/login/validate", validateLoginOTP);
 
 router.post("/user/forgotPassword/validate", validateForgotPasswordOTP);
 
-router.post("/user/updateUserInfo/:userId", updateUserInfo);
+router.post("/user/updateUserInfo/:userId", isSignedIn, updateUserInfo);
 
-router.get('/user/subscriptionInfo/:userId',getSubscribtionInfo)
+router.get('/user/subscriptionInfo/:userId',isSignedIn, getSubscriptionInfo)
 
 router.get('/user/admin/dashboardInfo/:userId',isSignedIn,isAdmin,getAdminDashboardInfo);
 
 router.get('/user/regionalAdmin/dashboardInfo/:userId',isSignedIn , isRegionalAdmin , getRegionalAdminInfo) ;
 
 router.get('/user/owner/dashboardInfo/:userId',isSignedIn ,isOwner, getOwnerDashboardInfo)
+
+router.get('/user/tenant/dashboardInfo/:userId',isSignedIn , tenantDashboardInfo);
 
 module.exports = router;

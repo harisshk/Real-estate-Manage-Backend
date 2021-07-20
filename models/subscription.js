@@ -16,6 +16,14 @@ const subscriptionSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
+		billingCycle :{
+			type : Number ,
+			default : 0 ,
+		},
+		paidUntil : {
+			type : String,
+			default : ''
+		}
 	},
 	{timestamps: true},
 );

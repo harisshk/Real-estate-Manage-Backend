@@ -8,6 +8,7 @@ const {StatusCodes} = require("http-status-codes");
 const generatePassword = require("password-generator");
 const {sendPasswordMailer, mailer} = require("../methods/nodemailer");
 const {generateRandom4DigitOTP} = require("../methods/otpGenerate");
+const Order = require("../models/order");
 
 exports.register = async (req, res) => {
 	try {
@@ -468,7 +469,7 @@ exports.updateUserInfo = async (req, res) => {
 	}
 };
 
-exports.getSubscribtionInfo = async (req,res) => {
+exports.getSubscriptionInfo = async (req,res) => {
 	try{
 
 		let userInfo = await User.findOne({_id :req.user._id}).populate('subscription').populate({path : "subscription" , populate :'property'}) ;
@@ -544,6 +545,31 @@ exports.getOwnerDashboardInfo = async (req,res) => {
 			error : true ,
 			err : error.message ,
 			message : "Error in getting dashboard Info"
+		})
+	}
+}
+
+exports.tenantDashboardInfo = async(req,res) => {
+	try{
+		let userInfo = await User.findOne({_id :req.user._id}).populate('subscription').populate({path : "subscription.property" , populate :'owner'}).populate({path : "subscription" , populate :'property'});
+		let pendingOrders = [] ;
+		if(userInfo?.subscription?.billingCycle > 0){
+			pendingOrders = await Order.find({user : req.user._id , paymentStatus:"Pending"});
+		}
+		return res.status(StatusCodes.OK).json({
+			error : false ,
+			message : "Success" ,
+			result : {
+				user : userInfo ,
+				pendingOrders : pendingOrders
+			} 
+		})
+	}
+	catch(error){
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			error : true ,
+			err : error.message ,
+			message :"Subscription Info error"
 		})
 	}
 }

@@ -23,6 +23,10 @@ const transactionSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
+		amountPaid : {
+			type : Number ,
+			required : true 
+		}
 	},
 	{timestamps: true},
 );
