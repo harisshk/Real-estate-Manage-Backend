@@ -1,6 +1,6 @@
 const nodemailer = require("nodemailer");
 
-const mailer = (email,OTP,text) => {
+const mailer = (email, OTP, text) => {
   let userNameMail = "hari.jsmith494@gmail.com",
     applicationPassword = "fqcjwpduyiuhwgun";
   var transporter = nodemailer.createTransport({
@@ -18,13 +18,38 @@ const mailer = (email,OTP,text) => {
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-     
+
     }
 
   });
 };
 
-const sendPasswordMailer = (email,password) => {
+
+const sendMail = (email, body, content) => {
+  let userNameMail = "hari.jsmith494@gmail.com",
+    applicationPassword = "fqcjwpduyiuhwgun";
+  var transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: userNameMail,
+      pass: applicationPassword,
+    },
+  });
+  var mailOptions = {
+    from: "hari.jsmith494@gmail.com",
+    to: email,
+    subject: body,
+    html: content,
+  };
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      return res.status(400).json({ error: true, message: "Error in sending Invoice Mail" })
+    }
+
+  });
+};
+
+const sendPasswordMailer = (email, password) => {
   let userNameMail = "hari.jsmith494@gmail.com",
     applicationPassword = "fqcjwpduyiuhwgun";
   var transporter = nodemailer.createTransport({
@@ -42,10 +67,10 @@ const sendPasswordMailer = (email,password) => {
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-     
+
     }
 
   });
 };
 
-module.exports = {mailer,sendPasswordMailer}
+module.exports = { mailer, sendPasswordMailer, sendMail }
