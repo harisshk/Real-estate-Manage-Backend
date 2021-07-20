@@ -50,8 +50,6 @@ exports.placeOrder = async(req,res) => {
         };
         let subscriptionResponse = await Subscription.findOneAndUpdate({tenant : tenant , property : property},{$set : subscriptionInput},{new : true})
         let orderInput = {
-            transactionId : transactionResponse._id,
-            paymentStatus : paymentStatus
         };
         await Order.findOneAndUpdate({_id :subscriptionResponse._id},{$set : orderInput});
         return res.status(StatusCodes.OK).json({
