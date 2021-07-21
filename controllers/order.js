@@ -36,7 +36,7 @@ exports.generateOrders = async(req,res) => {
 
 exports.placeOrder = async(req,res) => {
     try{
-        const{tenant , property , transactionId , amountPaid , paymentStatus , billingCycle} = req.body;
+        const{tenant , property , transactionId , amountPaid , paymentStatus , billingCycle , orders} = req.body;
         let transactionInput = {
             tenant : tenant,
             property : property,
@@ -53,9 +53,9 @@ exports.placeOrder = async(req,res) => {
             transactionId : transactionResponse._id,
             paymentStatus : "Done"
         };
-        console.log(orderInput);
-
-        await Order.findOneAndUpdate({subscription :subscriptionResponse._id},{$set : orderInput});
+        for(let i = 0 ; i < orders.length ; i++){
+            await Order.findOneAndUpdate({_id :orders[i]._id},{$set : orderInput});  
+        }
         return res.status(StatusCodes.OK).json({
             error : false,
             message : "Success"
