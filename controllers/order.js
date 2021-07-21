@@ -66,3 +66,21 @@ exports.placeOrder = async(req,res) => {
     }
     
 }
+
+exports.historyOfOrders = async(req,res) => {
+    try{
+        let orderHistory = await Order.find({user : req.user._id});
+        return res.status(StatusCodes.OK).json({
+            error : false ,
+            message :"success" ,
+            orderHistory : orderHistory
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : false ,
+            err : error.message,
+            message : "Error in fetching the history of orders"
+        })
+    }
+}
