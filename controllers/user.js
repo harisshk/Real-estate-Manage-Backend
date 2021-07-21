@@ -551,7 +551,7 @@ exports.getOwnerDashboardInfo = async (req,res) => {
 
 exports.tenantDashboardInfo = async(req,res) => {
 	try{
-		let userInfo = await User.findOne({_id :req.user._id}).populate('subscription').populate({path : "subscription.property" , populate :'owner'}).populate({path : "subscription" , populate :'property'});
+		let userInfo = await User.findOne({_id :req.user._id},{jwtToken : 0 , password : 0}).populate('subscription').populate({path : "subscription" , populate :'property'});
 		let pendingOrders = [] ;
 		if(userInfo?.subscription?.billingCycle > 0){
 			pendingOrders = await Order.find({user : req.user._id , paymentStatus:"Pending"});

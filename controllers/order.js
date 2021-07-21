@@ -4,13 +4,14 @@ const Order = require('../models/order');
 const Transaction = require('../models/transaction')
 var Subscription = require('../models/subscription')
 
+const month = ["Jan" , "Feb" , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct", "Nov" , "Dec"]
+
 exports.generateOrders = async(req,res) => {
     try {
         let subscription = await Subscription.find({ isActive: true }).populate('property', { rent: 1 }).populate('tenant', { name: 1, email: 1 });
-        console.log(subscription , ' ----- ' , subscription.length)
         for (let i = 0; i < subscription.length; i++) {
             // Creating order
-            await new Order({ subscription: subscription[i]._id, user: subscription[i].tenant._id, amount: subscription[i].property?.rent }).save();
+            await new Order({ subscription: subscription[i]._id, user: subscription[i].tenant._id, amount: subscription[i].property?.rent , orderMessage : `Rent ${month[new Date().getMonth()]}` }).save();
             // Incrementing billing Cycle
             await Subscription.findOneAndUpdate({_id : subscription[i]._id},{$inc: {billingCycle: 1}});
             // Sending mail 
@@ -35,8 +36,7 @@ exports.generateOrders = async(req,res) => {
 
 exports.placeOrder = async(req,res) => {
     try{
-        console.log(req.body,'---------');
-        const{tenant , property , transactionId , amountPaid , paymentStatus} = req.body;
+        const{tenant , property , transactionId , amountPaid , paymentStatus , billingCycle} = req.body;
         let transactionInput = {
             tenant : tenant,
             property : property,
@@ -45,13 +45,17 @@ exports.placeOrder = async(req,res) => {
         }
         let transactionResponse = await Transaction(transactionInput);
         let subscriptionInput = {
-            billingCycle : 0,
+            billingCycle : paymentStatus === "Done" ? 0 : billingCycle ,
             paidUntil : new Date()
         };
         let subscriptionResponse = await Subscription.findOneAndUpdate({tenant : tenant , property : property},{$set : subscriptionInput},{new : true})
         let orderInput = {
+            transactionId : transactionResponse._id,
+            paymentStatus : "Done"
         };
-        await Order.findOneAndUpdate({_id :subscriptionResponse._id},{$set : orderInput});
+        console.log(orderInput);
+
+        await Order.findOneAndUpdate({subscription :subscriptionResponse._id},{$set : orderInput});
         return res.status(StatusCodes.OK).json({
             error : false,
             message : "Success"
@@ -69,7 +73,7 @@ exports.placeOrder = async(req,res) => {
 
 exports.historyOfOrders = async(req,res) => {
     try{
-        let orderHistory = await Order.find({user : req.user._id});
+        let orderHistory = await Order.find({user : req.user._id}).sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
