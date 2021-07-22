@@ -19,6 +19,10 @@ const orderSchema = new mongoose.Schema(
             type : mongoose.SchemaTypes.ObjectId,
             ref : "Transaction",
         },
+		orderMessage : {
+			type : String ,
+			default : "Rent"
+		},
         paymentStatus: {
             type : String ,
             default : 'Pending' 

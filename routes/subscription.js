@@ -9,6 +9,8 @@ router.post('/subscription/add/admin/property/:userId', isSignedIn, isAdmin , ne
 
 router.post('/subscription/update/admin/property/:userId/:subscriptionId',isSignedIn ,isAdmin , updateSubscription );
 
+router.post('/subscription/add/regionalAdmin/property/:userId',isSignedIn ,isRegionalAdmin , newSubscription );
+
 router.post('/subscription/update/regionalAdmin/property/:userId/:subscriptionId',isSignedIn ,isRegionalAdmin , updateSubscription );
 
 

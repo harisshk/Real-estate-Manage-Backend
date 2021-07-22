@@ -10,6 +10,7 @@ const propertyRoute = require("./routes/property");
 const assestsRoute = require('./assests/data');
 const subscriptionRoute = require("./routes/subscription");
 const orderRoute = require('./routes/order')
+var cronJobs = require('./cronJob/order');
 
 const PORT = process.env.PORT || 5050;
 
