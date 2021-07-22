@@ -10,6 +10,7 @@ const propertyRoute = require("./routes/property");
 const assestsRoute = require('./assests/data');
 const subscriptionRoute = require("./routes/subscription");
 const orderRoute = require('./routes/order')
+const paymentRoute = require('./routes/payment')
 var cronJobs = require('./cronJob/order');
 
 const PORT = process.env.PORT || 5050;
@@ -43,5 +44,6 @@ app.use("/api", propertyRoute);
 app.use('/api',subscriptionRoute)
 app.use('/api',orderRoute)
 app.use('/data',assestsRoute)
+app.use('/api',paymentRoute)
 
 app.listen(PORT, () => console.log(`Server is running at PORT ${PORT}`));
