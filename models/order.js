@@ -35,6 +35,10 @@ const orderSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
+		owner : {
+			type : mongoose.SchemaTypes.ObjectId,
+            ref : "User",
+		}
 	},
 	{timestamps: true},
 );

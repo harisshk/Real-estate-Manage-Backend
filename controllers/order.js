@@ -2,7 +2,9 @@ const { StatusCodes } = require('http-status-codes');
 const { sendMail } = require('../methods/nodemailer');
 const Order = require('../models/order');
 const Transaction = require('../models/transaction')
-var Subscription = require('../models/subscription')
+var Subscription = require('../models/subscription');
+const subscription = require('../models/subscription');
+const { populate } = require('../models/order');
 
 const month = ["Jan" , "Feb" , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct", "Nov" , "Dec"]
 
@@ -91,7 +93,8 @@ exports.historyOfOrdersTenant = async(req,res) => {
 
 exports.historyOfOrdersOwner = async(req,res) => {
     try{
-        let orderHistory = await Order.find({'subscription.property.owner' : req.user._id}).sort({createdAt : -1});
+        let orderHistory = await Order.find({owner: req.user._id}).populate({path : "subscription" , populate :'tenant'}).populate({path : "subscription" , populate :'property'}).sort({createdAt : -1});
+        console.log(orderHistory); 
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
@@ -109,7 +112,7 @@ exports.historyOfOrdersOwner = async(req,res) => {
 
 exports.historyOfOrdersRegionalAdmin = async(req,res) => {
     try{
-        let orderHistory = await Order.find({'subscription.property.region' : req.user.regions[0]}).sort({createdAt : -1});
+        let orderHistory = await Order.find({'subscription.property.region' : req.user.regions[0],paymentStatus : "Done"}).populate('subscription').populate({path : "subscription" , populate :'tenant'}).populate({path : "subscription" , populate :'property'}).sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
@@ -127,7 +130,7 @@ exports.historyOfOrdersRegionalAdmin = async(req,res) => {
 
 exports.historyOfOrdersAdmin = async(req,res) => {
     try{
-        let orderHistory = await Order.find().sort({createdAt : -1});
+        let orderHistory = await Order.find({paymentStatus : "Done"}).populate('subscription').populate({path : "subscription" , populate : {path : "tenant" ,select : "name"}}).populate({path : "subscription" , populate : {path : "property" ,select : "name owner rent"}}).sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
