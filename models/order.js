@@ -10,7 +10,7 @@ const orderSchema = new mongoose.Schema(
         user : {
             type : mongoose.SchemaTypes.ObjectId,
             ref : "User",
-        },
+        },		
 		amount: {
 			type : Number ,
 			required : true ,

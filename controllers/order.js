@@ -36,7 +36,7 @@ exports.generateOrders = async(req,res) => {
 
 exports.placeOrder = async(req,res) => {
     try{
-        const{tenant , property , transactionId , amountPaid , paymentStatus , billingCycle} = req.body;
+        const{tenant , property , transactionId , amountPaid , paymentStatus , billingCycle , orders} = req.body;
         let transactionInput = {
             tenant : tenant,
             property : property,
@@ -53,9 +53,9 @@ exports.placeOrder = async(req,res) => {
             transactionId : transactionResponse._id,
             paymentStatus : "Done"
         };
-        console.log(orderInput);
-
-        await Order.findOneAndUpdate({subscription :subscriptionResponse._id},{$set : orderInput});
+        for(let i = 0 ; i < orders.length ; i++){
+            await Order.findOneAndUpdate({_id :orders[i]._id},{$set : orderInput});  
+        }
         return res.status(StatusCodes.OK).json({
             error : false,
             message : "Success"
@@ -71,9 +71,63 @@ exports.placeOrder = async(req,res) => {
     
 }
 
-exports.historyOfOrders = async(req,res) => {
+exports.historyOfOrdersTenant = async(req,res) => {
     try{
         let orderHistory = await Order.find({user : req.user._id}).sort({createdAt : -1});
+        return res.status(StatusCodes.OK).json({
+            error : false ,
+            message :"success" ,
+            orderHistory : orderHistory
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : false ,
+            err : error.message,
+            message : "Error in fetching the history of orders"
+        })
+    }
+}
+
+exports.historyOfOrdersOwner = async(req,res) => {
+    try{
+        let orderHistory = await Order.find({'subscription.property.owner' : req.user._id}).sort({createdAt : -1});
+        return res.status(StatusCodes.OK).json({
+            error : false ,
+            message :"success" ,
+            orderHistory : orderHistory
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : false ,
+            err : error.message,
+            message : "Error in fetching the history of orders"
+        })
+    }
+}
+
+exports.historyOfOrdersRegionalAdmin = async(req,res) => {
+    try{
+        let orderHistory = await Order.find({'subscription.property.region' : req.user.regions[0]}).sort({createdAt : -1});
+        return res.status(StatusCodes.OK).json({
+            error : false ,
+            message :"success" ,
+            orderHistory : orderHistory
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : false ,
+            err : error.message,
+            message : "Error in fetching the history of orders"
+        })
+    }
+}
+
+exports.historyOfOrdersAdmin = async(req,res) => {
+    try{
+        let orderHistory = await Order.find().sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
