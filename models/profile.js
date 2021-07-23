@@ -5,6 +5,10 @@ const userSchema = new mongoose.Schema(
 	{
 		user: {type: mongoose.SchemaTypes.ObjectId, ref: "User"},
 		idProof : {type : Number , default : ''},
+		documents : [{
+			url : String ,
+			type : String,
+		}],
 		isActive: {
 			type: Boolean,
 			default: true,
