@@ -4,10 +4,18 @@ const mongoose = require("mongoose");
 const userSchema = new mongoose.Schema(
 	{
 		user: {type: mongoose.SchemaTypes.ObjectId, ref: "User"},
-		idProof : {type : Number , default : ''},
+		idProof : {type : String , default : ''},
+		phoneNumber: {type : String , default : ''},
+		ifsc : {type : String , default : ''},
+		accountHolderName :{type : String , default : ''},
+		accountNumber : {type : String , default : ''},
 		documents : [{
 			url : String ,
 			type : String,
+			verified : {
+				type : Boolean,
+				defualt : false,
+			},
 		}],
 		isActive: {
 			type: Boolean,
