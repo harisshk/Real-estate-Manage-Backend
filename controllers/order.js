@@ -38,22 +38,24 @@ exports.generateOrders = async(req,res) => {
 
 exports.placeOrder = async(req,res) => {
     try{
-        const{tenant , property , transactionId , amountPaid , paymentStatus , billingCycle , orders} = req.body;
+        const{tenant , property , transactionId , amountPaid , paymentStatus , billingCycle , orders , region , owner} = req.body;
         let transactionInput = {
             tenant : tenant,
             property : property,
             transactionId : transactionId,
-            amountPaid : amountPaid
+            amountPaid : amountPaid,
         }
         let transactionResponse = await Transaction(transactionInput);
         let subscriptionInput = {
             billingCycle : paymentStatus === "Done" ? 0 : billingCycle ,
             paidUntil : new Date()
         };
-        let subscriptionResponse = await Subscription.findOneAndUpdate({tenant : tenant , property : property},{$set : subscriptionInput},{new : true})
+        await Subscription.findOneAndUpdate({tenant : tenant , property : property},{$set : subscriptionInput},{new : true});
         let orderInput = {
             transactionId : transactionResponse._id,
-            paymentStatus : "Done"
+            paymentStatus : "Done",
+            owner : owner,
+            region : region
         };
         for(let i = 0 ; i < orders.length ; i++){
             await Order.findOneAndUpdate({_id :orders[i]._id},{$set : orderInput});  
@@ -112,7 +114,7 @@ exports.historyOfOrdersOwner = async(req,res) => {
 
 exports.historyOfOrdersRegionalAdmin = async(req,res) => {
     try{
-        let orderHistory = await Order.find({'subscription.property.region' : req.user.regions[0],paymentStatus : "Done"}).populate('subscription').populate({path : "subscription" , populate :'tenant'}).populate({path : "subscription" , populate :'property'}).sort({createdAt : -1});
+        let orderHistory = await Order.find({region : req.user.regions[0],paymentStatus : "Done"}).populate('subscription').populate({path : "subscription" , populate :'tenant'}).populate({path : "subscription" , populate :'property'}).sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,

@@ -2,7 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const User = require("../models/user");
-const Property = require('../models/property')
+const Property = require('../models/property');
+const Profile = require('../models/profile');
 const OTP = require("../models/otp");
 const {StatusCodes} = require("http-status-codes");
 const generatePassword = require("password-generator");
@@ -572,4 +573,24 @@ exports.tenantDashboardInfo = async(req,res) => {
 			message :"Subscription Info error"
 		})
 	}
+}
+
+exports.getUserInfo = async(req,res) => {
+	try{	
+		let profile = await Profile({user : req.user._id});
+		req.user.jwtToken = undefined;
+		return res.status(400).json({
+			message : "success" ,
+			error : false ,
+			user : req.user ,
+			profile : profile
+		});
+	}catch(error){
+		console.log(error);
+		return res.status(StatusCodes.OK).json({
+			error : true ,
+			err : error.message ,
+			message : "Error in getting user profile ."
+		});
+	};
 }

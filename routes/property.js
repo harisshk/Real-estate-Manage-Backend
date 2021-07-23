@@ -55,4 +55,6 @@ router.post(
 	updateProperty
 );
 
+// router.get('/property/propertyInfo/:propertyId',isSignedIn , getPropertyInfo);
+
 module.exports = router;

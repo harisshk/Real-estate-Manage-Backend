@@ -21,7 +21,8 @@ const {
 	getAdminDashboardInfo,
 	getRegionalAdminInfo,
 	getOwnerDashboardInfo,
-	tenantDashboardInfo
+	tenantDashboardInfo,
+	getUserInfo
 } = require("../controllers/user");
 
 const {
@@ -125,5 +126,7 @@ router.get('/user/regionalAdmin/dashboardInfo/:userId',isSignedIn , isRegionalAd
 router.get('/user/owner/dashboardInfo/:userId',isSignedIn ,isOwner, getOwnerDashboardInfo)
 
 router.get('/user/tenant/dashboardInfo/:userId',isSignedIn , tenantDashboardInfo);
+
+router.get('/user/accountInfo/:userId' , isSignedIn , getUserInfo);
 
 module.exports = router;
