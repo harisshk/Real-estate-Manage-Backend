@@ -15,8 +15,8 @@ exports.newSubscription = async (req, res) => {
           }
      req.body.tenant = checkTenant._id ;
         let newSubscription = await new Subscription(req.body).save();
-        let property = await Property.findOneAndUpdate({_id : property} , {subscription : newSubscription._id},{new : true})
-        await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id , regions : [property.region] },{new : true});
+        let propertyInfo = await Property.findOneAndUpdate({_id : property} , {subscription : newSubscription._id},{new : true})
+        await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id , regions : [propertyInfo.region] },{new : true});
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "Subscription successful",
