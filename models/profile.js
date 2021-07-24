@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 
 const profileSchema = new mongoose.Schema(
 	{
+		isVerified : {type : Boolean,default : false},
 		user: {type: mongoose.SchemaTypes.ObjectId, ref: "User"},
 		idProof : {type : String , default : ''},
 		phoneNumber: {type : String , default : ''},
@@ -10,8 +11,9 @@ const profileSchema = new mongoose.Schema(
 		accountHolderName :{type : String , default : ''},
 		accountNumber : {type : String , default : ''},
 		documents : [{
-			url : String ,
-			type : String,
+			url : 
+			{type : String} ,
+			docType :{type : String},
 			verified : {
 				type : Boolean,
 				defualt : false,

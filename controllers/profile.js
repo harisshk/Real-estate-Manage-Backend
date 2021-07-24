@@ -4,10 +4,11 @@ const {StatusCodes} = require("http-status-codes");
 
 exports.createProfile = async(req,res) => {
     try{
-        await new Profile(req.body).save();
+        let profile = await new Profile(req.body).save();
         return res.status(StatusCodes.OK).json({
             error : false ,
             message : "success",
+            profile : profile
         })
     }catch(error){
         console.log(error);
@@ -42,6 +43,7 @@ exports.getProfileInfo = async(req,res)=>{
 exports.updateProfile = async (req,res)=>{
     try{
         let profile = await Profile.findOneAndUpdate({user : req.params.userId},{$set : req.body},{new : true});
+        console.log(req.body);
         if(profile === null){
             await new Profile(req.body).save();
         }
