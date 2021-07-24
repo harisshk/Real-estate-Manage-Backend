@@ -35,6 +35,11 @@ const orderSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
+		region:{
+			type:String,
+			required:true
+		},
+		
 		owner : {
 			type : mongoose.SchemaTypes.ObjectId,
             ref : "User",
