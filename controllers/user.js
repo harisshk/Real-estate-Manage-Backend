@@ -91,7 +91,7 @@ exports.verifyAccount = (req, res) => {
 //TODO : Make the Secret Code Private .
 exports.login = (req, res) => {
 	//Finding if an account is created with the provided email .
-	User.findOne({email: req.body.email}, (error, userInfo) => {
+	User.findOne({email: req.body.email,isActive:true}, (error, userInfo) => {
 		if (error || !userInfo) {
 			return res.status(StatusCodes.BAD_REQUEST).json({
 				error: true,
@@ -138,7 +138,7 @@ exports.login = (req, res) => {
 };
 
 exports.generateOTP = async (req, res) => {
-	User.findOne({email: req.body.email})
+	User.findOne({email: req.body.email,isActive:true})
 		.then((userExists) => {
 			if (userExists) {
 				const generatedOTP = generateRandom4DigitOTP();
