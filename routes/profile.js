@@ -1,7 +1,9 @@
 const express = require('express');
+const { setUser } = require('../controllers/auth');
 const { createProfile, getProfileInfo, updateProfile, getUnverifiedProfileAdmin, getUnverifiedProfileRegionalAdmin, getUnverifiedProfileAdminCount, getUnverifiedProfileRegionalAdminCount } = require('../controllers/profile');
 const router = express();
 
+router.param('userId' , setUser);
 
 router.get('/profile/:userId', getProfileInfo);
 
