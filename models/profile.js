@@ -3,22 +3,21 @@ const mongoose = require("mongoose");
 
 const profileSchema = new mongoose.Schema(
 	{
-		isVerified : {type : Boolean,default : false},
 		user: {type: mongoose.SchemaTypes.ObjectId, ref: "User"},
-		idProof : {type : String , default : ''},
 		phoneNumber: {type : String , default : ''},
-		ifsc : {type : String , default : ''},
-		accountHolderName :{type : String , default : ''},
-		accountNumber : {type : String , default : ''},
+		bank :{
+			ifsc : {type : String , default : ''},
+			accountHolderName :{type : String , default : ''},
+			accountNumber : {type : String , default : ''},
+			bankName : {type : String , default : ''}
+		},
+		region:{type : String , default: ""},
 		documents : [{
-			url : 
-			{type : String} ,
+			idProof : {type : String , default : ''},
+			url : {type : String} ,
 			docType :{type : String},
-			verified : {
-				type : Boolean,
-				defualt : false,
-			},
 		}],
+		isVerified : {type : Boolean,default : false},
 		isActive: {
 			type: Boolean,
 			default: true,

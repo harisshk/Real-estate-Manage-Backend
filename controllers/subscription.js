@@ -5,7 +5,7 @@ const Property = require("../models/property");
 
 exports.newSubscription = async (req, res) => {
     try {
-        const { tenant  , property} = req.body;
+        const { tenant  , property } = req.body;
         let checkTenant = await User.findOne({ email: tenant, role: "tenant" });
         if (!checkTenant) {
             return res.status(StatusCodes.UNAUTHORIZED).json({
@@ -15,8 +15,8 @@ exports.newSubscription = async (req, res) => {
           }
      req.body.tenant = checkTenant._id ;
         let newSubscription = await new Subscription(req.body).save();
-        await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id },{new : true});
-        await Property.findOneAndUpdate({_id : property} , {subscription : newSubscription._id},{new : true})
+        let property = await Property.findOneAndUpdate({_id : property} , {subscription : newSubscription._id},{new : true})
+        await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id , regions : [property.region] },{new : true});
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "Subscription successful",

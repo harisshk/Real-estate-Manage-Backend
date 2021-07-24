@@ -78,7 +78,8 @@ exports.getUnverifiedProfileAdminCount = async (req, res) => {
         })
 }
 exports.getUnverifiedProfileRegionalAdminCount = async (req, res) => {
-    Profile.find({ isVerified: false, }).countDocuments()
+    // req.user.regions[0]
+    Profile.find({ isVerified: false, region : req.user.regions[0]}).countDocuments()
         .then((count) => {
             return res.status(StatusCodes.OK).json({
                 error: false,
