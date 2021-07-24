@@ -1,7 +1,7 @@
 //Import Module's
 const mongoose = require("mongoose");
 
-const userSchema = new mongoose.Schema(
+const profileSchema = new mongoose.Schema(
 	{
 		user: {type: mongoose.SchemaTypes.ObjectId, ref: "User"},
 		idProof : {type : String , default : ''},
@@ -29,4 +29,4 @@ const userSchema = new mongoose.Schema(
 	{timestamps: true},
 );
 // Export the Schema with the name User.
-module.exports = mongoose.model("Profile", userSchema);
+module.exports = mongoose.model("Profile", profileSchema);

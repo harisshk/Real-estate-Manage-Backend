@@ -41,7 +41,10 @@ exports.getProfileInfo = async(req,res)=>{
 
 exports.updateProfile = async (req,res)=>{
     try{
-        await Profile.findOneAndUpdate({_id : profileId},{$set : req.body});
+        let profile = await Profile.findOneAndUpdate({user : req.params.userId},{$set : req.body},{new : true});
+        if(profile === null){
+            await new Profile(req.body).save();
+        }
         return res.status(StatusCodes.OK).json({
             error : false ,
             message : "success"

@@ -577,9 +577,10 @@ exports.tenantDashboardInfo = async(req,res) => {
 
 exports.getUserInfo = async(req,res) => {
 	try{	
-		let profile = await Profile({user : req.user._id});
+		let profile = await Profile.findOne({user : req.user._id});
 		req.user.jwtToken = undefined;
-		return res.status(400).json({
+		console.log(profile,'----- ');
+		return res.status(StatusCodes.OK).json({
 			message : "success" ,
 			error : false ,
 			user : req.user ,
