@@ -127,6 +127,6 @@ router.get('/user/owner/dashboardInfo/:userId',isSignedIn ,isOwner, getOwnerDash
 
 router.get('/user/tenant/dashboardInfo/:userId',isSignedIn , tenantDashboardInfo);
 
-router.get('/user/accountInfo/:userId' , isSignedIn , getUserInfo);
+router.get('/user/accountInfo/:userId' , getUserInfo);
 
 module.exports = router;
