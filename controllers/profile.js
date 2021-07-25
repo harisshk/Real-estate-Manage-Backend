@@ -13,7 +13,7 @@ exports.createProfile = async (req, res) => {
     } catch (error) {
         console.log(error);
         return res.status(StatusCodes.BAD_REQUEST).json({
-            error: false,
+            error: true,
             err: error.message,
             message: "Error in creating profile"
         })
@@ -42,14 +42,14 @@ exports.getProfileInfo = async (req, res) => {
 
 exports.updateProfile = async (req, res) => {
     try {
-        let profile = await Profile.findOneAndUpdate({ user: req.params.userId }, { $set: req.body }, { new: true });
-        console.log(req.body);
+        let profile = await Profile.findOneAndUpdate({ user: req.body.userId }, { $set: req.body }, { new: true });
         if (profile === null) {
             await new Profile(req.body).save();
         }
         return res.status(StatusCodes.OK).json({
             error: false,
-            message: "success"
+            message: "success",
+            profile:profile
         })
     } catch (error) {
         console.log(error);
@@ -97,6 +97,7 @@ exports.getUnverifiedProfileRegionalAdminCount = async (req, res) => {
 }
 exports.getUnverifiedProfileAdmin = async (req, res) => {
     Profile.find({ isVerified: false, })
+    .populate("user")
         .then((profile) => {
             return res.status(StatusCodes.OK).json({
                 error: false,
@@ -113,7 +114,8 @@ exports.getUnverifiedProfileAdmin = async (req, res) => {
         })
 }
 exports.getUnverifiedProfileRegionalAdmin = async (req, res) => {
-    Profile.find({ isVerified: false, })
+    Profile.find({ isVerified: false,region:req.user.regions[0]})
+    .populate("user")
         .then((profile) => {
             return res.status(StatusCodes.OK).json({
                 error: false,

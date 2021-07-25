@@ -36,7 +36,7 @@ exports.setUser = (req, res, next, id) => {
 				message: "Error in finding the user Id",
 			});
 		}
-		userInfo.password = undefined;
+		//userInfo.password = undefined;
 		req.user = userInfo;
 		next();
 	});
