@@ -38,3 +38,39 @@ exports.updateSupport = async (req,res) => {
     }
 
 }
+
+exports.getSupportList = async(req,res) => {
+    try{
+        let supports = await Support.find({user : req.params.userId});
+        return res.status(StatusCodes.OK).json({
+            error : false ,
+            message : "success",
+            supports :supports,
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : false,
+            err : error.message,
+            message : "Error in updating the support",
+        })
+    }
+}
+
+exports.supportDescription = async(req,res) => {
+    try{
+        let support = await Support.findOne({_id : req.params.supportId});
+        return res.status(StatusCodes.OK).json({
+            error : false ,
+            message : "success",
+            support :support,
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : false,
+            err : error.message,
+            message : "Error in updating the support",
+        })
+    }
+}

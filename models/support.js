@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const supportSchema = new mongoose.Schema(
 	{	
-		tenant: {
+		user: {
 			type: mongoose.SchemaTypes.ObjectId,
 			ref: "User",
 		},
