@@ -26,7 +26,7 @@ const profileSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
-		rejected: {
+		rejectedReason: {
 			type: String,
 			default: "",
 		},
