@@ -98,6 +98,7 @@ exports.getUnverifiedProfileRegionalAdminCount = async (req, res) => {
 exports.getUnverifiedProfileAdmin = async (req, res) => {
     Profile.find({ isVerified: false,isActive:true })
     .populate("user")
+    .populate("rejectedBy")
         .then((profile) => {
             return res.status(StatusCodes.OK).json({
                 error: false,
@@ -116,6 +117,7 @@ exports.getUnverifiedProfileAdmin = async (req, res) => {
 exports.getUnverifiedProfileRegionalAdmin = async (req, res) => {
     Profile.find({ isVerified: false,isActive:true,region:req.user.regions[0]})
     .populate("user")
+    .populate("rejectedBy")
         .then((profile) => {
             return res.status(StatusCodes.OK).json({
                 error: false,
