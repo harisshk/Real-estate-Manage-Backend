@@ -26,6 +26,15 @@ const profileSchema = new mongoose.Schema(
 			type: Boolean,
 			default: false,
 		},
+		rejectedReason: {
+			type: String,
+			default: "",
+		},
+		rejectedBy: {
+			type: mongoose.SchemaTypes.ObjectId,
+			ref:"User"
+		},
+		
 	},
 	{timestamps: true},
 );

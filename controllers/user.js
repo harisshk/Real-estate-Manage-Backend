@@ -577,7 +577,7 @@ exports.tenantDashboardInfo = async(req,res) => {
 
 exports.getUserInfo = async(req,res) => {
 	try{	
-		let profile = await Profile.findOne({user : req.user._id});
+		let profile = await Profile.findOne({user : req.user._id}).populate("rejectedBy")
 		req.user.jwtToken = undefined;
 		console.log(profile,'----- ');
 		return res.status(StatusCodes.OK).json({
