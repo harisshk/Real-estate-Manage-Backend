@@ -27,6 +27,10 @@ const supportSchema = new mongoose.Schema(
             type : String ,
             default : "",
         },
+        assignedTo:{
+            type:mongoose.SchemaTypes.ObjectId,
+            ref:"User"
+        }
 
 	},
 	{timestamps: true},
