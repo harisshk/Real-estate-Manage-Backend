@@ -19,6 +19,10 @@ const supportSchema = new mongoose.Schema(
                 }
             }
         ],
+        subject:{
+            type : String,
+            default : "",
+        },
         region : {
             type : String,
             default : "",
