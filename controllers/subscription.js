@@ -7,20 +7,28 @@ exports.newSubscription = async (req, res) => {
     try {
         const { tenant  , property } = req.body;
         let checkTenant = await User.findOne({ email: tenant, role: "tenant" });
-        if (!checkTenant) {
+        if (!checkTenant || checkTenant.role !== "tenant") {
             return res.status(StatusCodes.UNAUTHORIZED).json({
                 error: true,
                 message: "user not found or role mismatch",
             })
           }
-     req.body.tenant = checkTenant._id ;
+        if(checkTenant.subscription){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                error : true ,
+                message : "tenant already in use"
+            })
+        }
+        req.body.tenant = checkTenant._id ;
         let newSubscription = await new Subscription(req.body).save();
+        // let subscriptionExists = await 
         let propertyInfo = await Property.findOneAndUpdate({_id : property} , {subscription : newSubscription._id},{new : true})
         await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id , regions : [propertyInfo.region] },{new : true});
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "Subscription successful",
             property : property,
+            subscription : newSubscription._id
         })
     } catch (error) {
         return res.status(StatusCodes.BAD_REQUEST).json({
