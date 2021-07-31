@@ -4,8 +4,8 @@ const {
 	updateProperty,
 	getProperties,
 	getPropertiesByRegionalAdmin,
-	getPropertiesByAdmin,getPropertiesByHouseOwner
-	
+	getPropertiesByAdmin,getPropertiesByHouseOwner,
+	getPropertyInfo
 } = require("../controllers/property");
 const {isSignedIn, setUser, isOwner, isAdmin, isRegionalAdmin} = require("../controllers/auth");
 const router = express.Router();
@@ -55,6 +55,6 @@ router.post(
 	updateProperty
 );
 
-// router.get('/property/propertyInfo/:propertyId',isSignedIn , getPropertyInfo);
+router.get('/property/propertyInfo/:userId/:propertyId',isSignedIn , getPropertyInfo);
 
 module.exports = router;
