@@ -74,7 +74,7 @@ exports.supportDescription = async(req,res) => {
         })
     }
 }
-export const getAllSupportByAdmin = async(req,res) => {
+exports.getAllSupportByAdmin = async(req,res) => {
     try{
         let supports = await Support.find({});
         return res.status(StatusCodes.OK).json({
@@ -92,7 +92,7 @@ export const getAllSupportByAdmin = async(req,res) => {
     }
 }
 
-export const getAllSupportByRegionalAdmin = async(req,res) => {
+exports.getAllSupportByRegionalAdmin = async(req,res) => {
     try{
         let supports = await Support.find({region : req.body.region});
         return res.status(StatusCodes.OK).json({
