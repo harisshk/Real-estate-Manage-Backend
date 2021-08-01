@@ -12,7 +12,7 @@ exports.createSupport = async(req,res) => {
     }catch(error){
         console.log(error);
         return res.status(StatusCodes.BAD_REQUEST).json({
-            error : false,
+            error : true,
             err : error.message,
             message : "Error in creating the support",
         })
@@ -31,7 +31,7 @@ exports.updateSupport = async (req,res) => {
     }catch(error){
         console.log(error);
         return res.status(StatusCodes.BAD_REQUEST).json({
-            error : false,
+            error : true,
             err : error.message,
             message : "Error in updating the support",
         })
@@ -50,7 +50,7 @@ exports.getSupportList = async(req,res) => {
     }catch(error){
         console.log(error);
         return res.status(StatusCodes.BAD_REQUEST).json({
-            error : false,
+            error : true,
             err : error.message,
             message : "Error in updating the support",
         })
