@@ -2,42 +2,46 @@
 const mongoose = require("mongoose");
 
 const supportSchema = new mongoose.Schema(
-	{	
-		user: {
-			type: mongoose.SchemaTypes.ObjectId,
-			ref: "User",
-		},
-		messages: [
+    {
+        supportNo: {
+            type: String,
+            required:true
+        },
+        user: {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: "User",
+        },
+        messages: [
             {
-                user : {
-                    type : mongoose.SchemaTypes.ObjectId ,
-                    ref : "User",
+                user: {
+                    type: mongoose.SchemaTypes.ObjectId,
+                    ref: "User",
                 },
-                message : {
+                message: {
                     type: String,
-                    default : '',
+                    default: '',
                 }
             }
         ],
-        subject:{
-            type : String,
-            default : "",
+        subject: {
+            type: String,
+            default: "",
         },
-        region : {
-            type : String,
-            default : "",
-        },   
-		status : {
-            type : String ,
-            default : "",
+        region: {
+            type: String,
+            default: "",
         },
-        assignedTo:{
-            type:mongoose.SchemaTypes.ObjectId,
-            ref:"User"
+        status: {
+            type: String,
+            default: "",
+        },
+        assignedTo: {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: "User"
         }
 
-	},
-	{timestamps: true},
+    },
+    { timestamps: true },
 );
 
 // Export the Schema with the name User.
