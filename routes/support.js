@@ -1,5 +1,5 @@
 const express = require("express");
-const { isSignedIn,setUser } = require("../controllers/auth");
+const { isSignedIn,setUser, isRegionalAdmin } = require("../controllers/auth");
 const { createSupport, updateSupport ,getSupportList, supportDescription } = require("../controllers/support");
 const router = express.Router();
 
@@ -10,6 +10,10 @@ router.post("/support/new/:userId",isSignedIn ,createSupport );
 router.put('/support/add/:userId/:supportId',isSignedIn,updateSupport);
 
 router.get('/support/list/:userId' , isSignedIn , getSupportList);
+
+router.get('/support/list/admin/:userId' , isSignedIn , isAdmin, getSupportList);
+
+router.get('/support/list/regionalAdmin/:userId' , isSignedIn ,isRegionalAdmin, getSupportList);
 
 router.get('/support/:userId/:supportId',isSignedIn , supportDescription); 
 
