@@ -1,19 +1,19 @@
-const {StatusCodes} = require("http-status-codes");
+const { StatusCodes } = require("http-status-codes");
 const Property = require("../models/property");
 const User = require("../models/user");
 
 exports.addProperty = async (req, res) => {
 	try {
-		let user = await User.findOne({email : req.body.owner}) ;
-		if(!user){
+		let user = await User.findOne({ email: req.body.owner });
+		if (!user) {
 			return res.status(StatusCodes.BAD_REQUEST).json({
-				error : true ,
-				message : "Owner email not found , create account with email ID first" ,
+				error: true,
+				message: "Owner email not found , create account with email ID first",
 
 			})
 		}
-		req.body.owner = user._id ;
-			let newProperty = await new Property(req.body).save();
+		req.body.owner = user._id;
+		let newProperty = await new Property(req.body).save();
 
 		return res.status(StatusCodes.ACCEPTED).json({
 			message: "Property added",
@@ -31,7 +31,7 @@ exports.addProperty = async (req, res) => {
 };
 
 exports.updateProperty = (req, res) => {
-	Property.findOne({_id: req.params.propertyId}, {$set: req.body})
+	Property.findOne({ _id: req.params.propertyId }, { $set: req.body })
 		.then((response) => {
 			return res.status(StatusCodes.ACCEPTED).json({
 				message: "Property updated",
@@ -49,8 +49,8 @@ exports.updateProperty = (req, res) => {
 
 exports.deleteProperty = (req, res) => {
 	Property.findOne(
-		{_id: req.params.propertyId},
-		{$set: {isDelete: true, deletedBy: req.user._id}},
+		{ _id: req.params.propertyId },
+		{ $set: { isDelete: true, deletedBy: req.user._id } },
 	)
 		.then((response) => {
 			return res.status(StatusCodes.ACCEPTED).json({
@@ -101,21 +101,21 @@ exports.getProperties = async (req, res) => {
 
 		return res
 			.status(StatusCodes.BAD_REQUEST)
-			.json({error: false, properties: results});
+			.json({ error: false, properties: results });
 	} catch (error) {
 		return res
 			.status(StatusCodes.BAD_REQUEST)
-			.json({error: true, message: error.message});
+			.json({ error: true, message: error.message });
 	}
 };
 
-exports.getPropertiesByAdmin = async(req,res)=>{
-	try{
-		let properties = await Property.find({isDeleted : false}).populate('subscription');
-			return res.status(StatusCodes.ACCEPTED).json({
-			error : false ,
-			message : "Properties Fetched Successfully",
-			properties : properties ,
+exports.getPropertiesByAdmin = async (req, res) => {
+	try {
+		let properties = await Property.find({ isDeleted: false }).populate('subscription');
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "Properties Fetched Successfully",
+			properties: properties,
 		})
 	}
 	catch (error) {
@@ -128,13 +128,13 @@ exports.getPropertiesByAdmin = async(req,res)=>{
 	}
 };
 
-exports.getPropertiesByRegionalAdmin = async(req,res)=>{
-	try{
-		let properties = await Property.find({isDeleted : false , region : req.user.regions[0] }).populate('subscription').populate({path : "subscription" , populate :'tenant'}).populate("owner",{jwtToken:0,password:0}) ;
+exports.getPropertiesByRegionalAdmin = async (req, res) => {
+	try {
+		let properties = await Property.find({ isDeleted: false, region: req.user.regions[0] }).populate('subscription').populate({ path: "subscription", populate: 'tenant' }).populate("owner", { jwtToken: 0, password: 0 });
 		return res.status(StatusCodes.ACCEPTED).json({
-			error : false ,
-			message : "Properties Fetched Successfully",
-			properties : properties ,
+			error: false,
+			message: "Properties Fetched Successfully",
+			properties: properties,
 		})
 	}
 	catch (error) {
@@ -146,34 +146,33 @@ exports.getPropertiesByRegionalAdmin = async(req,res)=>{
 	}
 };
 
-exports.getPropertyInfo = async(req,res) => {
-	const {propertyId} = req.params ;
-	try{
-
-		let propertyInfo = await Property.findOne({_id : propertyId})
+exports.getPropertyInfo = async (req, res) => {
+	const { propertyId } = req.params;
+	try {
+		let propertyInfo = await Property.findOne({ _id: propertyId })
 			.populate('subscription')
-		return res.status(400).json({error : false , message : "Success" , property : propertyInfo})
-	}catch(error){
+		return res.status(StatusCodes.OK).json({ error: false, message: "Success", property: propertyInfo })
+	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST)
-					.json({error : true ,message : "Error in getting Property Info",err : error})
+			.json({ error: true, message: "Error in getting Property Info", err: error })
 	}
 
 }
 
-exports.getPropertiesByHouseOwner = async(req,res) => {
-	try{
-		let properties = await Property.find({owner : req.user._id , isDeleted : false} ).populate('subscription');
+exports.getPropertiesByHouseOwner = async (req, res) => {
+	try {
+		let properties = await Property.find({ owner: req.user._id, isDeleted: false }).populate('subscription');
 		return res.status(StatusCodes.ACCEPTED).json({
-			error : false ,
-			message : "Properties Fetched Successfully",
-			properties : properties ,
+			error: false,
+			message: "Properties Fetched Successfully",
+			properties: properties,
 		})
-	}catch(error){
+	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			message: "Error fetching property ",
 			error: true,
 			err: error.message,
 		});
 	}
-	
+
 }
