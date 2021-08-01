@@ -499,11 +499,11 @@ exports.getAdminDashboardInfo = async(req,res) => {
 		let regionalAdminCount = await User.find({isDeleted : false  ,role : "regional-admin"}).countDocuments() ;
 		let ownerCount = await User.find({isDeleted : false , role : "owner" }).countDocuments() ;
 		let propertyCount = await Property.find({isDeleted : false }).countDocuments() ;
-		let supportRequestCount = await Support.find({isActive : true});
+		let supportRequestCount = await Support.find({isActive : true}).countDocuments();
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "Admins" , count : adminCount},{title : "Regional Admins" , count : regionalAdminCount},{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" ,count  : propertyCount }]
+			result : [{title : "Admins" , count : adminCount},{title : "Regional Admins" , count : regionalAdminCount},{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" ,count  : propertyCount },{title : 'Tickets Raised' , count :supportRequestCount }]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
@@ -520,10 +520,11 @@ exports.getRegionalAdminInfo = async (req,res) => {
 		let tenantCount = await User.find({isDeleted : false  , role : "tenant" },{$in : {regions : req.user.regions[0]}}).countDocuments() ;
 		let ownerCount = await User.find({isDeleted : false , role : "owner"},{$in : {regions : req.user.regions[0]}}).countDocuments() ;
 		let propertyCount = await Property.find({isDeleted : false , region : req.user.regions[0]}).countDocuments();
+		let supportRequestCount = await Support.find({isActive : true,region : req.user.regions[0]}).countDocuments();
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" , count : propertyCount}]
+			result : [{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" , count : propertyCount},{title : 'Tickets Raised' , count : supportRequestCount}]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
