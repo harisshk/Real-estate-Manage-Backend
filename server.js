@@ -12,6 +12,7 @@ const subscriptionRoute = require("./routes/subscription");
 const orderRoute = require('./routes/order');
 const profileRoute = require('./routes/profile');
 const paymentRoute = require('./routes/payment')
+const supportRoute = require('./routes/support')
 var cronJobs = require('./cronJob/order');
 
 const PORT = process.env.PORT || 5050;
@@ -46,6 +47,7 @@ app.use('/api',subscriptionRoute);
 app.use('/api',orderRoute);
 app.use('/data',assestsRoute);
 app.use('/api',profileRoute);
-app.use('/api',paymentRoute)
+app.use('/api',paymentRoute);
+app.use('/api',supportRoute);
 
 app.listen(PORT, () => console.log(`Server is running at PORT ${PORT}`));
