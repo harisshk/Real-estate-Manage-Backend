@@ -9,12 +9,19 @@ const mailer = (email, OTP, text) => {
       user: userNameMail,
       pass: applicationPassword,
     },
-  });
+    from : {
+      name: 'info@stglobalsolutions.com',
+      address: 'info@stglobalsolutions.com'
+    }
+});
   var mailOptions = {
-    from: "hari.jsmith494@gmail.com",
+    from : {
+      name: 'info@stglobalsolutions.com',
+      address: 'info@stglobalsolutions.com'
+    },
     to: email,
-    subject: `OTP`,
-    html: `<p>your ${text} OTP is ${OTP}</p>`,
+    subject: `PROPY!! LOGIN OTP`,
+    html: `<p>Your ${text} OTP is ${OTP}</p>`,
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
@@ -34,9 +41,16 @@ const sendMail = (email, body, content) => {
       user: userNameMail,
       pass: applicationPassword,
     },
+    from : {
+      name: 'info@stglobalsolutions.com',
+      address: 'info@stglobalsolutions.com'
+    }
   });
   var mailOptions = {
-    from: "hari.jsmith494@gmail.com",
+    from : {
+      name: 'info@stglobalsolutions.com',
+      address: 'info@stglobalsolutions.com'
+    },
     to: email,
     subject: body,
     html: content,
@@ -58,12 +72,18 @@ const sendPasswordMailer = (email, password) => {
       user: userNameMail,
       pass: applicationPassword,
     },
+    from : {
+      name: 'info@stglobalsolutions.com',
+      address: 'info@stglobalsolutions.com'
+    }
   });
   var mailOptions = {
-    from: "hari.jsmith494@gmail.com",
-    to: email,
-    subject: `Password`,
-    html: `<p>your login password is ${password}. Kindly change the password </p>`,
+    from : {
+      name: 'info@stglobalsolutions.com',
+      address: 'info@stglobalsolutions.com'
+    },to: email,
+    subject: `PROPY Login Password`,
+    html: `<p>Propy Welcome's you.Your Login password is ${password}.</p>`,
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {

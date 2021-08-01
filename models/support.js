@@ -33,11 +33,15 @@ const supportSchema = new mongoose.Schema(
         },
         status: {
             type: String,
-            default: "",
+            default: "New",
         },
         assignedTo: {
             type: mongoose.SchemaTypes.ObjectId,
             ref: "User"
+        },
+        isActive : {
+            type : Boolean,
+            default : true,
         }
 
     },
