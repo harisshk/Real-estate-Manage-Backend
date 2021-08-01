@@ -10,6 +10,7 @@ const generatePassword = require("password-generator");
 const {sendPasswordMailer, mailer} = require("../methods/nodemailer");
 const {generateRandom4DigitOTP} = require("../methods/otpGenerate");
 const Order = require("../models/order");
+const Support = require("../models/support");
 
 exports.register = async (req, res) => {
 	try {
@@ -498,6 +499,7 @@ exports.getAdminDashboardInfo = async(req,res) => {
 		let regionalAdminCount = await User.find({isDeleted : false  ,role : "regional-admin"}).countDocuments() ;
 		let ownerCount = await User.find({isDeleted : false , role : "owner" }).countDocuments() ;
 		let propertyCount = await Property.find({isDeleted : false }).countDocuments() ;
+		let supportRequestCount = await Support.find({isActive : true});
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,

@@ -11,7 +11,7 @@ const mailer = (email, OTP, text) => {
     },
   });
   var mailOptions = {
-    from: "hari.jsmith494@gmail.com",
+    from: process.env.EMAIL_ADDRESS || "info@stglobalsolutions.com",
     to: email,
     subject: `OTP`,
     html: `<p>your ${text} OTP is ${OTP}</p>`,
@@ -36,7 +36,7 @@ const sendMail = (email, body, content) => {
     },
   });
   var mailOptions = {
-    from: "hari.jsmith494@gmail.com",
+    from: process.env.EMAIL_ADDRESS || "info@stglobalsolutions.com",
     to: email,
     subject: body,
     html: content,
@@ -60,10 +60,10 @@ const sendPasswordMailer = (email, password) => {
     },
   });
   var mailOptions = {
-    from: "hari.jsmith494@gmail.com",
+    from: "info@stglobalsolutions.com",
     to: email,
-    subject: `Password`,
-    html: `<p>your login password is ${password}. Kindly change the password </p>`,
+    subject: `PROPY Login Password`,
+    html: `<p>Propy Welcome's you.Your Login password is ${password}.</p>`,
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
