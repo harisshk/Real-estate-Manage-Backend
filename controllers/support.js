@@ -8,6 +8,7 @@ exports.createSupport = async (req, res) => {
         .then((count) => {
             let newSupportCount = {
                 ...req.body,
+                messages:[{ time: Date(), message:"Ticket created"}],
                 supportNo: String(count + 1000 + 1)
             }
             let newSupport = new Support(newSupportCount)
