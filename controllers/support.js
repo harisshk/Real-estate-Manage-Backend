@@ -92,7 +92,7 @@ exports.supportDescription = async (req, res) => {
 }
 exports.getAllSupportByAdmin = async (req, res) => {
     try {
-        let supports = await Support.find({});
+        let supports = await Support.find({}).populate('user');
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
@@ -110,7 +110,7 @@ exports.getAllSupportByAdmin = async (req, res) => {
 
 exports.getAllSupportByRegionalAdmin = async (req, res) => {
     try {
-        let supports = await Support.find({ region: req.body.region });
+        let supports = await Support.find({ region: req.body.region }).populate('user');
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
