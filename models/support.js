@@ -20,6 +20,10 @@ const supportSchema = new mongoose.Schema(
                 message: {
                     type: String,
                     default: '',
+                },
+                date:{
+                    type: String,
+                    default: '',
                 }
             }
         ],

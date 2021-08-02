@@ -1,6 +1,6 @@
 const express = require("express");
 const { isSignedIn,setUser, isRegionalAdmin,isAdmin } = require("../controllers/auth");
-const { createSupport, updateSupport ,getSupportList, supportDescription, getAllSupportByAdmin, getAllSupportByRegionalAdmin } = require("../controllers/support");
+const { createSupport, updateStatusSupport ,getSupportList, supportDescription, getAllSupportByAdmin, getAllSupportByRegionalAdmin, addMessageSupport } = require("../controllers/support");
 const router = express.Router();
 
 router.param("userId", setUser);
@@ -13,7 +13,11 @@ router.post("/support/new/:userId",isSignedIn ,createSupport );
 /**
  * @description update support by admin and regional admin
  */
-router.put('/support/add/:userId/:supportId',isSignedIn,updateSupport);
+router.put('/support/updateStatus/:userId/:supportId',isSignedIn,updateStatusSupport);
+/**
+ * @description update support by admin and regional admin
+ */
+router.put('/support/updateStatus/:userId/:supportId',isSignedIn,addMessageSupport);
 
 /**
  * @description get support for tenant and owner (own support)

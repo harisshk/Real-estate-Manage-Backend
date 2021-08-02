@@ -1,5 +1,6 @@
 const { StatusCodes } = require("http-status-codes");
-const Support = require("../models/support")
+const Support = require("../models/support");
+const user = require("../models/user");
 
 exports.createSupport = async (req, res) => {
     Support.find({})
@@ -37,7 +38,7 @@ exports.createSupport = async (req, res) => {
 
 
 
-exports.updateSupport = async (req, res) => {
+exports.updateStatusSupport = async (req, res) => {
     try {
         let support = await Support.findOneAndUpdate({ _id: req.params.supportId }, { $set: req.body }, { new: true });
         return res.status(StatusCodes.OK).json({
@@ -51,6 +52,25 @@ exports.updateSupport = async (req, res) => {
             error: true,
             err: error.message,
             message: "Error in updating the support",
+        })
+    }
+}
+exports.addMessageSupport = async (req, res) => {
+    try {
+        var arr = []
+        arr.push({ date: Date(), message: req.body.message,user:req.user.id });
+        let support = await Support.findOneAndUpdate({ _id: req.params.supportId }, { $push:{messages:arr}  }, { new: true });
+        return res.status(StatusCodes.OK).json({
+            error: false,
+            message: "success",
+            support: support,
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error: true,
+            err: error.message,
+            message: "Error in updating the support message",
         })
     }
 }
