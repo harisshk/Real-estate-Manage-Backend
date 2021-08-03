@@ -131,7 +131,7 @@ exports.getAllSupportByAdmin = async (req, res) => {
 
 exports.getAllSupportByRegionalAdmin = async (req, res) => {
     try {
-        let supports = await Support.find({ region: req.body.region }).populate('user');
+        let supports = await Support.find({ region: req.user.regions[0] }).populate('user');
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
