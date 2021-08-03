@@ -17,7 +17,7 @@ router.put('/support/updateStatus/:userId/:supportId',isSignedIn,updateStatusSup
 /**
  * @description update support by admin and regional admin
  */
-router.put('/support/updateStatus/:userId/:supportId',isSignedIn,addMessageSupport);
+router.put('/support/updateMessage/:userId/:supportId',isSignedIn,addMessageSupport);
 
 /**
  * @description get support for tenant and owner (own support)
