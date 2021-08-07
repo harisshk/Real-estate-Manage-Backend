@@ -500,10 +500,40 @@ exports.getAdminDashboardInfo = async(req,res) => {
 		let ownerCount = await User.find({isDeleted : false , role : "owner" }).countDocuments() ;
 		let propertyCount = await Property.find({isDeleted : false }).countDocuments() ;
 		let supportRequestCount = await Support.find({isActive : true}).countDocuments();
+		let pendingDueCount = await Order.find({paymentStatus : "Pending"}).countDocuments();
 		return res.status(StatusCodes.OK).json({
-			error : false ,
-			message : "success" ,
-			result : [{title : "Admins" , count : adminCount},{title : "Regional Admins" , count : regionalAdminCount},{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" ,count  : propertyCount },{title : 'Active Tickets Raised' , count :supportRequestCount }]
+			error : false,
+			message : "success",
+			result : [
+				{
+					title : "Admins", 
+					count : adminCount
+				},
+				{
+					title : "Regional Admins", 
+					count : regionalAdminCount
+				},
+				{
+					title : "House Owners", 
+					count : ownerCount
+				},
+				{
+					title : "Tenants",
+					count : tenantCount
+				},
+				{
+					title : "Properties",
+					count  : propertyCount
+				},
+				{
+					title : 'Active Tickets Raised', 
+					count :supportRequestCount
+				},
+				{
+					title : "Pending Due",
+					count : pendingDueCount
+				}
+			]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
@@ -521,10 +551,32 @@ exports.getRegionalAdminInfo = async (req,res) => {
 		let ownerCount = await User.find({isDeleted : false , role : "owner"},{$in : {regions : req.user.regions[0]}}).countDocuments() ;
 		let propertyCount = await Property.find({isDeleted : false , region : req.user.regions[0]}).countDocuments();
 		let supportRequestCount = await Support.find({isActive : true,region : req.user.regions[0]}).countDocuments();
+		let pendingDueCount = await Order.find({paymentStatus : "Pending" , region : req.user.regions[0]}).countDocuments();
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" , count : propertyCount},{title : 'Active Tickets Raised' , count : supportRequestCount}]
+			result : [
+				{
+					title : "House Owners", 
+					count : ownerCount
+				},
+				{
+					title : "Tenants",
+					count : tenantCount
+				},
+				{
+					title : "Properties", 
+					count : propertyCount
+				},
+				{
+					title : 'Active Tickets Raised',
+					count : supportRequestCount
+				},
+				{
+					title : 'Pending Due',
+					count : pendingDueCount
+				}
+			]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
@@ -538,11 +590,21 @@ exports.getRegionalAdminInfo = async (req,res) => {
 exports.getOwnerDashboardInfo = async (req,res) => {
 	try{
 		let propertyCount = await Property.find({isDeleted : false , owner : req.user._id}).countDocuments();
+		let pendingDueCount = await Order.find({paymentStatus : "Pending" ,owner : req.user._id}).countDocuments();
 		
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "Properties" , count : propertyCount}]
+			result : [
+				{
+					title : "Properties", 
+					count : propertyCount
+				},
+				{
+					title : "Pending Due",
+					count : pendingDueCount
+				}
+			]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
