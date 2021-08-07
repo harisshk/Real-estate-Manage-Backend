@@ -3,8 +3,6 @@ const { sendMail } = require('../methods/nodemailer');
 const Order = require('../models/order');
 const Transaction = require('../models/transaction')
 var Subscription = require('../models/subscription');
-const subscription = require('../models/subscription');
-const { populate } = require('../models/order');
 
 const month = ["Jan" , "Feb" , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct", "Nov" , "Dec"]
 
@@ -102,10 +100,16 @@ exports.historyOfOrdersTenant = async(req,res) => {
 
 exports.historyOfOrdersOwner = async(req,res) => {
     try{
-        console.log('-----')
-        let orderHistory = await Order.find({owner: req.user._id}).populate({path : "subscription" , populate :'tenant'}).populate({path : "subscription" , populate :'property'}).sort({createdAt : -1});
-        console.log(orderHistory); 
-        console.log('orders')
+        let orderHistory = await Order.find({owner: req.user._id , paymentStatus : "Done"})
+            .populate({
+                path : "subscription",
+                 populate :'tenant'
+            })
+            .populate({
+                path : "subscription",
+                populate :'property'
+            })
+            .sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
@@ -117,13 +121,50 @@ exports.historyOfOrdersOwner = async(req,res) => {
             error : false ,
             err : error.message,
             message : "Error in fetching the history of orders"
+        })
+    }
+}
+
+exports.pendingDueOwner = async(req,res) => {
+    try{
+        let pendingDue = await Order.find({owner: req.user._id, paymentStatus : "Pending"})
+            .populate({
+                path : "subscription", 
+                populate :'tenant'
+            })
+            .populate({
+                path : "subscription",
+                populate :'property'
+            })
+            .sort({createdAt : -1});
+        return res.status(StatusCodes.OK).json({
+            error : false ,
+            message :"success" ,
+            orderHistory : pendingDue
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : false ,
+            err : error.message,
+            message : "Error in fetching the dues"
         })
     }
 }
 
 exports.historyOfOrdersRegionalAdmin = async(req,res) => {
     try{
-        let orderHistory = await Order.find({region : req.user.regions[0],paymentStatus : "Done"}).populate('subscription').populate({path : "subscription" , populate :'tenant'}).populate({path : "subscription" , populate :'property'}).sort({createdAt : -1});
+        let orderHistory = await Order.find({region : req.user.regions[0],paymentStatus : "Done"})
+            .populate('subscription')
+            .populate({
+                path : "subscription",
+                populate :'tenant'
+            })
+            .populate({
+                path : "subscription",
+                populate :'property'
+            })
+            .sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
@@ -139,9 +180,52 @@ exports.historyOfOrdersRegionalAdmin = async(req,res) => {
     }
 }
 
+exports.pendingDueRegionalAdmin = async(req,res) => {
+    try{
+        let pendingDue = await Order.find({region : req.user.regions[0],paymentStatus : "Pending"})
+            .populate('subscription')
+            .populate({
+                path : "subscription",
+                populate :'tenant'
+            })
+            .populate({
+                path : "subscription",
+                populate :'property'
+            })
+            .sort({createdAt : -1});
+        return res.status(StatusCodes.OK).json({
+            error : false ,
+            message :"success" ,
+            orderHistory : pendingDue
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : false ,
+            err : error.message,
+            message : "Error in fetching the dues"
+        })
+    }
+}
+
 exports.historyOfOrdersAdmin = async(req,res) => {
     try{
-        let orderHistory = await Order.find({paymentStatus : "Done"}).populate('subscription').populate({path : "subscription" , populate : {path : "tenant" ,select : "name"}}).populate({path : "subscription" , populate : {path : "property" ,select : "name owner rent"}}).sort({createdAt : -1});
+        let orderHistory = await Order.find({paymentStatus : "Done"})
+            .populate('subscription')
+            .populate({
+                path : "subscription",
+                populate : {
+                    path : "tenant",
+                    select : "name"
+                }})
+            .populate({
+                path : "subscription", 
+                populate : {
+                    path : "property",
+                    select : "name owner rent"
+                }
+            })
+            .sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
@@ -153,6 +237,40 @@ exports.historyOfOrdersAdmin = async(req,res) => {
             error : false ,
             err : error.message,
             message : "Error in fetching the history of orders"
+        })
+    }
+}
+
+exports.pendingDueAdmin = async(req,res) => {
+    try{
+        let pendingDue = await Order.find({paymentStatus : "Pending"})
+            .populate('subscription')
+            .populate({
+                path : "subscription", 
+                populate : {
+                    path : "tenant",
+                    select : "name"
+                }
+            })
+            .populate({
+                path : "subscription", 
+                populate : {
+                    path : "property",
+                    select : "name owner rent"
+                }
+            })
+            .sort({createdAt : -1});
+        return res.status(StatusCodes.OK).json({
+            error : false ,
+            message :"success" ,
+            orderHistory : pendingDue
+        })
+    }catch(error){
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : false ,
+            err : error.message,
+            message : "Error in fetching the dues"
         })
     }
 }
