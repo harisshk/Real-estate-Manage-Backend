@@ -43,8 +43,12 @@ exports.getProfileInfo = async (req, res) => {
 exports.updateProfile = async (req, res) => {
     try {
         let profile = await Profile.findOneAndUpdate({ user: req.body.userId }, { $set: req.body }, { new: true });
-        if (profile === null) {
-            await new Profile(req.body).save();
+         if(profile === null){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                error : true , 
+                message : "Error in getting the user profile.",
+                err : "profile is null"
+            })
         }
         return res.status(StatusCodes.OK).json({
             error: false,
@@ -52,7 +56,6 @@ exports.updateProfile = async (req, res) => {
             profile:profile
         })
     } catch (error) {
-        console.log(error);
         return res.status(StatusCodes.BAD_REQUEST).json({
             error: true,
             err: error.message,

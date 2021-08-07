@@ -52,7 +52,7 @@ exports.placeOrder = async(req,res) => {
             transactionId : transactionId,
             amountPaid : amountPaid,
         }
-        let transactionResponse = await Transaction(transactionInput);
+        let transactionResponse = await Transaction(transactionInput).save();
         let subscriptionInput = {
             billingCycle : paymentStatus === "Done" ? 0 : billingCycle ,
             paidUntil : new Date()

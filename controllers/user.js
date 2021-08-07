@@ -503,7 +503,7 @@ exports.getAdminDashboardInfo = async(req,res) => {
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "Admins" , count : adminCount},{title : "Regional Admins" , count : regionalAdminCount},{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" ,count  : propertyCount },{title : 'Tickets Raised' , count :supportRequestCount }]
+			result : [{title : "Admins" , count : adminCount},{title : "Regional Admins" , count : regionalAdminCount},{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" ,count  : propertyCount },{title : 'Active Tickets Raised' , count :supportRequestCount }]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
@@ -524,7 +524,7 @@ exports.getRegionalAdminInfo = async (req,res) => {
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
-			result : [{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" , count : propertyCount},{title : 'Tickets Raised' , count : supportRequestCount}]
+			result : [{title : "House Owners" , count : ownerCount},{title : "Tenants" , count : tenantCount},{title : "Properties" , count : propertyCount},{title : 'Active Tickets Raised' , count : supportRequestCount}]
 		})
 	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
@@ -582,7 +582,6 @@ exports.getUserInfo = async(req,res) => {
 	try{	
 		let profile = await Profile.findOne({user : req.user._id}).populate("rejectedBy")
 		req.user.jwtToken = undefined;
-		console.log(profile,'----- ');
 		return res.status(StatusCodes.OK).json({
 			message : "success" ,
 			error : false ,
