@@ -9,7 +9,8 @@ const {
     historyOfOrdersAdmin,
     pendingDueAdmin,
     pendingDueRegionalAdmin,
-    pendingDueOwner
+    pendingDueOwner,
+    sendRemainder
 } = require("../controllers/order");
 const router = express.Router();
 
@@ -32,5 +33,12 @@ router.get('/order/due/regionalAdmin/:userId',isSignedIn , isRegionalAdmin , pen
 router.get('/order/due/admin/:userId',isSignedIn,isAdmin,pendingDueAdmin);
 
 router.get('/order/due/owner/:userId',isSignedIn , isOwner , pendingDueOwner);
+
+// body {
+//   to : email(String),
+//   subject : subject(String),
+//   content : content(String), 
+// }
+router.post('/order/remainder/',sendRemainder);
 
 module.exports = router;
