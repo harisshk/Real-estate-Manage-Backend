@@ -2,6 +2,7 @@ const { StatusCodes } = require('http-status-codes');
 const { sendMail } = require('../methods/nodemailer');
 const Order = require('../models/order');
 const Transaction = require('../models/transaction')
+const User = require('../models/user')
 var Subscription = require('../models/subscription');
 
 const month = ["Jan" , "Feb" , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct", "Nov" , "Dec"]
@@ -271,6 +272,25 @@ exports.pendingDueAdmin = async(req,res) => {
             error : false ,
             err : error.message,
             message : "Error in fetching the dues"
+        })
+    }
+}
+
+exports.sendRemainder = async (req,res) => {
+    try{
+        const {to , subject , body} = req.body;
+        let user =await User.findOne({_id : to});
+
+        sendMail(user.email, subject, body);
+        return res.status(StatusCodes.OK).json({
+            error : false,
+            message : "Remainder Sent"
+        })
+ }catch(error){
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : true,
+            err : "Error in sending the remainder",
+            message : "Error in sending the remainder"
         })
     }
 }

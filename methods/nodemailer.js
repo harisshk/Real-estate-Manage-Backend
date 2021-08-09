@@ -57,9 +57,9 @@ const sendMail = (email, body, content) => {
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      return res.status(400).json({ error: true, message: "Error in sending Invoice Mail" })
+      throw error;
+      // return res.status(400).json({ error: true, message: "Error in sending mail" })
     }
-
   });
 };
 
