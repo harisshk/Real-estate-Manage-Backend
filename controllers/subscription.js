@@ -2,6 +2,7 @@ const Subscription = require("../models/subscription");
 const User = require('../models/user')
 const { StatusCodes } = require('http-status-codes');
 const Property = require("../models/property");
+const { sendMail } = require("../methods/nodemailer");
 
 exports.newSubscription = async (req, res) => {
     try {
@@ -24,6 +25,12 @@ exports.newSubscription = async (req, res) => {
         // let subscriptionExists = await 
         let propertyInfo = await Property.findOneAndUpdate({_id : property} , {subscription : newSubscription._id},{new : true})
         await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id , regions : [propertyInfo.region] },{new : true});
+        let body = `Tenant ${checkTenant.name} as assigned to Property ${propertyInfo.name}`;
+        let subject = `Tenant Assigned`;
+        let allAdmins = await User.find({role : "admin" , isActive : false});
+        for(let i = 0 ; i < allAdmins.length ; i++){
+            sendMail(allAdmins[i].email, subject ,body);
+        }
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "Subscription successful",

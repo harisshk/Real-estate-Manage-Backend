@@ -1,4 +1,5 @@
 const { StatusCodes } = require("http-status-codes");
+const { sendMail } = require("../methods/nodemailer");
 const Support = require("../models/support");
 const user = require("../models/user");
 
@@ -41,7 +42,15 @@ exports.createSupport = async (req, res) => {
 
 exports.updateStatusSupport = async (req, res) => {
     try {
-        let support = await Support.findOneAndUpdate({ _id: req.params.supportId }, { $set: req.body }, { new: true });
+        let support = await Support.findOneAndUpdate(
+                { _id: req.params.supportId }, 
+                { $set: req.body }, 
+                { new: true }
+            ).populate("user");
+        let body = `#${support.supportNo} Support Number Status has changed to ${req.body.status}`;
+        let subject = `(#${support.supportNo} Support Number) Status has been updated`;
+        sendMail(support?.user?.email,subject,body)
+       
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
@@ -60,7 +69,15 @@ exports.addMessageSupport = async (req, res) => {
     try {
         var arr = []
         arr.push({ date: Date(), message: req.body.message,user:req.user.id });
-        let support = await Support.findOneAndUpdate({ _id: req.params.supportId }, { $push:{messages:arr}  }, { new: true });
+        let support = await Support.findOneAndUpdate(
+                { _id: req.params.supportId }, 
+                { $push:{messages:arr}  }, 
+                { new: true }
+            )
+            .populate("user");
+        let body = `${req.body.message}`;
+        let subject = `(#${support.supportNo} Support Number) Admins Have Responded to your Request`;
+        sendMail(support?.user?.email,subject,body)
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
