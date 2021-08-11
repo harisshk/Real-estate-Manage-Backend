@@ -34,7 +34,7 @@ const mailer = (email, OTP, text) => {
 
 const sendMail = (email, body, content) => {
   let userNameMail = "hari.jsmith494@gmail.com",
-    applicationPassword = "fqcjwpduyiuhwgun";
+  applicationPassword = "fqcjwpduyiuhwgun";
   var transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -58,7 +58,6 @@ const sendMail = (email, body, content) => {
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
       throw error;
-      // return res.status(400).json({ error: true, message: "Error in sending mail" })
     }
   });
 };

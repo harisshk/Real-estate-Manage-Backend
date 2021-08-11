@@ -7,7 +7,7 @@ const Profile = require('../models/profile');
 const OTP = require("../models/otp");
 const {StatusCodes} = require("http-status-codes");
 const generatePassword = require("password-generator");
-const {sendPasswordMailer, mailer} = require("../methods/nodemailer");
+const {sendPasswordMailer, mailer, sendMail} = require("../methods/nodemailer");
 const {generateRandom4DigitOTP} = require("../methods/otpGenerate");
 const Order = require("../models/order");
 const Support = require("../models/support");
@@ -356,6 +356,19 @@ exports.createAccountByAdmins = async (req, res) => {
 		};
 		let newUser = await new User(user).save();
 		sendPasswordMailer(req.body.email, password);
+		let body = `<p>New User Created</p>
+		<p>Name: ${newUser.name}</p>
+		<p>Role: ${newUser.role}</p>
+		<p>&nbsp;</p>
+		<p>- Account Created By ${req.user.name}</p>`;
+        let subject = `!! PROPY New User Added`;
+        let allAdmins = await User.find({role : "admin" , isActive : true});
+        if(req.user.role === "regional-admin"){
+			// for(let i = 0 ; i < allAdmins.length ; i++){
+				sendMail ('hari850800@gmail.com', subject ,body);
+			// }
+		}
+		
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Account is created Successfully",

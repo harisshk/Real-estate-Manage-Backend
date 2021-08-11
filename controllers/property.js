@@ -1,4 +1,5 @@
 const { StatusCodes } = require("http-status-codes");
+const { sendMail } = require("../methods/nodemailer");
 const Property = require("../models/property");
 const User = require("../models/user");
 
@@ -14,7 +15,24 @@ exports.addProperty = async (req, res) => {
 		}
 		req.body.owner = user._id;
 		let newProperty = await new Property(req.body).save();
-
+		let body = `<p>New Property Added</p>
+		<p>${newProperty.name}&nbsp;</p>
+		<p style="text-align: center;"><img src=${newProperty?.photos[0]} alt="" width="421" height="280" /></p>
+		<p>Property Location</p>
+		<p>&nbsp; &nbsp;${newProperty?.addressLine1},</p>
+		<p>&nbsp; &nbsp;${newProperty?.addressLine2 || ''}</p>
+		<p>&nbsp; &nbsp;${newProperty?.zipCode}, ${newProperty?.region}.</p>
+		<p>&nbsp; &nbsp;${newProperty?.state}</p>
+		<p>Rent: ${newProperty.rent} Rs</p>
+		<p>Initial Deposit: ${newProperty.initialDeposit} Rs</p>
+		<p>Square Feet: ${newProperty.size} ft</p>
+		<p>Added By ${req.user.name}-(${req?.user?.regions[0]})</p>
+		<p>&nbsp;&nbsp;</p>`;
+        let subject = `!! PROPY New Property Added`;
+        let allAdmins = await User.find({role : "admin" , isActive : true});
+        for(let i = 0 ; i < allAdmins.length ; i++){
+            sendMail (allAdmins[i].email, subject ,body);
+        }
 		return res.status(StatusCodes.ACCEPTED).json({
 			message: "Property added",
 			error: false,
