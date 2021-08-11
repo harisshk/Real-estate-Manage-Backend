@@ -4,8 +4,6 @@ const { sendMail } = require('../methods/nodemailer');
 const Order = require('../models/order');
 const Subscription = require('../models/subscription')
 
-
-
 const scheduledJobForCreatingOrderEveryMonth =async () => {
     try {
         let subscription = await Subscription.find({ isActive: true }).populate('property', { rent: 1 , name : 1 , owner : 1 , region : 1 }).populate('tenant', { name: 1, email: 1 , regions : 1});

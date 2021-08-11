@@ -11,7 +11,7 @@ const {sendPasswordMailer, mailer, sendMail} = require("../methods/nodemailer");
 const {generateRandom4DigitOTP} = require("../methods/otpGenerate");
 const Order = require("../models/order");
 const Support = require("../models/support");
-
+const {addActivitiesUser} = require("../utils/logHandler/index")
 exports.register = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
@@ -24,6 +24,7 @@ exports.register = async (req, res) => {
 		}
 		let newUser = await new User(req.body).save();
 		newUser.password = undefined;
+		addActivitiesUser(req.user,newUser._id,`New ${newUser.role} addded`)
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Account is created Successfully",
@@ -160,8 +161,8 @@ exports.generateOTP = async (req, res) => {
 						});
 					})
 					.catch((error) => {
-						res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-							error: StatusCodes.INTERNAL_SERVER_ERROR,
+						res.status(StatusCodes.BAD_REQUEST).send({
+							error: StatusCodes.BAD_REQUEST,
 							success: false,
 							message: error,
 						});
@@ -175,8 +176,8 @@ exports.generateOTP = async (req, res) => {
 			}
 		})
 		.catch((error) => {
-			res.status(StatusCodes.INTERNAL_SERVER_ERROR).send({
-				error: StatusCodes.INTERNAL_SERVER_ERROR,
+			res.status(StatusCodes.BAD_REQUEST).send({
+				error: StatusCodes.BAD_REQUEST,
 				success: false,
 				message: error,
 			});
@@ -208,21 +209,21 @@ exports.validateLoginOTP = (req, res) => {
 						});
 					})
 					.catch((error) => {
-						res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+						res.status(StatusCodes.BAD_REQUEST).json({
 							errorMessage: error,
 							error: true,
 							message: "OTP cannot be validated",
 						});
 					});
 			} else {
-				res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+				res.status(StatusCodes.BAD_REQUEST).json({
 					message: "Invalid OTP",
 					error: true,
 				});
 			}
 		})
 		.catch((error) => {
-			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			res.status(StatusCodes.BAD_REQUEST).json({
 				message: error,
 				error: true,
 			});
@@ -243,7 +244,7 @@ exports.validateForgotPasswordOTP = (req, res) => {
 					userId: userInfo._id,
 				});
 			} else {
-				res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+				res.status(StatusCodes.BAD_REQUEST).json({
 					message: "Invalid OTP",
 					error: true,
 					valid: false,
@@ -251,7 +252,7 @@ exports.validateForgotPasswordOTP = (req, res) => {
 			}
 		})
 		.catch((error) => {
-			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			res.status(StatusCodes.BAD_REQUEST).json({
 				errorMessage: error,
 				message: "Invalid OTP",
 				error: true,
@@ -314,7 +315,7 @@ exports.getOTPForPassword = async (req, res) => {
 					});
 				})
 				.catch((error) => {
-					res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+					res.status(StatusCodes.BAD_REQUEST).json({
 						error: true,
 						err: error.message,
 						message: "Error in sending the OTP",
@@ -331,7 +332,7 @@ exports.getOTPForPassword = async (req, res) => {
 			
 		})
 		.catch((error) => {
-			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			res.status(StatusCodes.BAD_REQUEST).json({
 				userExists: false,
 					error: true,
 					message: "Internal server error",
@@ -368,7 +369,7 @@ exports.createAccountByAdmins = async (req, res) => {
 				sendMail ('hari850800@gmail.com', subject ,body);
 			// }
 		}
-		
+		addActivitiesUser(req.user._id,newUser._id,newUser.role==="tenant"? `New ${newUser.role}  added` : `New ${newUser.role} added in ${newUser?.regions[0]}`)
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Account is created Successfully",
@@ -448,15 +449,16 @@ exports.logout = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-	User.findByIdAndUpdate({_id: req.body.userId}, {$set: req.body})
-		.then(() => {
+	User.findByIdAndUpdate({_id: req.body.userId}, {$set: req.body},{new:1})
+		.then((updatedUserInfo) => {
+			addActivitiesUser(req.user?._id,updatedUserInfo?._id,`${updatedUserInfo?.name} profile has beed updated by ${req?.user?.name}`)
 			res.status(StatusCodes.OK).json({
 				error: false,
 				message: "User updated successfully",
 			});
 		})
 		.catch((error) => {
-			res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+			res.status(StatusCodes.BAD_REQUEST).json({
 				error: true,
 				errorMessage: error,
 				message:"User not updated"
@@ -486,7 +488,6 @@ exports.updateUserInfo = async (req, res) => {
 
 exports.getSubscriptionInfo = async (req,res) => {
 	try{
-
 		let userInfo = await User.findOne({_id :req.user._id}).populate('subscription').populate({path : "subscription" , populate :'property'}) ;
 		return res.status(StatusCodes.OK).json({
 			error : false ,
