@@ -44,7 +44,17 @@ exports.generateOrders = async(req,res) => {
 
 exports.placeOrder = async(req,res) => {
     try{
-        const{tenant , property , transactionId , amountPaid , paymentStatus , billingCycle , orders , region , owner} = req.body;
+        const{
+            tenant, 
+            property, 
+            transactionId, 
+            amountPaid, 
+            paymentStatus, 
+            billingCycle, 
+            orders, 
+            region, 
+            owner
+        } = req.body;
         let transactionInput = {
             tenant : tenant,
             property : property,
@@ -66,6 +76,90 @@ exports.placeOrder = async(req,res) => {
         for(let i = 0 ; i < orders.length ; i++){
             await Order.findOneAndUpdate({_id :orders[i]._id},{$set : orderInput});  
         }
+        let subject = `PROPY Your Payment Receipt`;
+        let body = `<table border="0" width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+        <tr>
+        <td align="center" bgcolor="#D2C7BA">
+        <table style="max-width: 600px;" border="0" width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+        <tr>
+        <td style="padding: 36px 24px 0; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top: 3px solid #d4dadf;" align="left" bgcolor="#ffffff">
+        <h1 style="margin: 0; font-size: 32px; font-weight: bold; letter-spacing: -1px; line-height: 48px;">PROPY! Payment Receipt&nbsp;</h1>
+        </td>
+        </tr>
+        </tbody>
+        </table>
+        </td>
+        </tr>
+        <tr>
+        <td align="center" bgcolor="#D2C7BA">
+        <table style="max-width: 600px;" border="0" width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+        <tr>
+        <td style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;" align="left" bgcolor="#ffffff">
+        <p style="margin: 0;">Here is a summary of your recent payment. If you have any questions or concerns about your order, please <a href="https://propy-d6d47.web.app/">contact us</a>.</p>
+        </td>
+        </tr>
+        <tr>
+        <td style="padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;" align="left" bgcolor="#ffffff">
+        <table style="height: 96px; width: 100%;" border="0" width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+        <tr style="height: 24px;">
+        <td style="padding: 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; height: 24px;" align="left" bgcolor="#D2C7BA" width="75%"><strong>Bills TransactionId # ${transactionId}</strong></td>
+        <td style="padding: 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; height: 24px;" align="left" bgcolor="#D2C7BA" width="25%">&nbsp;</td>
+        </tr>
+        <tr style="height: 24px;">
+        <td style="padding: 6px 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; height: 24px;" align="left" width="75%">Amount Paid</td>
+        <td style="padding: 6px 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; height: 24px;" align="left" width="25%">
+        <div>
+        <div>${amountPaid}</div>
+        </div>
+        </td>
+        </tr>
+        <tr style="height: 24px;">
+        <td style="padding: 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-top: 2px dashed #d2c7ba; border-bottom: 2px dashed #d2c7ba; height: 24px;" align="left" width="75%"><strong>Total</strong></td>
+        <td style="padding: 12px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px; border-top: 2px dashed #d2c7ba; border-bottom: 2px dashed #d2c7ba; height: 24px;" align="left" width="25%"><strong>${amountPaid}</strong></td>
+        </tr>
+        </tbody>
+        </table>
+        </td>
+        </tr>
+        </tbody>
+        </table>
+        </td>
+        </tr>
+        <tr>
+        <td align="center" valign="top" bgcolor="#D2C7BA" width="100%">
+        <table style="max-width: 600px;" border="0" width="100%" cellspacing="0" cellpadding="0" align="center" bgcolor="#ffffff">
+        <tbody>
+        <tr>
+        <td style="font-size: 0; border-bottom: 3px solid #d4dadf;" align="center" valign="top">&nbsp;</td>
+        </tr>
+        </tbody>
+        </table>
+        </td>
+        </tr>
+        <tr>
+        <td style="padding: 24px;" align="center" bgcolor="#D2C7BA">
+        <table style="max-width: 600px;" border="0" width="100%" cellspacing="0" cellpadding="0">
+        <tbody>
+        <tr>
+        <td style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;" align="center" bgcolor="#D2C7BA">
+        <p style="margin: 0;">You received this email because you have subscribed to propy.</p>
+        </td>
+        </tr>
+        <tr>
+        <td style="padding: 12px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 14px; line-height: 20px; color: #666;" align="center" bgcolor="#D2C7BA">&nbsp;</td>
+        </tr>
+        </tbody>
+        </table>
+        </td>
+        </tr>
+        </tbody>
+        </table>
+        <!-- end body -->`;
+        sendMail(req.user.email,subject,body);
         return res.status(StatusCodes.OK).json({
             error : false,
             message : "Success"
