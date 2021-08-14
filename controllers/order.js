@@ -6,7 +6,6 @@ const User = require('../models/user')
 var Subscription = require('../models/subscription');
 
 const month = ["Jan" , "Feb" , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct", "Nov" , "Dec"]
-
 exports.generateOrders = async(req,res) => {
     try {
         let subscription = await Subscription.find({ isActive: true }).populate('property', { rent: 1 , name : 1 , owner : 1 , region : 1 }).populate('tenant', { name: 1, email: 1  , regions : 1});
