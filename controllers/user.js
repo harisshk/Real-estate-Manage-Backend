@@ -241,7 +241,7 @@ exports.validateForgotPasswordOTP = (req, res) => {
 					message: "OTP validated successfully",
 					error: false,
 					valid: true,
-					userId: userInfo._id,
+					userId: userInfo.user._id,
 				});
 			} else {
 				res.status(StatusCodes.BAD_REQUEST).json({
