@@ -4,7 +4,7 @@ const Order = require('../models/order');
 const Transaction = require('../models/transaction')
 const User = require('../models/user')
 var Subscription = require('../models/subscription');
-
+const {addTransactionUser} = require("../utils/logHandler/index")
 const month = ["Jan" , "Feb" , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct", "Nov" , "Dec"]
 exports.generateOrders = async(req,res) => {
     try {
@@ -65,6 +65,7 @@ exports.placeOrder = async(req,res) => {
             billingCycle : paymentStatus === "Done" ? 0 : billingCycle ,
             paidUntil : new Date()
         };
+        addTransactionUser("",`Rent payed ${amountPaid} in the region ${region}`,tenant)
         await Subscription.findOneAndUpdate({tenant : tenant , property : property},{$set : subscriptionInput},{new : true});
         let orderInput = {
             transactionId : transactionResponse._id,
