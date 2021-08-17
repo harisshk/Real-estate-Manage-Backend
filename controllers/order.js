@@ -239,8 +239,6 @@ exports.pendingDueOwner = async(req,res) => {
                 }
             })
             .sort({createdAt : -1});
-
-            console.log(pendingDue)
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
