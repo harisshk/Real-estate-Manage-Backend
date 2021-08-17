@@ -223,15 +223,24 @@ exports.historyOfOrdersOwner = async(req,res) => {
 exports.pendingDueOwner = async(req,res) => {
     try{
         let pendingDue = await Order.find({owner: req.user._id, paymentStatus : "Pending"})
+        .populate('subscription')
             .populate({
                 path : "subscription", 
-                populate :'tenant'
+                populate : {
+                    path : "tenant",
+                    select : "name"
+                }
             })
             .populate({
-                path : "subscription",
-                populate :'property'
+                path : "subscription", 
+                populate : {
+                    path : "property",
+                    select : "name owner rent"
+                }
             })
             .sort({createdAt : -1});
+
+            console.log(pendingDue)
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
@@ -278,15 +287,21 @@ exports.historyOfOrdersRegionalAdmin = async(req,res) => {
 exports.pendingDueRegionalAdmin = async(req,res) => {
     try{
         let pendingDue = await Order.find({region : req.user.regions[0],paymentStatus : "Pending"})
-            .populate('subscription')
-            .populate({
-                path : "subscription",
-                populate :'tenant'
-            })
-            .populate({
-                path : "subscription",
-                populate :'property'
-            })
+        .populate('subscription')
+        .populate({
+            path : "subscription", 
+            populate : {
+                path : "tenant",
+                select : "name"
+            }
+        })
+        .populate({
+            path : "subscription", 
+            populate : {
+                path : "property",
+                select : "name owner rent"
+            }
+        })
             .sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
             error : false ,
@@ -381,9 +396,10 @@ exports.sendRemainder = async (req,res) => {
             message : "Remainder Sent"
         })
  }catch(error){
+     console.log(error)
         return res.status(StatusCodes.BAD_REQUEST).json({
             error : true,
-            err : "Error in sending the remainder",
+            err : error,
             message : "Error in sending the remainder"
         })
     }
