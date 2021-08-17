@@ -49,20 +49,39 @@ exports.addProperty = async (req, res) => {
 };
 
 exports.updateProperty = (req, res) => {
-	Property.findOne({ _id: req.params.propertyId }, { $set: req.body })
-		.then((response) => {
+	Property.findByIdAndUpdate({ _id: req.params.propertyId }, { $set: req.body },{new:1})
+		.then(async(updatedProperty) => {
+		let body = `<p>Property Updated</p>
+		<p>${updatedProperty.name}&nbsp;</p>
+		<p style="text-align: center;"><img src=${updatedProperty?.photos[0]} alt="" width="421" height="280" /></p>
+		<p>Property Location</p>
+		<p>&nbsp; &nbsp;${updatedProperty?.addressLine1},</p>
+		<p>&nbsp; &nbsp;${updatedProperty?.addressLine2 || ''}</p>
+		<p>&nbsp; &nbsp;${updatedProperty?.zipCode}, ${updatedProperty?.region}.</p>
+		<p>&nbsp; &nbsp;${updatedProperty?.state}</p>
+		<p>Rent: ${updatedProperty.rent} Rs</p>
+		<p>Initial Deposit: ${updatedProperty.initialDeposit} Rs</p>
+		<p>Square Feet: ${updatedProperty.size} ft</p>
+		<p>Updated By ${req.user.name}-(${req?.user?.role})</p>
+		<p>&nbsp;&nbsp;</p>`;
+        let subject = `!! PROPY Property Updated`;
+        let allAdmins = await User.find({role : "admin" , isActive : true});
+        for(let i = 0 ; i < allAdmins.length ; i++){
+            sendMail (allAdmins[i].email, subject ,body);
+        }
 			return res.status(StatusCodes.ACCEPTED).json({
 				message: "Property updated",
 				error: false,
 			});
 		})
-		.catch((error) =>
+		.catch((error) =>{
+			console.log(error)
 			res.status(StatusCodes.BAD_REQUEST).json({
 				message: "Error in updating the property ",
 				error: true,
 				err: error,
-			}),
-		);
+			})
+		})
 };
 
 exports.deleteProperty = (req, res) => {
