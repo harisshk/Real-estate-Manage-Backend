@@ -471,7 +471,9 @@ exports.updateUserInfo = async (req, res) => {
 		let updatedUser = await User.findByIdAndUpdate(
 			{_id: req.user._id},
 			{$set: req.body},
+			{new : true}
 		);
+		updatedUser.password = undefined ;
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Updated Info Successfully",
