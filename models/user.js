@@ -25,9 +25,6 @@ const userSchema = new mongoose.Schema(
 		fcmToken: {
 			type: String,
 		},
-		webFcmToken: {
-			type: String,
-		},
 		phoneNumber:{
 			type: String,
 			required:true
