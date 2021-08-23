@@ -145,10 +145,46 @@ exports.getAllSupportByAdmin = async (req, res) => {
         })
     }
 }
+exports.getSupportByFilterAdmin = async (req, res) => {
+    const {status} = req.body
+    try {
+        let supports = await Support.find({status:status}).populate('user');
+        return res.status(StatusCodes.OK).json({
+            error: false,
+            message: "success",
+            supports: supports,
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error: true,
+            err: error.message,
+            message: "Error in updating the support",
+        })
+    }
+}
 
 exports.getAllSupportByRegionalAdmin = async (req, res) => {
     try {
         let supports = await Support.find({ region: req.user.regions[0] }).populate('user');
+        return res.status(StatusCodes.OK).json({
+            error: false,
+            message: "success",
+            supports: supports,
+        })
+    } catch (error) {
+        console.log(error);
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error: true,
+            err: error.message,
+            message: "Error in updating the support",
+        })
+    }
+}
+exports.getSupportByFilterRegionalAdmin = async (req, res) => {
+    const {status} = req.body
+    try {
+        let supports = await Support.find({ status:status,region: req.user.regions[0] }).populate('user');
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
