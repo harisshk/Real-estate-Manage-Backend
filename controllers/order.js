@@ -32,7 +32,6 @@ exports.generateOrders = async(req,res) => {
             message: "Orders created for all active subscription ."
         })
     } catch (error) {
-        console.log(error);
         // If Error Send email to Admin
         let to = `hari.jsmith494@gmail.com`
         let mailSubject =  `Error in creating the Order Invoice`

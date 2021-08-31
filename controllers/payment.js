@@ -1,13 +1,10 @@
 const Razorpay = require('razorpay');
 const request = require('request');
-
 const razorInstance = new Razorpay({
   key_id : process.env.RAZORKEYID,
   key_secret : process.env.RAZORKEYSECRET
 })
 exports.getOrders = async(req,res) =>{
-    console.log(process.env.RAZORKEYID)
-    console.log(process.env.RAZORKEYSECRET)
   try{
     const options ={
       amount : Number(req.params.amount)*100,
@@ -36,8 +33,6 @@ exports.getOrders = async(req,res) =>{
 exports.captureAmount = async(req,res) =>{
     const {amount} = req.body
   try{
-    console.log(process.env.RAZORKEYID)
-    console.log(process.env.RAZORKEYSECRET)
     return request(
       {
         method : "POST",
@@ -45,8 +40,6 @@ exports.captureAmount = async(req,res) =>{
         form:{
           amount : (Number(amount) *100),
           currency: "INR",
-          
-          
         },
       },
       async function(err,response,body){
@@ -65,3 +58,4 @@ exports.captureAmount = async(req,res) =>{
     })
   }
 }
+
