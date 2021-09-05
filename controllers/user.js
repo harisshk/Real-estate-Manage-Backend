@@ -12,6 +12,7 @@ const {generateRandom4DigitOTP} = require("../methods/otpGenerate");
 const Order = require("../models/order");
 const Support = require("../models/support");
 const {addActivitiesUser} = require("../utils/logHandler/index")
+const {createRazorPayCustomer} = require('../methods/razorPayCustomer')
 exports.register = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
@@ -341,9 +342,10 @@ exports.getOTPForPassword = async (req, res) => {
 };
 
 exports.createAccountByAdmins = async (req, res) => {
+	const {email, phoneNumber, name, role} = req.body
 	try {
 		//Checking for a user with same email Id
-		let preUser = await User.findOne({email: req.body.email});
+		let preUser = await User.findOne({email: email});
 		if (preUser) {
 			return res.status(StatusCodes.CONFLICT).json({
 				error: true,
@@ -351,12 +353,22 @@ exports.createAccountByAdmins = async (req, res) => {
 			});
 		}
 		const password = generatePassword(8, false);
+		var razorPayCustomerDetails
+		if(role === "owner"){
+			razorPayCustomerDetails = await createRazorPayCustomer({
+				email:email,
+				name:name,
+				phoneNumber:phoneNumber
+			})
+
+		}
 		let user = {
 			...req.body,
 			password: password,
+			payoutsContactId:razorPayCustomerDetails?.id
 		};
 		let newUser = await new User(user).save();
-		sendPasswordMailer(req.body.email, password);
+		sendPasswordMailer(email, password);
 		let body = `<p>New User Created</p>
 		<p>Name: ${newUser.name}</p>
 		<p>Role: ${newUser.role}</p>
@@ -364,7 +376,7 @@ exports.createAccountByAdmins = async (req, res) => {
 		<p>- Account Created By ${req.user.name}</p>`;
         let subject = `!! PROPY New User Added`;
         let allAdmins = await User.find({role : "admin" , isActive : true});
-        if(req.user.role === "regional-admin"){
+        if(role === "regional-admin"){
 			// for(let i = 0 ; i < allAdmins.length ; i++){
 				sendMail ('hari850800@gmail.com', subject ,body);
 			// }
@@ -667,7 +679,6 @@ exports.getUserInfo = async(req,res) => {
 			profile : profile
 		});
 	}catch(error){
-		console.log(error);
 		return res.status(StatusCodes.OK).json({
 			error : true ,
 			err : error.message ,

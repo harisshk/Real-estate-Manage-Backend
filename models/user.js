@@ -45,6 +45,20 @@ const userSchema = new mongoose.Schema(
 		subscription : {
 			type : mongoose.SchemaTypes.ObjectId,
 			ref : "Subscription"
+		},
+		/**
+		 * @ Id of the account/contact created in payment API
+		 */
+		payoutsContactId:{
+			type:String,
+			
+		},
+		/**
+		 * @ Id of the fund account created in payment API
+		 */
+		payoutsFundAccountId:{
+			type:String,
+			
 		}
 	},
 	{timestamps: true},
