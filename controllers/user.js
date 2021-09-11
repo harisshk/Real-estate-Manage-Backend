@@ -5,18 +5,18 @@ const User = require("../models/user");
 const Property = require('../models/property');
 const Profile = require('../models/profile');
 const OTP = require("../models/otp");
-const { StatusCodes } = require("http-status-codes");
+const {StatusCodes} = require("http-status-codes");
 const generatePassword = require("password-generator");
-const { sendPasswordMailer, mailer, sendMail } = require("../methods/nodemailer");
-const { generateRandom4DigitOTP } = require("../methods/otpGenerate");
+const {sendPasswordMailer, mailer, sendMail} = require("../methods/nodemailer");
+const {generateRandom4DigitOTP} = require("../methods/otpGenerate");
 const Order = require("../models/order");
 const Support = require("../models/support");
-const { addActivitiesUser } = require("../utils/logHandler/index")
-const { createRazorPayCustomer } = require('../methods/razorPayCustomer')
+const {addActivitiesUser} = require("../utils/logHandler/index")
+const {createRazorPayCustomer} = require('../methods/razorPayCustomer')
 exports.register = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
-		let preUser = await User.findOne({ email: req.body.email });
+		let preUser = await User.findOne({email: req.body.email });
 		if (preUser) {
 			return res.status(StatusCodes.CONFLICT).json({
 				error: true,
@@ -25,7 +25,7 @@ exports.register = async (req, res) => {
 		}
 		let newUser = await new User(req.body).save();
 		newUser.password = undefined;
-		addActivitiesUser(req.user._id, newUser._id, `New ${newUser.role} ${newUser.name} added by ${req.user.name}(${req.user.role})`)
+		addActivitiesUser(req.user._id,newUser._id,`New ${newUser.role} ${newUser.name} added by ${req.user.name}(${req.user.role})`)
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Account is created Successfully",
@@ -42,7 +42,7 @@ exports.register = async (req, res) => {
 
 exports.verifyAccount = (req, res) => {
 	try {
-		User.find({ email: req.body.email }, (error, result) => {
+		User.find({email: req.body.email}, (error, result) => {
 			res.statusCode = 200;
 			res.setHeader("Content-Type", "application/json");
 			if (error || result.length !== 0) {
@@ -61,7 +61,7 @@ exports.verifyAccount = (req, res) => {
 				},
 			});
 			var OTP = generateRandom4DigitOTP();
-			let { email } = req.body;
+			let {email} = req.body;
 			var mailOptions = {
 				from: "hari.jsmith494@gmail.com",
 				to: email,
@@ -94,7 +94,7 @@ exports.verifyAccount = (req, res) => {
 //TODO : Make the Secret Code Private .
 exports.login = (req, res) => {
 	//Finding if an account is created with the provided email .
-	User.findOne({ email: req.body.email, isActive: true }, (error, userInfo) => {
+	User.findOne({email: req.body.email, isActive: true }, (error, userInfo) => {
 		if (error || !userInfo) {
 			return res.status(StatusCodes.BAD_REQUEST).json({
 				error: true,
@@ -110,13 +110,13 @@ exports.login = (req, res) => {
 			}
 
 			let token = jwt.sign(
-				{ _id: userInfo._id, role: userInfo.role },
+				{_id: userInfo._id, role: userInfo.role },
 				process.env.JWTCODE,
 			);
 
 			User.findOneAndUpdate(
-				{ _id: userInfo._id },
-				{ jwtToken: token },
+				{_id: userInfo._id},
+				{jwtToken: token},
 				(e, userInfoWithToken) => {
 					if (e) {
 						return res.status(StatusCodes.BAD_REQUEST).json({
@@ -141,7 +141,7 @@ exports.login = (req, res) => {
 };
 
 exports.generateOTP = async (req, res) => {
-	User.findOne({ email: req.body.email })
+	User.findOne({email: req.body.email})
 		.then((userExists) => {
 			if (userExists) {
 				const generatedOTP = generateRandom4DigitOTP();
@@ -190,17 +190,17 @@ exports.generateOTP = async (req, res) => {
  *
  */
 exports.validateLoginOTP = (req, res) => {
-	const { email, otp } = req.body;
-	OTP.findOne({ username: email })
-		.populate("user", { password: 0, jwtToken: 0 })
+	const {email, otp} = req.body;
+	OTP.findOne({username: email})
+		.populate("user", {password: 0, jwtToken: 0})
 		.sort("-createdAt")
 		.then((userInfo) => {
 			if (userInfo.otp === otp) {
 				let token = jwt.sign(
-					{ _id: userInfo._id, role: userInfo.role },
+					{_id: userInfo._id, role: userInfo.role},
 					process.env.JWTCODE,
 				);
-				User.findOneAndUpdate({ email: email }, { $set: { jwtToken: token } }, { new: true })
+				User.findOneAndUpdate({email: email}, {$set: {jwtToken: token}} ,{ new: true } )
 					.then((updatedUser) => {
 						return res.status(StatusCodes.OK).json({
 							message: "OTP validated success",
@@ -232,9 +232,9 @@ exports.validateLoginOTP = (req, res) => {
 };
 
 exports.validateForgotPasswordOTP = (req, res) => {
-	const { email, otp } = req.body;
-	OTP.findOne({ username: email })
-		.populate("user", { password: 0, jwtToken: 0 })
+	const {email, otp} = req.body;
+	OTP.findOne({username: email})
+		.populate("user", {password: 0, jwtToken: 0})
 		.sort("-createdAt")
 		.then((userInfo) => {
 			if (userInfo.otp === otp) {
@@ -269,8 +269,8 @@ exports.updateNewPassword = (req, res) => {
 			});
 		}
 		User.findByIdAndUpdate(
-			{ _id: req.body.userId },
-			{ password: hash },
+			{_id: req.body.userId},
+			{password: hash},
 			(e, updateUserInfo) => {
 				if (e) {
 					return res.status(StatusCodes.BAD_REQUEST).json({
@@ -293,10 +293,10 @@ exports.updateNewPassword = (req, res) => {
 };
 
 exports.getOTPForPassword = async (req, res) => {
-	const { email } = req.body;
-	User.findOne({ email: email })
+	const {email} = req.body;
+	User.findOne({email: email})
 		.then((userInfo) => {
-			if (userInfo) {
+			if(userInfo){
 				const generatedOTP = generateRandom4DigitOTP();
 				let otpDetails = {
 					otp: generatedOTP,
@@ -323,7 +323,7 @@ exports.getOTPForPassword = async (req, res) => {
 						});
 					});
 			}
-			else {
+			else{
 				res.status(StatusCodes.OK).send({
 					userExists: false,
 					error: false,
@@ -342,10 +342,10 @@ exports.getOTPForPassword = async (req, res) => {
 };
 
 exports.createAccountByAdmins = async (req, res) => {
-	const { email, phoneNumber, name, role } = req.body
+	const {email, phoneNumber, name, role} = req.body
 	try {
 		//Checking for a user with same email Id
-		let preUser = await User.findOne({ email: email });
+		let preUser = await User.findOne({email: email});
 		if (preUser) {
 			return res.status(StatusCodes.CONFLICT).json({
 				error: true,
@@ -354,18 +354,18 @@ exports.createAccountByAdmins = async (req, res) => {
 		}
 		const password = generatePassword(8, false);
 		var razorPayCustomerDetails
-		if (role === "owner") {
+		if(role === "owner"){
 			razorPayCustomerDetails = await createRazorPayCustomer({
-				email: email,
-				name: name,
-				phoneNumber: phoneNumber
+				email:email,
+				name:name,
+				phoneNumber:phoneNumber
 			})
 
 		}
 		let user = {
 			...req.body,
 			password: password,
-			payoutsContactId: razorPayCustomerDetails?.id
+			payoutsContactId:razorPayCustomerDetails?.id
 		};
 		let newUser = await new User(user).save();
 		sendPasswordMailer(email, password);
@@ -374,14 +374,14 @@ exports.createAccountByAdmins = async (req, res) => {
 		<p>Role: ${newUser.role}</p>
 		<p>&nbsp;</p>
 		<p>- Account Created By ${req.user.name}</p>`;
-		let subject = `!! PROPY New User Added`;
-		let allAdmins = await User.find({ role: "admin", isActive: true });
-		if (role === "regional-admin") {
+	let subject = `!! PROPY New User Added`;
+	let allAdmins = await User.find({role: "admin", isActive: true });
+	if (role === "regional-admin"){
 			// for(let i = 0 ; i < allAdmins.length ; i++){
-			sendMail('hari850800@gmail.com', subject, body);
+				sendMail ('hari850800@gmail.com', subject ,body);
 			// }
 		}
-		addActivitiesUser(req.user._id, newUser._id, newUser.role === "tenant" ? `New ${newUser.role} ${newUser.name}  added` : `New ${newUser.role} added in ${newUser?.regions[0]}`)
+		addActivitiesUser(req.user._id,newUser._id,newUser.role==="tenant"? `New ${newUser.role} ${newUser.name}  added` : `New ${newUser.role} added in ${newUser?.regions[0]}`)
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Account is created Successfully",
@@ -420,7 +420,7 @@ exports.getAllUsersByRoles = async (req, res) => {
 
 		results.users = await User.find({
 			isDeleted: false,
-			_id: { $nin: req.user._id },
+			_id: {$nin: req.user._id},
 			role: req.query.role,
 		});
 		return res.status(StatusCodes.ACCEPTED).json({
@@ -438,13 +438,13 @@ exports.getAllUsersByRoles = async (req, res) => {
 };
 exports.logout = (req, res) => {
 	User.findOneAndUpdate(
-		{ _id: req.user._id },
-		{ jwtToken: null },
+		{_id: req.user._id},
+		{jwtToken: null},
 		(error, user) => {
 			if (!user) {
 				return res
 					.status(StatusCodes.BAD_REQUEST)
-					.json({ error: true, message: "Error in finding the user Id" });
+					.json({error: true, message: "Error in finding the user Id"});
 			}
 			if (error) {
 				return res.status(StatusCodes.BAD_REQUEST).json({
@@ -461,9 +461,9 @@ exports.logout = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-	User.findByIdAndUpdate({ _id: req.body.userId }, { $set: req.body }, { new: 1 })
+	User.findByIdAndUpdate({_id: req.body.userId}, {$set: req.body},{new:1})
 		.then((updatedUserInfo) => {
-			addActivitiesUser(req.user?._id, updatedUserInfo?._id, `${updatedUserInfo?.name} profile has beed updated by ${req?.user?.name} (${req?.user?.role})`)
+			addActivitiesUser(req.user?._id,updatedUserInfo?._id,`${updatedUserInfo?.name} profile has beed updated by ${req?.user?.name} (${req?.user?.role})`)
 			res.status(StatusCodes.OK).json({
 				error: false,
 				message: "User updated successfully",
@@ -473,7 +473,7 @@ exports.updateUser = (req, res) => {
 			res.status(StatusCodes.BAD_REQUEST).json({
 				error: true,
 				errorMessage: error,
-				message: "User not updated"
+				message:"User not updated"
 			});
 		});
 };
@@ -481,11 +481,11 @@ exports.updateUser = (req, res) => {
 exports.updateUserInfo = async (req, res) => {
 	try {
 		let updatedUser = await User.findByIdAndUpdate(
-			{ _id: req.user._id },
-			{ $set: req.body },
-			{ new: true }
+			{_id: req.user._id},
+			{$set: req.body},
+			{new: true}
 		);
-		updatedUser.password = undefined;
+		updatedUser.password = undefined ;
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Updated Info Successfully",
@@ -501,144 +501,144 @@ exports.updateUserInfo = async (req, res) => {
 };
 
 exports.getSubscriptionInfo = async (req, res) => {
-	try {
-		let userInfo = await User.findOne({ _id: req.user._id }).populate('subscription').populate({ path: "subscription", populate: 'property' });
+	try{
+		let userInfo = await User.findOne({_id :req.user._id }).populate('subscription').populate({path: "subscription" , populate : 'property'});
 		return res.status(StatusCodes.OK).json({
-			error: false,
-			message: "Success",
-			user: userInfo
+			error:false ,
+			message:"Success" ,
+			user:userInfo
 		})
 	}
-	catch (error) {
+	catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
 			error: true,
 			err: error.message,
-			message: "Subscription Info error"
+			message :"Subscription Info error"
 		})
 	}
 
 
 }
 
-exports.getAdminDashboardInfo = async (req, res) => {
-	try {
-		let tenantCount = await User.find({ isDeleted: false, role: "tenant" }).countDocuments();
-		let adminCount = await User.find({ isDeleted: false, role: "admin" }).countDocuments();
-		let regionalAdminCount = await User.find({ isDeleted: false, role: "regional-admin" }).countDocuments();
-		let ownerCount = await User.find({ isDeleted: false, role: "owner" }).countDocuments();
-		let propertyCount = await Property.find({ isDeleted: false }).countDocuments();
-		let supportRequestCount = await Support.find({ isActive: true }).countDocuments();
-		let pendingDueCount = await Order.find({ paymentStatus: "Pending" }).countDocuments();
+exports.getAdminDashboardInfo = async(req,res) => {
+	try{
+		let tenantCount = await User.find({isDeleted : false  , role : "tenant" }).countDocuments() ;
+		let adminCount = await User.find({isDeleted : false , role: "admin" }).countDocuments() ;
+		let regionalAdminCount = await User.find({isDeleted : false ,role: "regional-admin" }).countDocuments() ;
+		let ownerCount = await User.find({isDeleted : false , role : "owner" }).countDocuments() ;
+		let propertyCount = await Property.find({isDeleted: false }).countDocuments() ;
+		let supportRequestCount = await Support.find({isActive: true }).countDocuments();
+		let pendingDueCount = await Order.find({paymentStatus: "Pending" }).countDocuments();
 		return res.status(StatusCodes.OK).json({
-			error: false,
-			message: "success",
-			result: [
+			error : false,
+			message : "success",
+			result : [
 				{
-					title: "Admins",
-					count: adminCount
+					title : "Admins", 
+					count : adminCount
 				},
 				{
-					title: "Regional Admins",
-					count: regionalAdminCount
+					title : "Regional Admins", 
+					count : regionalAdminCount
 				},
 				{
-					title: "House Owners",
-					count: ownerCount
+					title : "House Owners", 
+					count : ownerCount
 				},
 				{
-					title: "Tenants",
-					count: tenantCount
+					title : "Tenants",
+					count : tenantCount
 				},
 				{
-					title: "Properties",
-					count: propertyCount
+					title : "Properties",
+					count  : propertyCount
 				},
 				{
-					title: 'Active Tickets Raised',
-					count: supportRequestCount
+					title : 'Active Tickets Raised', 
+					count :supportRequestCount
 				},
 				{
-					title: "Pending Due",
-					count: pendingDueCount
+					title : "Pending Due",
+					count : pendingDueCount
 				}
 			]
 		})
-	} catch (error) {
+	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
-			error: true,
-			err: error.message,
-			message: "Error in getting dashboard Info"
+			error : true ,
+			err : error.message ,
+			message : "Error in getting dashboard Info"
 		})
 	}
-
+	
 }
 
-exports.getRegionalAdminInfo = async (req, res) => {
-	try {
-		let tenantCount = await User.find({ isDeleted: false, role: "tenant" }, { $in: { regions: req.user.regions[0] } }).countDocuments();
-		let ownerCount = await User.find({ isDeleted: false, role: "owner" }, { $in: { regions: req.user.regions[0] } }).countDocuments();
-		let propertyCount = await Property.find({ isDeleted: false, region: req.user.regions[0] }).countDocuments();
-		let supportRequestCount = await Support.find({ isActive: true, region: req.user.regions[0] }).countDocuments();
-		let pendingDueCount = await Order.find({ paymentStatus: "Pending", region: req.user.regions[0] }).countDocuments();
+exports.getRegionalAdminInfo = async (req,res) => {
+	try{
+		let tenantCount = await User.find({isDeleted : false , role : "tenant" },{$in : {regions : req.user.regions[0]}}).countDocuments() ;
+		let ownerCount = await User.find({isDeleted: false , role : "owner"},{$in: {regions : req.user.regions[0]}}).countDocuments() ;
+		let propertyCount = await Property.find({isDeleted : false , region : req.user.regions[0] }).countDocuments();
+		let supportRequestCount = await Support.find({isActive: true,region : req.user.regions[0] }).countDocuments();
+		let pendingDueCount = await Order.find({paymentStatus: "Pending" , region : req.user.regions[0] }).countDocuments();
 		return res.status(StatusCodes.OK).json({
-			error: false,
-			message: "success",
-			result: [
+			error : false ,
+			message : "success" ,
+			result : [
 				{
-					title: "House Owners",
-					count: ownerCount
+					title : "House Owners", 
+					count : ownerCount
 				},
 				{
-					title: "Tenants",
-					count: tenantCount
+					title : "Tenants",
+					count : tenantCount
 				},
 				{
-					title: "Properties",
-					count: propertyCount
+					title : "Properties", 
+					count : propertyCount
 				},
 				{
-					title: 'Active Tickets Raised',
-					count: supportRequestCount
+					title : 'Active Tickets Raised',
+					count : supportRequestCount
 				},
 				{
-					title: 'Pending Due',
-					count: pendingDueCount
+					title : 'Pending Due',
+					count : pendingDueCount
 				}
 			]
 		})
-	} catch (error) {
+	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
-			error: true,
-			err: error.message,
-			message: "Error in getting dashboard Info"
+			error : true ,
+			err : error.message ,
+			message : "Error in getting dashboard Info"
 		})
 	}
 }
 
 exports.getOwnerDashboardInfo = async (req, res) => {
-	try {
-		let propertyCount = await Property.find({ isDeleted: false, owner: req.user._id }).countDocuments();
-		let pendingDueCount = await Order.find({ paymentStatus: "Pending", owner: req.user._id }).countDocuments();
+	try{
+		let propertyCount = await Property.find({isDeleted : false , owner: req.user._id }).countDocuments();
+		let pendingDueCount = await Order.find({paymentStatus : "Pending" , owner: req.user._id }).countDocuments();
 
 		return res.status(StatusCodes.OK).json({
-			error: false,
-			message: "success",
-			result: [
+			error : false ,
+			message : "success" ,
+			result : [
 				{
-					title: "Properties",
-					count: propertyCount
+					title : "Properties", 
+					count : propertyCount
 				},
 				{
-					title: "Pending Due",
-					count: pendingDueCount
+					title : "Pending Due",
+					count : pendingDueCount
 				}
 			]
 		})
-	} catch (error) {
+	}catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
-			error: true,
-			err: error.message,
-			message: "Error in getting dashboard Info"
+			error : true ,
+			err : error.message ,
+			message : "Error in getting dashboard Info"
 		})
 	}
 }
