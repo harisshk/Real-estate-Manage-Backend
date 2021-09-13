@@ -132,9 +132,9 @@ router.get('/user/tenant/dashboardInfo/:userId',isSignedIn , tenantDashboardInfo
 
 router.get('/user/accountInfo/:userId' , getUserInfo);
 
-router.post('/user/admin/owners/:userId',isSignedIn , isAdmin, getUsersForAssignAdmin);
+router.post('/user/admin/owner/:userId',isSignedIn , isAdmin, getUsersForAssignAdmin);
 router.post('/user/admin/tenant/:userId',isSignedIn , isAdmin, getUsersForAssignAdmin);
-router.post('/user/regional-admin/owners/:userId',isSignedIn , isRegionalAdmin , getUsersForAssignRegionalAdmin);
+router.post('/user/regional-admin/owner/:userId',isSignedIn , isRegionalAdmin , getUsersForAssignRegionalAdmin);
 router.post('/user/regional-admin/tenant/:userId',isSignedIn , isRegionalAdmin , getUsersForAssignRegionalAdmin);
 
 module.exports = router;
