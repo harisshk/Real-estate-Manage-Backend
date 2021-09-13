@@ -66,9 +66,10 @@ exports.updateProperty = (req, res) => {
 		<p>&nbsp;&nbsp;</p>`;
         let subject = `!! PROPY Property Updated`;
         let allAdmins = await User.find({role : "admin" , isActive : true});
-        for(let i = 0 ; i < allAdmins.length ; i++){
-            sendMail (allAdmins[i].email, subject ,body);
-        }
+        // for(let i = 0 ; i < allAdmins.length ; i++){
+        //     sendMail (allAdmins[i].email, subject ,body);
+        // }
+		sendMail ("hari850800@gmail.com", subject ,body);
 			return res.status(StatusCodes.ACCEPTED).json({
 				message: "Property updated",
 				error: false,
@@ -186,7 +187,7 @@ exports.getPropertiesByRegionalAdmin = async (req, res) => {
 exports.getPropertyInfo = async (req, res) => {
 	const { propertyId } = req.params;
 	try {
-		let propertyInfo = await Property.findOne({ _id: propertyId })
+		let propertyInfo = await Property.findOne({ _id: propertyId }).populate("owner")
 			.populate('subscription')
 		return res.status(StatusCodes.OK).json({ error: false, message: "Success", property: propertyInfo })
 	} catch (error) {
