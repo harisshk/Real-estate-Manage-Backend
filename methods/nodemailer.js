@@ -1,8 +1,8 @@
 const nodemailer = require("nodemailer");
 
 const mailer = (email, OTP, text) => {
-  let userNameMail = "hari.jsmith494@gmail.com",
-    applicationPassword = "fqcjwpduyiuhwgun";
+  let userNameMail = process.env.SENDER_EMAIL,
+    applicationPassword = process.env.SENDER_EMAIL_PASSWORD;
   var transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -33,8 +33,8 @@ const mailer = (email, OTP, text) => {
 
 
 const sendMail = (email, body, content) => {
-  let userNameMail = "hari.jsmith494@gmail.com",
-  applicationPassword = "fqcjwpduyiuhwgun";
+  let userNameMail = process.env.SENDER_EMAIL,
+  applicationPassword = process.env.SENDER_EMAIL_PASSWORD;
   var transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -63,8 +63,8 @@ const sendMail = (email, body, content) => {
 };
 
 const sendPasswordMailer = (email, password) => {
-  let userNameMail = "hari.jsmith494@gmail.com",
-    applicationPassword = "fqcjwpduyiuhwgun";
+  let userNameMail = process.env.SENDER_EMAIL,
+    applicationPassword = process.env.SENDER_EMAIL_PASSWORD;
   var transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {

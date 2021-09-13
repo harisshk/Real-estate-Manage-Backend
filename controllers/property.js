@@ -186,7 +186,7 @@ exports.getPropertiesByRegionalAdmin = async (req, res) => {
 exports.getPropertyInfo = async (req, res) => {
 	const { propertyId } = req.params;
 	try {
-		let propertyInfo = await Property.findOne({ _id: propertyId })
+		let propertyInfo = await Property.findOne({ _id: propertyId }).populate("owner")
 			.populate('subscription')
 		return res.status(StatusCodes.OK).json({ error: false, message: "Success", property: propertyInfo })
 	} catch (error) {
