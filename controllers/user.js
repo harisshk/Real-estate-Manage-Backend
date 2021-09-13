@@ -16,7 +16,7 @@ const {createRazorPayCustomer} = require('../methods/razorPayCustomer')
 exports.register = async (req, res) => {
 	try {
 		//Checking for a user with same email Id
-		let preUser = await User.findOne({email: req.body.email});
+		let preUser = await User.findOne({email: req.body.email });
 		if (preUser) {
 			return res.status(StatusCodes.CONFLICT).json({
 				error: true,
@@ -94,7 +94,7 @@ exports.verifyAccount = (req, res) => {
 //TODO : Make the Secret Code Private .
 exports.login = (req, res) => {
 	//Finding if an account is created with the provided email .
-	User.findOne({email: req.body.email,isActive:true}, (error, userInfo) => {
+	User.findOne({email: req.body.email, isActive: true }, (error, userInfo) => {
 		if (error || !userInfo) {
 			return res.status(StatusCodes.BAD_REQUEST).json({
 				error: true,
@@ -110,7 +110,7 @@ exports.login = (req, res) => {
 			}
 
 			let token = jwt.sign(
-				{_id: userInfo._id, role: userInfo.role},
+				{_id: userInfo._id, role: userInfo.role },
 				process.env.JWTCODE,
 			);
 
@@ -200,7 +200,7 @@ exports.validateLoginOTP = (req, res) => {
 					{_id: userInfo._id, role: userInfo.role},
 					process.env.JWTCODE,
 				);
-				User.findOneAndUpdate({email : email}, {$set: {jwtToken: token}} ,{new : true} )
+				User.findOneAndUpdate({email: email}, {$set: {jwtToken: token}} ,{ new: true } )
 					.then((updatedUser) => {
 						return res.status(StatusCodes.OK).json({
 							message: "OTP validated success",
@@ -298,30 +298,30 @@ exports.getOTPForPassword = async (req, res) => {
 		.then((userInfo) => {
 			if(userInfo){
 				const generatedOTP = generateRandom4DigitOTP();
-			let otpDetails = {
-				otp: generatedOTP,
-				user: userInfo,
-				username: req.body.email,
-				
-			};
-			let newOtpDetails = new OTP(otpDetails);
-			newOtpDetails
-				.save()
-				.then(() => {
-					mailer(req.body.email, generatedOTP, "forgot password");
-					res.status(StatusCodes.OK).send({
-						userExists: true,
-						error: false,
-						message: "OTP successfully sent",
+				let otpDetails = {
+					otp: generatedOTP,
+					user: userInfo,
+					username: req.body.email,
+
+				};
+				let newOtpDetails = new OTP(otpDetails);
+				newOtpDetails
+					.save()
+					.then(() => {
+						mailer(req.body.email, generatedOTP, "forgot password");
+						res.status(StatusCodes.OK).send({
+							userExists: true,
+							error: false,
+							message: "OTP successfully sent",
+						});
+					})
+					.catch((error) => {
+						res.status(StatusCodes.BAD_REQUEST).json({
+							error: true,
+							err: error.message,
+							message: "Error in sending the OTP",
+						});
 					});
-				})
-				.catch((error) => {
-					res.status(StatusCodes.BAD_REQUEST).json({
-						error: true,
-						err: error.message,
-						message: "Error in sending the OTP",
-					});
-				});
 			}
 			else{
 				res.status(StatusCodes.OK).send({
@@ -330,13 +330,13 @@ exports.getOTPForPassword = async (req, res) => {
 					message: "User doesn't exist",
 				});
 			}
-			
+
 		})
 		.catch((error) => {
 			res.status(StatusCodes.BAD_REQUEST).json({
 				userExists: false,
-					error: true,
-					message: "Internal server error",
+				error: true,
+				message: "Internal server error",
 			});
 		});
 };
@@ -374,9 +374,9 @@ exports.createAccountByAdmins = async (req, res) => {
 		<p>Role: ${newUser.role}</p>
 		<p>&nbsp;</p>
 		<p>- Account Created By ${req.user.name}</p>`;
-        let subject = `!! PROPY New User Added`;
-        let allAdmins = await User.find({role : "admin" , isActive : true});
-        if(role === "regional-admin"){
+	let subject = `!! PROPY New User Added`;
+	let allAdmins = await User.find({role: "admin", isActive: true });
+	if (role === "regional-admin"){
 			// for(let i = 0 ; i < allAdmins.length ; i++){
 				sendMail ('hari850800@gmail.com', subject ,body);
 			// }
@@ -483,7 +483,7 @@ exports.updateUserInfo = async (req, res) => {
 		let updatedUser = await User.findByIdAndUpdate(
 			{_id: req.user._id},
 			{$set: req.body},
-			{new : true}
+			{new: true}
 		);
 		updatedUser.password = undefined ;
 		return res.status(StatusCodes.ACCEPTED).json({
@@ -500,19 +500,19 @@ exports.updateUserInfo = async (req, res) => {
 	}
 };
 
-exports.getSubscriptionInfo = async (req,res) => {
+exports.getSubscriptionInfo = async (req, res) => {
 	try{
-		let userInfo = await User.findOne({_id :req.user._id}).populate('subscription').populate({path : "subscription" , populate :'property'}) ;
+		let userInfo = await User.findOne({_id :req.user._id }).populate('subscription').populate({path: "subscription" , populate : 'property'});
 		return res.status(StatusCodes.OK).json({
-			error : false ,
-			message : "Success" ,
-			user : userInfo 
+			error:false ,
+			message:"Success" ,
+			user:userInfo
 		})
 	}
 	catch(error){
 		return res.status(StatusCodes.BAD_REQUEST).json({
-			error : true ,
-			err : error.message ,
+			error: true,
+			err: error.message,
 			message :"Subscription Info error"
 		})
 	}
@@ -522,13 +522,13 @@ exports.getSubscriptionInfo = async (req,res) => {
 
 exports.getAdminDashboardInfo = async(req,res) => {
 	try{
-		let tenantCount = await User.find({isDeleted : false  , role : "tenant"}).countDocuments() ;
-		let adminCount = await User.find({isDeleted : false , role :"admin"}).countDocuments() ;
-		let regionalAdminCount = await User.find({isDeleted : false  ,role : "regional-admin"}).countDocuments() ;
+		let tenantCount = await User.find({isDeleted : false  , role : "tenant" }).countDocuments() ;
+		let adminCount = await User.find({isDeleted : false , role: "admin" }).countDocuments() ;
+		let regionalAdminCount = await User.find({isDeleted : false ,role: "regional-admin" }).countDocuments() ;
 		let ownerCount = await User.find({isDeleted : false , role : "owner" }).countDocuments() ;
-		let propertyCount = await Property.find({isDeleted : false }).countDocuments() ;
-		let supportRequestCount = await Support.find({isActive : true}).countDocuments();
-		let pendingDueCount = await Order.find({paymentStatus : "Pending"}).countDocuments();
+		let propertyCount = await Property.find({isDeleted: false }).countDocuments() ;
+		let supportRequestCount = await Support.find({isActive: true }).countDocuments();
+		let pendingDueCount = await Order.find({paymentStatus: "Pending" }).countDocuments();
 		return res.status(StatusCodes.OK).json({
 			error : false,
 			message : "success",
@@ -575,11 +575,11 @@ exports.getAdminDashboardInfo = async(req,res) => {
 
 exports.getRegionalAdminInfo = async (req,res) => {
 	try{
-		let tenantCount = await User.find({isDeleted : false  , role : "tenant" },{$in : {regions : req.user.regions[0]}}).countDocuments() ;
-		let ownerCount = await User.find({isDeleted : false , role : "owner"},{$in : {regions : req.user.regions[0]}}).countDocuments() ;
-		let propertyCount = await Property.find({isDeleted : false , region : req.user.regions[0]}).countDocuments();
-		let supportRequestCount = await Support.find({isActive : true,region : req.user.regions[0]}).countDocuments();
-		let pendingDueCount = await Order.find({paymentStatus : "Pending" , region : req.user.regions[0]}).countDocuments();
+		let tenantCount = await User.find({isDeleted : false , role : "tenant" },{$in : {regions : req.user.regions[0]}}).countDocuments() ;
+		let ownerCount = await User.find({isDeleted: false , role : "owner"},{$in: {regions : req.user.regions[0]}}).countDocuments() ;
+		let propertyCount = await Property.find({isDeleted : false , region : req.user.regions[0] }).countDocuments();
+		let supportRequestCount = await Support.find({isActive: true,region : req.user.regions[0] }).countDocuments();
+		let pendingDueCount = await Order.find({paymentStatus: "Pending" , region : req.user.regions[0] }).countDocuments();
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
@@ -615,11 +615,11 @@ exports.getRegionalAdminInfo = async (req,res) => {
 	}
 }
 
-exports.getOwnerDashboardInfo = async (req,res) => {
+exports.getOwnerDashboardInfo = async (req, res) => {
 	try{
-		let propertyCount = await Property.find({isDeleted : false , owner : req.user._id}).countDocuments();
-		let pendingDueCount = await Order.find({paymentStatus : "Pending" ,owner : req.user._id}).countDocuments();
-		
+		let propertyCount = await Property.find({isDeleted : false , owner: req.user._id }).countDocuments();
+		let pendingDueCount = await Order.find({paymentStatus : "Pending" , owner: req.user._id }).countDocuments();
+
 		return res.status(StatusCodes.OK).json({
 			error : false ,
 			message : "success" ,
@@ -643,46 +643,85 @@ exports.getOwnerDashboardInfo = async (req,res) => {
 	}
 }
 
-exports.tenantDashboardInfo = async(req,res) => {
-	try{
-		let userInfo = await User.findOne({_id :req.user._id},{jwtToken : 0 , password : 0}).populate('subscription').populate({path : "subscription" , populate :'property'});
-		let pendingOrders = [] ;
-		if(userInfo?.subscription?.billingCycle > 0){
-			pendingOrders = await Order.find({user : req.user._id , paymentStatus:"Pending"});
+exports.tenantDashboardInfo = async (req, res) => {
+	try {
+		let userInfo = await User.findOne({ _id: req.user._id }, { jwtToken: 0, password: 0 }).populate('subscription').populate({ path: "subscription", populate: 'property' });
+		let pendingOrders = [];
+		if (userInfo?.subscription?.billingCycle > 0) {
+			pendingOrders = await Order.find({ user: req.user._id, paymentStatus: "Pending" });
 		}
 		return res.status(StatusCodes.OK).json({
-			error : false ,
-			message : "Success" ,
-			result : {
-				user : userInfo ,
-				pendingOrders : pendingOrders
-			} 
+			error: false,
+			message: "Success",
+			result: {
+				user: userInfo,
+				pendingOrders: pendingOrders
+			}
 		})
 	}
-	catch(error){
+	catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
-			error : true ,
-			err : error.message ,
-			message :"Subscription Info error"
+			error: true,
+			err: error.message,
+			message: "Subscription Info error"
 		})
 	}
 }
 
-exports.getUserInfo = async(req,res) => {
-	try{	
-		let profile = await Profile.findOne({user : req.user._id}).populate("rejectedBy")
+exports.getUserInfo = async (req, res) => {
+	try {
+		let profile = await Profile.findOne({ user: req.user._id }).populate("rejectedBy")
 		req.user.jwtToken = undefined;
 		return res.status(StatusCodes.OK).json({
-			message : "success" ,
-			error : false ,
-			user : req.user ,
-			profile : profile
+			message: "success",
+			error: false,
+			user: req.user,
+			profile: profile
 		});
-	}catch(error){
+	} catch (error) {
 		return res.status(StatusCodes.OK).json({
-			error : true ,
-			err : error.message ,
-			message : "Error in getting user profile ."
+			error: true,
+			err: error.message,
+			message: "Error in getting user profile ."
 		});
 	};
 }
+
+exports.getUsersForAssignAdmin = async (req, res) => {
+	const { role } = req.body
+	console.log(role)
+	try {
+		let users = await User.find({ role: role, isDeleted: false, isActive: true }, { email: 1, phoneNumber: 1, name: 1, subscription:1 })
+		return res.status(StatusCodes.OK).json({
+			message: "success",
+			error: false,
+			user: req.user,
+			users: users
+		});
+	} catch (error) {
+		return res.status(StatusCodes.OK).json({
+			error: true,
+			err: error.message,
+			message: "Error in getting users ."
+		});
+	};
+}
+exports.getUsersForAssignRegionalAdmin = async (req, res) => {
+	const { role } = req.body
+	try {
+		let users = await User.find({ role: role, regions: req.user.regions[0], isDeleted: false, isActive: true }, { email: 1, phoneNumber: 1, name: 1 })
+		return res.status(StatusCodes.OK).json({
+			message: "success",
+			error: false,
+			user: req.user,
+			users: users
+		});
+	} catch (error) {
+		return res.status(StatusCodes.OK).json({
+			error: true,
+			err: error.message,
+			message: "Error in getting users ."
+		});
+	};
+}
+
