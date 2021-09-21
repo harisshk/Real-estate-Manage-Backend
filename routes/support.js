@@ -1,5 +1,4 @@
 const express = require("express");
-const { filterByDate } = require("../controllers/activity");
 const { isSignedIn, setUser, isRegionalAdmin, isAdmin } = require("../controllers/auth");
 const { createSupport, updateStatusSupport, getSupportList, supportDescription, getAllSupportByAdmin, getAllSupportByRegionalAdmin, addMessageSupport, getSupportByFilterAdmin, getSupportByFilterRegionalAdmin, filterByDateAdmin, filterByDateRegionalAdmin } = require("../controllers/support");
 const router = express.Router();
