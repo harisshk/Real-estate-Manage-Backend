@@ -689,7 +689,6 @@ exports.getUserInfo = async (req, res) => {
 
 exports.getUsersForAssignAdmin = async (req, res) => {
 	const { role } = req.body
-	console.log(role)
 	try {
 		let users = await User.find({ role: role, isDeleted: false, isActive: true }, { email: 1, phoneNumber: 1, name: 1, subscription:1 })
 		return res.status(StatusCodes.OK).json({

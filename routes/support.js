@@ -1,6 +1,7 @@
 const express = require("express");
+const { filterByDate } = require("../controllers/activity");
 const { isSignedIn, setUser, isRegionalAdmin, isAdmin } = require("../controllers/auth");
-const { createSupport, updateStatusSupport, getSupportList, supportDescription, getAllSupportByAdmin, getAllSupportByRegionalAdmin, addMessageSupport, getSupportByFilterAdmin, getSupportByFilterRegionalAdmin } = require("../controllers/support");
+const { createSupport, updateStatusSupport, getSupportList, supportDescription, getAllSupportByAdmin, getAllSupportByRegionalAdmin, addMessageSupport, getSupportByFilterAdmin, getSupportByFilterRegionalAdmin, filterByDateAdmin, filterByDateRegionalAdmin } = require("../controllers/support");
 const router = express.Router();
 
 router.param("userId", setUser);
@@ -54,5 +55,21 @@ router.post('/support/status/admin/:userId', isSignedIn, isAdmin, getSupportByFi
  */
 
 router.post('/support/status/regionalAdmin/:userId', isSignedIn, isRegionalAdmin, getSupportByFilterRegionalAdmin);
+
+/**
+ * @desc filter by date only for admin
+ * @params startDate and endDate in body ISO format
+ * @returns support based on date range
+ */
+
+router.post('/support/date/admin/:userId', isSignedIn, isAdmin, filterByDateAdmin);
+
+/**
+ * @desc filter by date only for regional-admin
+ * @params startDate and endDate in body ISO format
+ * @returns support based on date range
+ */
+
+router.post('/support/date/admin/:userId', isSignedIn, isRegionalAdmin, filterByDateRegionalAdmin);
 
 module.exports = router;
