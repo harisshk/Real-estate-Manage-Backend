@@ -69,6 +69,6 @@ router.post('/support/date/admin/:userId', isSignedIn, isAdmin, filterByDateAdmi
  * @returns support based on date range
  */
 
-router.post('/support/date/admin/:userId', isSignedIn, isRegionalAdmin, filterByDateRegionalAdmin);
+router.post('/support/date/regional-admin/:userId', isSignedIn, isRegionalAdmin, filterByDateRegionalAdmin);
 
 module.exports = router;
