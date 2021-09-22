@@ -199,3 +199,38 @@ exports.getSupportByFilterRegionalAdmin = async (req, res) => {
         })
     }
 }
+
+exports.filterByDateRegionalAdmin = async(req,res) => {
+    const { startDate, endDate} = req.body
+    try{
+        let supports = await Support.find({createdAt:{$gt:startDate,$lt:endDate,region: req.user.regions[0]}}).populate('user')
+        return res.status(StatusCodes.OK).json({
+            error : false,
+            message :"success",
+            supports : supports,
+        })
+    }catch(error){
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : true,
+            err: error.message,
+            message :"Error in fetching the Supports",
+        })
+    }
+}
+exports.filterByDateAdmin = async(req,res) => {
+    const { startDate, endDate} = req.body
+    try{
+        let supports = await Support.find({createdAt:{$gt:startDate,$lt:endDate}}).populate('user')
+        return res.status(StatusCodes.OK).json({
+            error : false,
+            message :"success",
+            supports : supports,
+        })
+    }catch(error){
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : true,
+            err: error.message,
+            message :"Error in fetching the Supports",
+        })
+    }
+}
