@@ -203,7 +203,7 @@ exports.getSupportByFilterRegionalAdmin = async (req, res) => {
 exports.filterByDateRegionalAdmin = async(req,res) => {
     const { startDate, endDate} = req.body
     try{
-        let supports = await Support.find({createdAt:{$gt:startDate,$lt:endDate,region: req.user.regions[0]}}).populate('user')
+        let supports = await Support.find({createdAt:{$gte:startDate,$lte:endDate,region: req.user.regions[0]}}).populate('user')
         return res.status(StatusCodes.OK).json({
             error : false,
             message :"success",
@@ -220,7 +220,7 @@ exports.filterByDateRegionalAdmin = async(req,res) => {
 exports.filterByDateAdmin = async(req,res) => {
     const { startDate, endDate} = req.body
     try{
-        let supports = await Support.find({createdAt:{$gt:startDate,$lt:endDate}}).populate('user')
+        let supports = await Support.find({createdAt:{$gte:startDate,$lte:endDate}}).populate('user')
         return res.status(StatusCodes.OK).json({
             error : false,
             message :"success",
