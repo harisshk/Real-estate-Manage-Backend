@@ -21,7 +21,7 @@ exports.getUserActivities = async(req,res) => {
 exports.filterByDate = async(req,res) => {
     const { startDate, endDate} = req.body
     try{
-        let activities = await Activities.find({createdAt:{$gt:startDate,$lt:endDate}}).populate('user').populate('updatedBy');
+        let activities = await Activities.find({createdAt:{$gte:startDate,$lte:endDate}}).populate('user').populate('updatedBy');
         return res.status(StatusCodes.OK).json({
             error : false,
             message :"success",
