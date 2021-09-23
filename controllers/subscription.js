@@ -9,12 +9,14 @@ exports.newSubscription = async (req, res) => {
         const { tenant  , property } = req.body;
         let checkTenant = await User.findOne({ email: tenant, role: "tenant" });
         if (!checkTenant || checkTenant.role !== "tenant") {
+            console.log(checkTenant)
             return res.status(StatusCodes.UNAUTHORIZED).json({
                 error: true,
                 message: "user not found or role mismatch",
             })
-          }
+        }
         if(checkTenant.subscription){
+            console.log(checkTenant)
             return res.status(StatusCodes.BAD_REQUEST).json({
                 error : true ,
                 message : "tenant already in use"
@@ -39,12 +41,67 @@ exports.newSubscription = async (req, res) => {
         })
     } catch (error) {
         return res.status(StatusCodes.BAD_REQUEST).json({
-            error: false,
+            error: true,
             message: "Subscription Error",
             err: error.message
         })
     }
 
+}
+
+exports.reassignSubscription = async (req,res) => {
+    try {
+        const { tenant  , property } = req.body;
+        const propertyInfo = await Property.findOneAndUpdate({_id : property},{$set : {subscription : null}});
+        const subscriptionInfo = await Subscription.findByIdAndUpdate({_id : propertyInfo.subscription},{$set : {isActive: false}});
+        await User.findOneAndUpdate({_id: subscriptionInfo.tenant},{$set : {subscription: null}});
+        const newSubscriptionInfo = await new Subscription({
+            tenant: tenant,
+            property: property
+        }).save();
+        const newTenantInfo = await User.findOneAndUpdate({_id: tenant},{$set : {subscription: newSubscriptionInfo._id}});
+        if(newTenantInfo.subscription){
+            const previousSubscriptionInfo = await Subscription.findByIdAndUpdate({_id : newTenantInfo.subscription},{$set : {isActive: false}});
+            await Property.findOneAndUpdate({_id : previousSubscriptionInfo.property},{$set : {subscription : null}});
+            await Property.findOneAndUpdate({_id : property},{$set : {subscription : newSubscriptionInfo._id}});
+            return res.status(StatusCodes.OK).json({
+                error: false,
+                message: "success"
+            })
+        }else{
+            await Property.findOneAndUpdate({_id : property},{$set : {subscription : newSubscriptionInfo._id}});
+            return res.status(StatusCodes.OK).json({
+                error: false,
+                message: "success"
+            })
+        }
+    } catch (error) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error: true,
+            message: "Subscription Error",
+            err: error.message
+        })
+    }
+}
+
+
+exports.removeSubscription = async(req,res) => {
+    try{
+        const { propertyId } = req.params;
+        const propertyInfo = await Property.findOneAndUpdate({_id : propertyId},{$set : {subscription : null}});
+        const subscriptionInfo = await Subscription.findByIdAndUpdate({_id : propertyInfo.subscription},{$set : {isActive: false}});
+        await User.findOneAndUpdate({_id: subscriptionInfo?.tenant},{$set : {subscription: null}});
+        return res.status(StatusCodes.OK).json({
+            error: false,
+            message: "success",
+        })
+    }catch(error){
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error: true,
+            message: "Subscription Error",
+            err: error.message
+        })
+    } 
 }
 
 exports.updateSubscription = async (req, res) => {
