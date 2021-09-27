@@ -523,7 +523,7 @@ exports.getSubscriptionInfo = async (req, res) => {
 exports.getAdminDashboardInfo = async(req,res) => {
 	try{
 		let tenantCount = await User.find({isDeleted : false  , role : "tenant" }).countDocuments() ;
-		let adminCount = await User.find({isDeleted : false , role: "admin" }).countDocuments() ;
+		// let adminCount = await User.find({isDeleted : false , role: "admin" }).countDocuments() ;
 		let regionalAdminCount = await User.find({isDeleted : false ,role: "regional-admin" }).countDocuments() ;
 		let ownerCount = await User.find({isDeleted : false , role : "owner" }).countDocuments() ;
 		let propertyCount = await Property.find({isDeleted: false }).countDocuments() ;
