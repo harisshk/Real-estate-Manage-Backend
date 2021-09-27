@@ -148,7 +148,7 @@ exports.getProperties = async (req, res) => {
 
 exports.getPropertiesByAdmin = async (req, res) => {
 	try {
-		let properties = await Property.find({ isDeleted: false }).populate('subscription');
+		let properties = await Property.find({ isDeleted: false }).populate('subscription').populate("owner");
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Properties Fetched Successfully",

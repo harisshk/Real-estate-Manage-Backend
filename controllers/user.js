@@ -25,7 +25,7 @@ exports.register = async (req, res) => {
 		}
 		let newUser = await new User(req.body).save();
 		newUser.password = undefined;
-		addActivitiesUser(req.user._id,newUser._id,`New ${newUser.role} ${newUser.name} added by ${req.user.name}(${req.user.role})`)
+		addActivitiesUser(newUser._id, req.user._id, `New ${newUser.role} ${newUser.name} added by ${req.user.name}(${req.user.role})`)
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Account is created Successfully",
@@ -381,7 +381,7 @@ exports.createAccountByAdmins = async (req, res) => {
 				sendMail ('hari850800@gmail.com', subject ,body);
 			// }
 		}
-		addActivitiesUser(req.user._id,newUser._id,newUser.role==="tenant"? `New ${newUser.role} ${newUser.name}  added` : `New ${newUser.role} added in ${newUser?.regions[0]}`)
+		addActivitiesUser(newUser._id, req.user._id, newUser.role === "tenant" ? `New ${newUser.role} ${newUser.name}  added` : `New ${newUser.role} added in ${newUser?.regions[0]}`)
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Account is created Successfully",
@@ -463,7 +463,7 @@ exports.logout = (req, res) => {
 exports.updateUser = (req, res) => {
 	User.findByIdAndUpdate({_id: req.body.userId}, {$set: req.body},{new:1})
 		.then((updatedUserInfo) => {
-			addActivitiesUser(req.user?._id,updatedUserInfo?._id,`${updatedUserInfo?.name} profile has beed updated by ${req?.user?.name} (${req?.user?.role})`)
+			addActivitiesUser(updatedUserInfo?._id, req.user?._id, `${updatedUserInfo?.name} profile has beed updated by ${req?.user?.name} (${req?.user?.role})`)
 			res.status(StatusCodes.OK).json({
 				error: false,
 				message: "User updated successfully",
