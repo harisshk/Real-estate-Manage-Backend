@@ -533,10 +533,10 @@ exports.getAdminDashboardInfo = async(req,res) => {
 			error : false,
 			message : "success",
 			result : [
-				{
-					title : "Admins", 
-					count : adminCount
-				},
+				// {
+				// 	title : "Admins", 
+				// 	count : adminCount
+				// },
 				{
 					title : "Regional Admins", 
 					count : regionalAdminCount
