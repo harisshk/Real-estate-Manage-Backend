@@ -94,6 +94,10 @@ const propertySchema = new mongoose.Schema(
       type : mongoose.Schema.Types.ObjectId ,
       ref : "Subscription"
     },
+    geoLocation:{
+      latitude: '',
+      longitude: ''
+    }
   },
   { timestamps: true }
 );
