@@ -1,6 +1,6 @@
 const express = require("express");
 const { isAdmin, isSignedIn, setUser, isRegionalAdmin } = require("../controllers/auth");
-const { newSubscription, updateSubscription, reassignSubscription, removeSubscription } = require("../controllers/subscription");
+const { newSubscription, updateSubscription, reassignSubscription, removeSubscription, getSubscriptionByTenantId } = require("../controllers/subscription");
 const router = express.Router();
 
 router.param('userId' , setUser);
@@ -20,6 +20,8 @@ router.delete('/subscription/remove/regional-admin/:userId/:propertyId',isSigned
 router.post('/subscription/add/regionalAdmin/property/:userId',isSignedIn ,isRegionalAdmin , newSubscription );
 
 router.post('/subscription/update/regionalAdmin/property/:userId/:subscriptionId',isSignedIn ,isRegionalAdmin , updateSubscription );
+
+router.get('/subscription/tenant/:id', getSubscriptionByTenantId );
 
 
 module.exports = router ;

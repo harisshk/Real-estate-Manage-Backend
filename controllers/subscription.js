@@ -124,3 +124,21 @@ exports.updateSubscription = async (req, res) => {
 
 }
 
+exports.getSubscriptionByTenantId = async (req, res) =>{
+    let { id } = req.params
+    try {
+        let subscription = await Subscription.findOne({tenant:id,isActive:true}) 
+        return res.status(StatusCodes.OK).json({
+            error: false,
+            subscription:subscription,
+            message: "Subscription fetched",
+        })
+    } catch (error) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error: false,
+            message: "Subscription Error",
+            err: error.message
+        })
+    }
+}
+

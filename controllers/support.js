@@ -113,7 +113,19 @@ exports.getSupportList = async (req, res) => {
 
 exports.supportDescription = async (req, res) => {
     try {
-        let support = await Support.findOne({ _id: req.params.supportId });
+        let support = await Support.findOne({ _id: req.params.supportId })
+            .populate({
+                path: 'user',
+                populate: {
+                    path: 'subscription',
+                    populate: {
+                        path: "property",
+                        populate: {
+                            path: "owner"
+                        }
+                    },
+                }
+            })
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
