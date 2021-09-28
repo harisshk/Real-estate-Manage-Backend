@@ -30,9 +30,9 @@ exports.addProperty = async (req, res) => {
 		<p>&nbsp;&nbsp;</p>`;
         let subject = `!! PROPY New Property Added`;
         let allAdmins = await User.find({role : "admin" , isActive : true});
-        for(let i = 0 ; i < allAdmins.length ; i++){
-            sendMail (allAdmins[i].email, subject ,body);
-        }
+        // for(let i = 0 ; i < allAdmins.length ; i++){
+        //     sendMail (allAdmins[i].email, subject ,body);
+        // }
 		return res.status(StatusCodes.ACCEPTED).json({
 			message: "Property added",
 			error: false,
@@ -66,9 +66,9 @@ exports.updateProperty = (req, res) => {
 		<p>&nbsp;&nbsp;</p>`;
         let subject = `!! PROPY Property Updated`;
         let allAdmins = await User.find({role : "admin" , isActive : true});
-        for(let i = 0 ; i < allAdmins.length ; i++){
-            sendMail (allAdmins[i].email, subject ,body);
-        }
+        // for(let i = 0 ; i < allAdmins.length ; i++){
+        //     sendMail (allAdmins[i].email, subject ,body);
+        // }
 			return res.status(StatusCodes.ACCEPTED).json({
 				message: "Property updated",
 				error: false,
