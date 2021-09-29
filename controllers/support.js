@@ -4,7 +4,6 @@ const Support = require("../models/support");
 const user = require("../models/user");
 
 exports.createSupport = async (req, res) => {
-    console.log(req.body)
     Support.find({})
         .countDocuments()
         .then((count) => {
