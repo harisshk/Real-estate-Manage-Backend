@@ -4,7 +4,6 @@ const Support = require("../models/support");
 const user = require("../models/user");
 
 exports.createSupport = async (req, res) => {
-    console.log(req.body)
     Support.find({})
         .countDocuments()
         .then((count) => {
@@ -96,7 +95,7 @@ exports.addMessageSupport = async (req, res) => {
 
 exports.getSupportList = async (req, res) => {
     try {
-        let supports = await Support.find({ user: req.params.userId });
+        let supports = await Support.find({ user: req.params.userId }).populate("property");
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
@@ -137,7 +136,7 @@ exports.supportDescription = async (req, res) => {
 }
 exports.getAllSupportByAdmin = async (req, res) => {
     try {
-        let supports = await Support.find({}).populate('user');
+        let supports = await Support.find({}).populate('user').populate("property");
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
@@ -173,7 +172,7 @@ exports.getSupportByFilterAdmin = async (req, res) => {
 
 exports.getAllSupportByRegionalAdmin = async (req, res) => {
     try {
-        let supports = await Support.find({ region: req.user.regions[0] }).populate('user');
+        let supports = await Support.find({ region: req.user.regions[0] }).populate('user').populate("property");
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
