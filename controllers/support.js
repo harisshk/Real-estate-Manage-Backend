@@ -4,12 +4,13 @@ const Support = require("../models/support");
 const user = require("../models/user");
 
 exports.createSupport = async (req, res) => {
+    console.log(req.body)
     Support.find({})
         .countDocuments()
         .then((count) => {
             let newSupportCount = {
                 ...req.body,
-                messages:[{ date: Date(), message:"Ticket created"}],
+                messages: [{ date: Date(), message: "Ticket created" }],
                 supportNo: String(count + 1000 + 1)
             }
             let newSupport = new Support(newSupportCount)
@@ -20,13 +21,6 @@ exports.createSupport = async (req, res) => {
                         message: "success",
                         support: support
                     })
-                        .catch((error) => {
-                            return res.status(StatusCodes.BAD_REQUEST).json({
-                                error: true,
-                                err: error.message,
-                                message: "Error in creating the support",
-                            })
-                        })
                 })
                 .catch((error) => {
                     return res.status(StatusCodes.BAD_REQUEST).json({
@@ -35,6 +29,13 @@ exports.createSupport = async (req, res) => {
                         message: "Error in creating the support",
                     })
                 })
+        })
+        .catch((error) => {
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                error: true,
+                err: error.message,
+                message: "Error in creating the support",
+            })
         })
 }
 
@@ -113,7 +114,13 @@ exports.getSupportList = async (req, res) => {
 
 exports.supportDescription = async (req, res) => {
     try {
-        let support = await Support.findOne({ _id: req.params.supportId });
+        let support = await Support.findOne({ _id: req.params.supportId })
+            .populate("user", { password: 0, jwtToken: 0, fcmToken: 0 })
+            .populate({
+                path: "property",
+                populate: "owner",
+                select: { "password": 0, "jwtToken": 0, "fcmToken": 0 },
+            })
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
