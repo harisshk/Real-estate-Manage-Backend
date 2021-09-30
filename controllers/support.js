@@ -136,7 +136,11 @@ exports.supportDescription = async (req, res) => {
 }
 exports.getAllSupportByAdmin = async (req, res) => {
     try {
-        let supports = await Support.find({}).populate('user').populate("property");
+        let supports = await Support.find({}).populate('user')
+        .populate({
+            path:"property",
+            populate:"owner"
+        });
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
@@ -172,7 +176,11 @@ exports.getSupportByFilterAdmin = async (req, res) => {
 
 exports.getAllSupportByRegionalAdmin = async (req, res) => {
     try {
-        let supports = await Support.find({ region: req.user.regions[0] }).populate('user').populate("property");
+        let supports = await Support.find({ region: req.user.regions[0] }).populate('user')
+        .populate({
+            path:"property",
+            populate:"owner"
+        });
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
