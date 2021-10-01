@@ -572,6 +572,55 @@ exports.getAdminDashboardInfo = async(req,res) => {
 	}
 	
 }
+exports.getAdminDashboardFilterByRegion = async (req, res) => {
+	const { region } = req.params
+	try {
+		let tenantCount = await User.find({ isDeleted: false, role: "tenant", regions: region }).countDocuments();
+		// let adminCount = await User.find({isDeleted : false , role: "admin" }).countDocuments() ;
+		let regionalAdminCount = await User.find({ isDeleted: false, role: "regional-admin", regions: region }).countDocuments();
+		let ownerCount = await User.find({ isDeleted: false, role: "owner", regions: region }).countDocuments();
+		let propertyCount = await Property.find({ isDeleted: false, region: region }).countDocuments();
+		let supportRequestCount = await Support.find({ isActive: true, region: region }).countDocuments();
+		//let pendingDueCount = await Order.find({paymentStatus: "Pending" }).countDocuments();
+		return res.status(StatusCodes.OK).json({
+			error: false,
+			message: "success",
+			result: [
+				// {
+				// 	title : "Admins", 
+				// 	count : adminCount
+				// },
+				{
+					title: "Regional Admins",
+					count: regionalAdminCount
+				},
+				{
+					title: "House Owners",
+					count: ownerCount
+				},
+				{
+					title: "Tenants",
+					count: tenantCount
+				},
+				{
+					title: "Properties",
+					count: propertyCount
+				},
+				{
+					title: 'Active Tickets Raised',
+					count: supportRequestCount
+				},
+			]
+		})
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			error: true,
+			err: error.message,
+			message: "Error in getting dashboard Info"
+		})
+	}
+
+}
 
 exports.getRegionalAdminInfo = async (req,res) => {
 	try{
