@@ -27,7 +27,8 @@ const {
 	getUsersForAssignAdmin,
 	getUsersForAssignRegionalAdmin,
 	getTenantsForAssignAdmin,
-	getOwnersByRegion
+	getOwnersByRegion,
+	getAdminDashboardFilterByRegion
 } = require("../controllers/user");
 
 const {
@@ -124,6 +125,8 @@ router.post("/user/updateUserInfo/:userId", isSignedIn, updateUserInfo);
 router.get('/user/subscriptionInfo/:userId',isSignedIn, getSubscriptionInfo)
 
 router.get('/user/admin/dashboardInfo/:userId',isSignedIn,isAdmin,getAdminDashboardInfo);
+
+router.get('/user/admin/dashboardInfo/filter/:userId/:region',isSignedIn,isAdmin,getAdminDashboardFilterByRegion);
 
 router.get('/user/regionalAdmin/dashboardInfo/:userId',isSignedIn , isRegionalAdmin , getRegionalAdminInfo) ;
 
