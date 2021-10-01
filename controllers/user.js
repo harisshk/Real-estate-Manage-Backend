@@ -723,4 +723,22 @@ exports.getUsersForAssignRegionalAdmin = async (req, res) => {
 		});
 	};
 }
+exports.getOwnersByRegion = async (req, res) => {
+	const { regions } = req.params
+	try {
+		let users = await User.find({ regions: regions, isDeleted: false, isActive: true, role: "owner" }, { fcmToken: 0, jwtToken: 0, password: 0 })
+		return res.status(StatusCodes.OK).json({
+			message: "success",
+			error: false,
+			user: req.user,
+			users: users
+		});
+	} catch (error) {
+		return res.status(StatusCodes.OK).json({
+			error: true,
+			err: error.message,
+			message: "Error in getting users ."
+		});
+	};
+}
 
