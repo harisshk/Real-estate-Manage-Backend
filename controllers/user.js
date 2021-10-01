@@ -708,7 +708,25 @@ exports.getUsersForAssignAdmin = async (req, res) => {
 exports.getUsersForAssignRegionalAdmin = async (req, res) => {
 	const { role } = req.body
 	try {
-		let users = await User.find({ role: role, regions: req.user.regions[0], isDeleted: false, isActive: true }, { email: 1, phoneNumber: 1, name: 1 })
+		let users = await User.find({ role: role, regions: req.user.regions[0], isDeleted: false, isActive: true }, { email: 1, phoneNumber: 1, name: 1, subscription: 1 })
+		return res.status(StatusCodes.OK).json({
+			message: "success",
+			error: false,
+			user: req.user,
+			users: users
+		});
+	} catch (error) {
+		return res.status(StatusCodes.OK).json({
+			error: true,
+			err: error.message,
+			message: "Error in getting users ."
+		});
+	};
+}
+exports.getOwnersByRegion = async (req, res) => {
+	const { regions } = req.params
+	try {
+		let users = await User.find({ regions: regions, isDeleted: false, isActive: true, role: "owner" }, { fcmToken: 0, jwtToken: 0, password: 0 })
 		return res.status(StatusCodes.OK).json({
 			message: "success",
 			error: false,
