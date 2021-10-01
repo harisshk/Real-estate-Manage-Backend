@@ -5,7 +5,7 @@ const {
 	getProperties,
 	getPropertiesByRegionalAdmin,
 	getPropertiesByAdmin,getPropertiesByHouseOwner,
-	getPropertyInfo,getPropertiesByHouseOwnerHierarchy
+	getPropertyInfo,
 } = require("../controllers/property");
 const {isSignedIn, setUser, isOwner, isAdmin, isRegionalAdmin} = require("../controllers/auth");
 const router = express.Router();
@@ -39,7 +39,7 @@ router.get("/property/view/regionalAdmin/:userId",isSignedIn,isRegionalAdmin,get
 
 router.get("/property/view/owner/:userId",isSignedIn,isOwner, getPropertiesByHouseOwner)
 
-router.get("/property/owner/:userId", getPropertiesByHouseOwnerHierarchy)
+router.get("/property/owner/:userId", getPropertiesByHouseOwner)
 
 
 router.get("/property/view/:isVerified/:userId", isSignedIn, getProperties);
