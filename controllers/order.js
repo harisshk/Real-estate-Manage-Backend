@@ -22,7 +22,7 @@ exports.generateOrders = async(req,res) => {
                 let to = subscription[i].tenant.email;
                 let mailSubject = `REMAINDER!!! Propy(Invoice Remainder)`;
                 let mailBody = `Hi ${subscription[i].tenant.name} , your payment of Rs. ${subscription[i].property?.rent} is pending pay before 7th of this month to avoid due`;
-                sendMail(to, mailSubject, mailBody)
+                // sendMail(to, mailSubject, mailBody)
             }else {
                 console.log(subscription[i]);
             }
@@ -176,7 +176,11 @@ exports.placeOrder = async(req,res) => {
 
 exports.historyOfOrdersTenant = async(req,res) => {
     try{
-        let orderHistory = await Order.find({user : req.user._id}).sort({createdAt : -1});
+        let orderHistory = await Order.find({user : req.user._id}).sort({createdAt : -1})
+        .populate({
+            path:"transactionId",
+            populate:"property"
+        });
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,

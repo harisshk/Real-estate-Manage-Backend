@@ -28,7 +28,8 @@ const {
 	getUsersForAssignRegionalAdmin,
 	getTenantsForAssignAdmin,
 	getOwnersByRegion,
-	getAdminDashboardFilterByRegion
+	getAdminDashboardFilterByRegion,
+	getTenantsForAssignRegionalAdmin
 } = require("../controllers/user");
 
 const {
@@ -138,7 +139,7 @@ router.get('/user/accountInfo/:userId' , getUserInfo);
 router.post('/user/admin/owner/:userId',isSignedIn , isAdmin, getUsersForAssignAdmin);
 router.post('/user/admin/tenant/:userId',isSignedIn , isAdmin, getUsersForAssignAdmin);
 router.post('/user/regional-admin/owner/:userId',isSignedIn , isRegionalAdmin , getUsersForAssignRegionalAdmin);
-router.post('/user/regional-admin/tenant/:userId',isSignedIn , isRegionalAdmin , getUsersForAssignRegionalAdmin);
+router.post('/user/regional-admin/tenant/:userId',isSignedIn , isRegionalAdmin , getTenantsForAssignRegionalAdmin)
 
 router.get("/user/owners/region/:regions", getOwnersByRegion)
 module.exports = router;
