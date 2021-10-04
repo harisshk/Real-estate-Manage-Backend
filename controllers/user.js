@@ -772,6 +772,24 @@ exports.getUsersForAssignRegionalAdmin = async (req, res) => {
 		});
 	};
 }
+exports.getTenantsForAssignRegionalAdmin = async (req, res) => {
+	const { role } = req.body
+	try {
+		let users = await User.find({ role: role, isDeleted: false, isActive: true }, { email: 1, phoneNumber: 1, name: 1, subscription: 1 })
+		return res.status(StatusCodes.OK).json({
+			message: "success",
+			error: false,
+			user: req.user,
+			users: users
+		});
+	} catch (error) {
+		return res.status(StatusCodes.OK).json({
+			error: true,
+			err: error.message,
+			message: "Error in getting users ."
+		});
+	};
+}
 exports.getOwnersByRegion = async (req, res) => {
 	const { regions } = req.params
 	try {
