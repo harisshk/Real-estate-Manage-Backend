@@ -4,6 +4,7 @@ const Order = require('../models/order');
 const Transaction = require('../models/transaction')
 const User = require('../models/user')
 var Subscription = require('../models/subscription');
+const  mongoose = require('mongoose');
 //const {addTransactionUser} = require("../utils/logHandler/index")
 const month = ["Jan" , "Feb" , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct", "Nov" , "Dec"]
 exports.generateOrders = async(req,res) => {
@@ -406,6 +407,34 @@ exports.sendRemainder = async (req,res) => {
             error : true,
             err : error,
             message : "Error in sending the remainder"
+        })
+    }
+}
+
+exports.getTotalAmountByProperty = async (req, res) => {
+    const { id } = req.params
+    try {
+        const totalCount = await Transaction.aggregate([
+            { $match: { property: new mongoose.Types.ObjectId(id) } },
+            { $group: { _id: "$property", total: { $sum: "$amountPaid" } } }
+        ])
+        if (totalCount.length !== 0) {
+            return res.status(StatusCodes.OK).json({
+                error: false,
+                message: "Property total rent fetched successfully",
+                totalCount: totalCount[0].total
+            })
+        } else {
+            return res.status(StatusCodes.OK).json({
+                error: false,
+                message: "Property total rent fetched successfully",
+                totalCount: 0
+            })
+        }
+    } catch (error) {
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error: true,
+            message: error.message
         })
     }
 }
