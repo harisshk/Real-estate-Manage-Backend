@@ -177,10 +177,15 @@ exports.placeOrder = async(req,res) => {
 exports.historyOfOrdersTenant = async(req,res) => {
     try{
         let orderHistory = await Order.find({user : req.user._id}).sort({createdAt : -1})
-        .populate({
-            path:"transactionId",
-            populate:"property"
-        });
+            .populate('subscription')
+            .populate('owner',"name")
+            .populate({
+                path: "subscription",
+                populate: {
+                    path: "property",
+                    select: "name owner rent region"
+                }
+            })
         return res.status(StatusCodes.OK).json({
             error : false ,
             message :"success" ,
@@ -198,14 +203,15 @@ exports.historyOfOrdersTenant = async(req,res) => {
 
 exports.historyOfOrdersOwner = async(req,res) => {
     try{
-        let orderHistory = await Order.find({owner: req.user._id , paymentStatus : "Done"})
+        let orderHistory = await Order.find({ owner: req.user._id, paymentStatus: "Done" })
+            .populate('subscription')
+            .populate("user", "name")
             .populate({
-                path : "subscription",
-                 populate :'tenant'
-            })
-            .populate({
-                path : "subscription",
-                populate :'property'
+                path: "subscription",
+                populate: {
+                    path: "property",
+                    select: "name rent region"
+                }
             })
             .sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
@@ -259,15 +265,16 @@ exports.pendingDueOwner = async(req,res) => {
 
 exports.historyOfOrdersRegionalAdmin = async(req,res) => {
     try{
-        let orderHistory = await Order.find({region : req.user.regions[0],paymentStatus : "Done"})
+        let orderHistory = await Order.find({ region: req.user.regions[0], paymentStatus: "Done" })
             .populate('subscription')
+            .populate("user", "name")
+            .populate("owner", "name")
             .populate({
-                path : "subscription",
-                populate :'tenant'
-            })
-            .populate({
-                path : "subscription",
-                populate :'property'
+                path: "subscription",
+                populate: {
+                    path: "property",
+                    select: "name owner rent region"
+                }
             })
             .sort({createdAt : -1});
         return res.status(StatusCodes.OK).json({
@@ -289,6 +296,7 @@ exports.pendingDueRegionalAdmin = async(req,res) => {
     try{
         let pendingDue = await Order.find({region : req.user.regions[0],paymentStatus : "Pending"})
         .populate('subscription')
+        .populate("transactionId")
         .populate({
             path : "subscription", 
             populate : {
@@ -323,17 +331,13 @@ exports.historyOfOrdersAdmin = async(req,res) => {
     try{
         let orderHistory = await Order.find({paymentStatus : "Done"})
             .populate('subscription')
-            .populate({
-                path : "subscription",
-                populate : {
-                    path : "tenant",
-                    select : "name"
-                }})
+            .populate("user", "name")
+            .populate("owner", "name")
             .populate({
                 path : "subscription", 
                 populate : {
                     path : "property",
-                    select : "name owner rent"
+                    select : "name rent region"
                 }
             })
             .sort({createdAt : -1});
