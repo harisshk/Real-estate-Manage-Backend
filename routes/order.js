@@ -10,7 +10,8 @@ const {
     pendingDueAdmin,
     pendingDueRegionalAdmin,
     pendingDueOwner,
-    sendRemainder
+    sendRemainder,
+    getTotalAmountByProperty
 } = require("../controllers/order");
 const router = express.Router();
 
@@ -40,5 +41,7 @@ router.get('/order/due/owner/:userId',isSignedIn , isOwner , pendingDueOwner);
 //   content : content(String), 
 // }
 router.post('/order/remainder/',sendRemainder);
+
+router.get('/order/property/totalAmount/:id',getTotalAmountByProperty);
 
 module.exports = router;
