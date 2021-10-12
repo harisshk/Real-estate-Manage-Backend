@@ -13,7 +13,7 @@ const supportSchema = new mongoose.Schema(
         },
         property: {
             type: mongoose.SchemaTypes.ObjectId,
-            ref: "Property",
+            ref: "SubProperty",
         },
         messages: [
             {

@@ -6,6 +6,7 @@ const {
 	getPropertiesByRegionalAdmin,
 	getPropertiesByAdmin,getPropertiesByHouseOwner,
 	getPropertyInfo,
+	getParentPropertyInfo,
 } = require("../controllers/property");
 const {isSignedIn, setUser, isOwner, isAdmin, isRegionalAdmin} = require("../controllers/auth");
 const router = express.Router();
@@ -45,18 +46,19 @@ router.get("/property/owner/:userId", getPropertiesByHouseOwner)
 router.get("/property/view/:isVerified/:userId", isSignedIn, getProperties);
 
 router.post(
-	"/property/admin/update/:propertyId/:userId",
+	"/property/admin/update/:userId",
 	isSignedIn,
 	isAdmin,
 	updateProperty
 );
 router.post(
-	"/property/regionalAdmin/update/:propertyId/:userId",
+	"/property/regionalAdmin/update/:userId",
 	isSignedIn,
 	isRegionalAdmin,
 	updateProperty
 );
 
 router.get('/property/propertyInfo/:userId/:propertyId',isSignedIn , getPropertyInfo);
+router.get('/property/parentPropertyInfo/:userId/:propertyId', isSignedIn , getParentPropertyInfo);
 
 module.exports = router;
