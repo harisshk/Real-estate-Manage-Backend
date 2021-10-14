@@ -60,40 +60,69 @@ exports.addProperty = async (req, res) => {
 };
 
 
-exports.updateProperty = (req, res) => {
-	Property.findByIdAndUpdate({ _id: req.params.propertyId }, { $set: req.body }, { new: 1 })
-		.then(async (updatedProperty) => {
-			let body = `<p>Property Updated</p>
-		<p>${updatedProperty.name}&nbsp;</p>
-		<p style="text-align: center;"><img src=${updatedProperty?.photos[0]} alt="" width="421" height="280" /></p>
-		<p>Property Location</p>
-		<p>&nbsp; &nbsp;${updatedProperty?.addressLine1},</p>
-		<p>&nbsp; &nbsp;${updatedProperty?.addressLine2 || ''}</p>
-		<p>&nbsp; &nbsp;${updatedProperty?.zipCode}, ${updatedProperty?.region}.</p>
-		<p>&nbsp; &nbsp;${updatedProperty?.state}</p>
-		<p>Rent: ${updatedProperty.rent} Rs</p>
-		<p>Initial Deposit: ${updatedProperty.initialDeposit} Rs</p>
-		<p>Square Feet: ${updatedProperty.size} ft</p>
-		<p>Updated By ${req.user.name}-(${req?.user?.role})</p>
-		<p>&nbsp;&nbsp;</p>`;
-			let subject = `!! PROPY Property Updated`;
-			let allAdmins = await User.find({ role: "admin", isActive: true });
-			// for(let i = 0 ; i < allAdmins.length ; i++){
-			//     sendMail (allAdmins[i].email, subject ,body);
-			// }
-			return res.status(StatusCodes.ACCEPTED).json({
-				message: "Property updated",
-				error: false,
-			});
-		})
-		.catch((error) => {
-			console.log(error)
-			res.status(StatusCodes.BAD_REQUEST).json({
-				message: "Error in updating the property ",
-				error: true,
-				err: error,
-			})
-		})
+exports.updateProperty = async (req, res) => {
+	const { parentProperty, subProperty } = req.body
+	try {
+		let updatedProperty = await ParentProperty.findByIdAndUpdate({ _id: parentProperty._id }, { $set: parentProperty });
+		const { _id, updatedBy } = updatedProperty
+		let childId = []
+		let successRate = 0
+		subProperty.forEach(async (property) => {
+
+			if (property?._id) {
+				const data = {
+					...property,
+					parentId: _id,
+					updatedBy: req.user._id,
+				}
+				let updatedChild = await SubProperty.findOneAndUpdate({ _id: property?._id }, { $set: data }, { upsert: true })
+				childId.push(updatedChild._id)
+			} else {
+				const data = {
+					...property,
+					parentId: _id,
+					createdBy: req.user._id,
+				}
+				let updatedChild = await new SubProperty(data).save()
+				childId.push(updatedChild._id)
+			}
+			successRate += 1
+			if (successRate === subProperty?.length) {
+				await ParentProperty.findByIdAndUpdate({ _id: _id }, { subProperty: childId })
+			}
+		});
+
+		// let body = `<p>New Property Added</p>
+		// <p>${newProperty.name}&nbsp;</p>
+		// <p style="text-align: center;"><img src=${newProperty?.photos[0]} alt="" width="421" height="280" /></p>
+		// <p>Property Location</p>
+		// <p>&nbsp; &nbsp;${newProperty?.addressLine1},</p>
+		// <p>&nbsp; &nbsp;${newProperty?.addressLine2 || ''}</p>
+		// <p>&nbsp; &nbsp;${newProperty?.zipCode}, ${newProperty?.region}.</p>
+		// <p>&nbsp; &nbsp;${newProperty?.state}</p>
+		// <p>Rent: ${newProperty.rent} Rs</p>
+		// <p>Initial Deposit: ${newProperty.initialDeposit} Rs</p>
+		// <p>Square Feet: ${newProperty.size} ft</p>
+		// <p>Added By ${req.user.name}-(${req?.user?.regions[0]})</p>
+		// <p>&nbsp;&nbsp;</p>`;
+		// let subject = `!! PROPY New Property Added`;
+		// let allAdmins = await User.find({role : "admin" , isActive : true});
+		// for(let i = 0 ; i < allAdmins.length ; i++){
+		//     sendMail (allAdmins[i].email, subject ,body);
+		// }
+		return res.status(StatusCodes.ACCEPTED).json({
+			message: "Property updated",
+			error: false,
+			successRate: successRate,
+			childId: childId
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			message: "Error in updating the property ",
+			error: true,
+			err: error.message,
+		});
+	}
 };
 
 exports.deleteProperty = (req, res) => {
@@ -137,7 +166,15 @@ exports.getProperties = async (req, res) => {
 
 exports.getPropertiesByAdmin = async (req, res) => {
 	try {
-		let properties = await SubProperty.find({ isDeleted: false, isActive:true }).populate('subscription').populate("owner").populate("parentId")
+		let properties = await ParentProperty.find({ isDeleted: false, isActive: true })
+			.populate({
+				path: "subProperty",
+				populate: {
+					path: "owner",
+					select: "name email phoneNumber"
+				},
+			})
+			.populate("createdBy")
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Properties Fetched Successfully",
@@ -156,7 +193,15 @@ exports.getPropertiesByAdmin = async (req, res) => {
 
 exports.getPropertiesByRegionalAdmin = async (req, res) => {
 	try {
-		let properties = await Property.find({ isDeleted: false, region: req.user.regions[0] }).populate('subscription').populate({ path: "subscription", populate: 'tenant' }).populate("owner", { jwtToken: 0, password: 0 });
+		let properties = await ParentProperty.find({ isDeleted: false, isActive: true, region: req.user.regions[0] })
+			.populate({
+				path: "subProperty",
+				populate: {
+					path: "owner",
+					select: "name email phoneNumber"
+				},
+			})
+			.populate("createdBy")
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Properties Fetched Successfully",
@@ -175,8 +220,29 @@ exports.getPropertiesByRegionalAdmin = async (req, res) => {
 exports.getPropertyInfo = async (req, res) => {
 	const { propertyId } = req.params;
 	try {
-		let propertyInfo = await Property.findOne({ _id: propertyId }).populate("owner")
+		let propertyInfo = await SubProperty.findOne({ _id: propertyId }).populate("owner").populate("parentId")
 			.populate('subscription')
+			.populate('currentSubscription')
+
+		return res.status(StatusCodes.OK).json({ error: false, message: "Success", property: propertyInfo })
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST)
+			.json({ error: true, message: "Error in getting Property Info", err: error })
+	}
+
+}
+exports.getParentPropertyInfo = async (req, res) => {
+	const { propertyId } = req.params;
+	try {
+		let propertyInfo = await ParentProperty.findOne({ _id: propertyId })
+			.populate({
+				path: "subProperty",
+				populate: {
+					path: "owner",
+					select: "email name"
+				}
+			})
+			.populate("currentSubscription")
 		return res.status(StatusCodes.OK).json({ error: false, message: "Success", property: propertyInfo })
 	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST)
@@ -187,7 +253,9 @@ exports.getPropertyInfo = async (req, res) => {
 
 exports.getPropertiesByHouseOwner = async (req, res) => {
 	try {
-		let properties = await Property.find({ owner: req.user._id, isDeleted: false }).populate('subscription');
+		let properties = await SubProperty.find({ owner: req.user._id, isDeleted: false })
+		.populate('currentSubscription')
+		.populate('parentId')
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
 			message: "Properties Fetched Successfully",

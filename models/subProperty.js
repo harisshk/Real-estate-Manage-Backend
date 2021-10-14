@@ -71,6 +71,10 @@ const subPropertySchema = new mongoose.Schema(
             type: Array,
             ref: "Subscription"
         },
+        currentSubscription: {
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Subscription"
+        },
         geoLocation: {
             latitude: '',
             longitude: ''
