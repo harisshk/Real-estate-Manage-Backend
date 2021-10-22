@@ -24,8 +24,8 @@ exports.newSubscription = async (req, res) => {
         req.body.tenant = checkTenant._id ;
         let newSubscription = await new Subscription(req.body).save();
         // let subscriptionExists = await 
-        let propertyInfo = await SubProperty.findOneAndUpdate({ _id: property }, { $push: { subscription: newSubscription._id }, currentSubscription: newSubscription._id, isOccupied: true }, { new: true })
-        await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id , regions : [propertyInfo.region] },{new : true});
+        let propertyInfo = await SubProperty.findOneAndUpdate({ _id: property }, { $push: { subscription: newSubscription._id }, currentSubscription: newSubscription._id, isOccupied: true }, { new: true }).populate("parentId")
+        await User.findOneAndUpdate({ email: tenant }, { subscription: newSubscription._id , regions : [propertyInfo.parentId.region] },{new : true});
         let body = `Tenant ${checkTenant.name} as assigned to Property ${propertyInfo.name}`;
         let subject = `Tenant Assigned`;
         let allAdmins = await User.find({role : "admin" , isActive : false});
@@ -51,14 +51,14 @@ exports.newSubscription = async (req, res) => {
 exports.reassignSubscription = async (req,res) => {
     try {
         const { tenant  , property } = req.body;
-        const propertyInfo = await SubProperty.findOneAndUpdate({_id : property},{$set : {currentSubscription : null,isOccupied:false}});
+        const propertyInfo = await SubProperty.findOneAndUpdate({_id : property},{$set : {currentSubscription : null,isOccupied:false}}).populate("parentId");
         const subscriptionInfo = await Subscription.findByIdAndUpdate({_id : propertyInfo.currentSubscription},{$set : {isActive: false}});
-        await User.findOneAndUpdate({_id: subscriptionInfo.tenant},{$set : {subscription: null}});
+        await User.findOneAndUpdate({ _id: subscriptionInfo.tenant }, { $set: { subscription: null, regions: [] } });
         const newSubscriptionInfo = await new Subscription({
             tenant: tenant,
             property: property
         }).save();
-        const newTenantInfo = await User.findOneAndUpdate({_id: tenant},{$set : {subscription: newSubscriptionInfo._id}});
+        const newTenantInfo = await User.findOneAndUpdate({ _id: tenant }, { $set: { subscription: newSubscriptionInfo._id, regions: propertyInfo.parentId.region } });
         if(newTenantInfo.subscription){
             const previousSubscriptionInfo = await Subscription.findByIdAndUpdate({_id : newTenantInfo.subscription},{$set : {isActive: false}});
             await SubProperty.findOneAndUpdate({_id : previousSubscriptionInfo.property},{$set : {subscription : null}});
@@ -89,7 +89,7 @@ exports.removeSubscription = async(req,res) => {
         const { propertyId } = req.params;
         const propertyInfo = await SubProperty.findOneAndUpdate({_id : propertyId},{$set : {currentSubscription : null,isOccupied:false}});
         const subscriptionInfo = await Subscription.findByIdAndUpdate({_id : propertyInfo.currentSubscription},{$set : {isActive: false}});
-        await User.findOneAndUpdate({_id: subscriptionInfo?.tenant},{$set : {subscription: null}});
+        await User.findOneAndUpdate({ _id: subscriptionInfo?.tenant }, { $set: { subscription: null, regions: [] } });
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
