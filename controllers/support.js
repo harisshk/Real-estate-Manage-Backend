@@ -95,7 +95,10 @@ exports.addMessageSupport = async (req, res) => {
 
 exports.getSupportList = async (req, res) => {
     try {
-        let supports = await Support.find({ user: req.params.userId }).populate("property");
+        let supports = await Support.find({ user: req.params.userId }).populate({
+            path:"property",
+            populate:"parentId"
+        });
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
@@ -117,7 +120,7 @@ exports.supportDescription = async (req, res) => {
             .populate("user", { password: 0, jwtToken: 0, fcmToken: 0 })
             .populate({
                 path: "property",
-                populate: "owner",
+                populate: "owner parentId",
                 select: { "password": 0, "jwtToken": 0, "fcmToken": 0 },
             })
         return res.status(StatusCodes.OK).json({
@@ -139,7 +142,7 @@ exports.getAllSupportByAdmin = async (req, res) => {
         let supports = await Support.find({}).populate('user')
         .populate({
             path:"property",
-            populate:"owner"
+            populate:"owner parentId"
         });
         return res.status(StatusCodes.OK).json({
             error: false,
@@ -179,7 +182,7 @@ exports.getAllSupportByRegionalAdmin = async (req, res) => {
         let supports = await Support.find({ region: req.user.regions[0] }).populate('user')
         .populate({
             path:"property",
-            populate:"owner"
+            populate:"owner parentId"
         });
         return res.status(StatusCodes.OK).json({
             error: false,

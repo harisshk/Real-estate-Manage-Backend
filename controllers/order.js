@@ -9,20 +9,24 @@ const  mongoose = require('mongoose');
 const month = ["Jan" , "Feb" , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct", "Nov" , "Dec"]
 exports.generateOrders = async(req,res) => {
     try {
-        let subscription = await Subscription.find({ isActive: true }).populate('property', { rent: 1 , name : 1 , owner : 1 , region : 1 }).populate('tenant', { name: 1, email: 1  , regions : 1});
-    
+        let subscription = await Subscription.find({ isActive: true })
+        .populate({
+            path:"property",
+            populate:"parentId"
+        })
+        .populate('tenant', { name: 1, email: 1  , regions : 1});
         for (let i = 0; i < subscription.length; i++) {
            // Creating order
             let property = subscription[i].property;
             let tenant = subscription[i].tenant;
             if(property ){
-                await new Order({ owner : property.owner, subscription: subscription[i]._id, region : property.region , user: tenant._id, amount: property ? property?.rent : 5500 , orderMessage : `${property?.name} | Rent ${month[new Date().getMonth()]}` }).save();
+                await new Order({ owner : property.owner, subscription: subscription[i]._id, region : property.parentId.region , user: tenant._id, amount: property ? property?.rent : 5500 , orderMessage : `${property?.name} | Rent ${month[new Date().getMonth()]}` }).save();
                 // // Incrementing billing Cycle
                 await Subscription.findOneAndUpdate({_id : subscription[i]._id},{$inc: {billingCycle: 1}});
                 // Sending mail 
-                let to = subscription[i].tenant.email;
-                let mailSubject = `REMAINDER!!! Propy(Invoice Remainder)`;
-                let mailBody = `Hi ${subscription[i].tenant.name} , your payment of Rs. ${subscription[i].property?.rent} is pending pay before 7th of this month to avoid due`;
+                // let to = subscription[i].tenant.email;
+                // let mailSubject = `REMAINDER!!! Propy(Invoice Remainder)`;
+                // let mailBody = `Hi ${subscription[i].tenant.name} , your payment of Rs. ${subscription[i].property?.rent} is pending pay before 7th of this month to avoid due`;
                 // sendMail(to, mailSubject, mailBody)
             }else {
                 console.log(subscription[i]);
@@ -184,7 +188,8 @@ exports.historyOfOrdersTenant = async(req,res) => {
                 path: "subscription",
                 populate: {
                     path: "property",
-                    select: "name owner rent region"
+                    select: "name owner rent",
+                    populate:"parentId"
                 }
             })
         return res.status(StatusCodes.OK).json({
@@ -211,7 +216,8 @@ exports.historyOfOrdersOwner = async(req,res) => {
                 path: "subscription",
                 populate: {
                     path: "property",
-                    select: "name rent region"
+                    select: "name rent",
+                    populate:"parentId"
                 }
             })
             .sort({createdAt : -1});
@@ -245,7 +251,7 @@ exports.pendingDueOwner = async(req,res) => {
                 path : "subscription", 
                 populate : {
                     path : "property",
-                    select : "name owner rent"
+                    select : "name rent"
                 }
             })
             .sort({createdAt : -1});
@@ -274,7 +280,8 @@ exports.historyOfOrdersRegionalAdmin = async(req,res) => {
                 path: "subscription",
                 populate: {
                     path: "property",
-                    select: "name owner rent region"
+                    select: "name rent",
+                    populate:"parentId"
                 }
             })
             .sort({createdAt : -1});
@@ -338,7 +345,8 @@ exports.historyOfOrdersAdmin = async(req,res) => {
                 path : "subscription", 
                 populate : {
                     path : "property",
-                    select : "name rent region"
+                    select : "name rent",
+                    populate:"parentId"
                 }
             })
             .sort({createdAt : -1});

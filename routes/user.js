@@ -29,7 +29,8 @@ const {
 	getTenantsForAssignAdmin,
 	getOwnersByRegion,
 	getAdminDashboardFilterByRegion,
-	getTenantsForAssignRegionalAdmin
+	getTenantsForAssignRegionalAdmin,
+	getUsersByRegionAdmin
 } = require("../controllers/user");
 
 const {
@@ -104,7 +105,7 @@ router.post(
 	"/user/getUserByRole/regionalAdmin/:userId",
 	isSignedIn,
 	isRegionalAdmin,
-	getAllUsersByRoles,
+	getUsersByRegionAdmin,
 );
 router.post("/user/update/admin/:userId", isSignedIn, isAdmin, updateUser);
 router.post("/user/update/owner/:userId", isSignedIn, isOwner, updateUser);

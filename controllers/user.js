@@ -2,7 +2,8 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const User = require("../models/user");
-const Property = require('../models/property');
+const ParentProperty = require('../models/parentProperty');
+const SubProperty = require('../models/subProperty');
 const Profile = require('../models/profile');
 const OTP = require("../models/otp");
 const {StatusCodes} = require("http-status-codes");
@@ -436,6 +437,26 @@ exports.getAllUsersByRoles = async (req, res) => {
 		});
 	}
 };
+
+exports.getUsersByRegionAdmin = async (req,res) => {
+	try {
+		const { regions } = req.user
+		const { role } = req.query
+		console.log(regions, role)
+		const results = await User.find({ role:role, regions:{$in:regions[0]} })
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "user fetched successfully",
+			results: results,
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			error: false,
+			err: error.message,
+			message: "Error finding users",
+		});
+	}
+}
 exports.logout = (req, res) => {
 	User.findOneAndUpdate(
 		{_id: req.user._id},
@@ -526,7 +547,7 @@ exports.getAdminDashboardInfo = async(req,res) => {
 		// let adminCount = await User.find({isDeleted : false , role: "admin" }).countDocuments() ;
 		let regionalAdminCount = await User.find({isDeleted : false ,role: "regional-admin" }).countDocuments() ;
 		let ownerCount = await User.find({isDeleted : false , role : "owner" }).countDocuments() ;
-		let propertyCount = await Property.find({isDeleted: false }).countDocuments() ;
+		let propertyCount = await ParentProperty.find({isDeleted: false }).countDocuments() ;
 		let supportRequestCount = await Support.find({isActive: true }).countDocuments();
 		let pendingDueCount = await Order.find({paymentStatus: "Pending" }).countDocuments();
 		return res.status(StatusCodes.OK).json({
@@ -570,7 +591,7 @@ exports.getAdminDashboardInfo = async(req,res) => {
 			message : "Error in getting dashboard Info"
 		})
 	}
-	
+
 }
 exports.getAdminDashboardFilterByRegion = async (req, res) => {
 	const { region } = req.params
@@ -579,7 +600,7 @@ exports.getAdminDashboardFilterByRegion = async (req, res) => {
 		// let adminCount = await User.find({isDeleted : false , role: "admin" }).countDocuments() ;
 		let regionalAdminCount = await User.find({ isDeleted: false, role: "regional-admin", regions: region }).countDocuments();
 		let ownerCount = await User.find({ isDeleted: false, role: "owner", regions: region }).countDocuments();
-		let propertyCount = await Property.find({ isDeleted: false, region: region }).countDocuments();
+		let propertyCount = await ParentProperty.find({ isDeleted: false, region: region }).countDocuments();
 		let supportRequestCount = await Support.find({ isActive: true, region: region }).countDocuments();
 		//let pendingDueCount = await Order.find({paymentStatus: "Pending" }).countDocuments();
 		return res.status(StatusCodes.OK).json({
@@ -624,9 +645,9 @@ exports.getAdminDashboardFilterByRegion = async (req, res) => {
 
 exports.getRegionalAdminInfo = async (req,res) => {
 	try{
-		let tenantCount = await User.find({isDeleted : false , role : "tenant" },{$in : {regions : req.user.regions[0]}}).countDocuments() ;
-		let ownerCount = await User.find({isDeleted: false , role : "owner"},{$in: {regions : req.user.regions[0]}}).countDocuments() ;
-		let propertyCount = await Property.find({isDeleted : false , region : req.user.regions[0] }).countDocuments();
+		let tenantCount = await User.find({ isDeleted: false, role: "tenant", regions: { $in: req.user.regions[0] } }).countDocuments();
+		let ownerCount = await User.find({ isDeleted: false, role: "owner", regions: { $in: req.user.regions[0] } }).countDocuments();
+		let propertyCount = await ParentProperty.find({ isDeleted: false, region: req.user.regions[0] }).countDocuments();
 		let supportRequestCount = await Support.find({isActive: true,region : req.user.regions[0] }).countDocuments();
 		let pendingDueCount = await Order.find({paymentStatus: "Pending" , region : req.user.regions[0] }).countDocuments();
 		return res.status(StatusCodes.OK).json({
@@ -666,8 +687,8 @@ exports.getRegionalAdminInfo = async (req,res) => {
 
 exports.getOwnerDashboardInfo = async (req, res) => {
 	try{
-		let propertyCount = await Property.find({isDeleted : false , owner: req.user._id }).countDocuments();
-		let pendingDueCount = await Order.find({paymentStatus : "Pending" , owner: req.user._id }).countDocuments();
+		let propertyCount = await SubProperty.find({ isDeleted: false, owner: req.user._id }).countDocuments();
+		let pendingDueCount = await Order.find({ paymentStatus: "Pending", owner: req.user._id }).countDocuments();
 
 		return res.status(StatusCodes.OK).json({
 			error : false ,
@@ -694,7 +715,14 @@ exports.getOwnerDashboardInfo = async (req, res) => {
 
 exports.tenantDashboardInfo = async (req, res) => {
 	try {
-		let userInfo = await User.findOne({ _id: req.user._id }, { jwtToken: 0, password: 0 }).populate('subscription').populate({ path: "subscription", populate: 'property' });
+		let userInfo = await User.findOne({ _id: req.user._id }, { jwtToken: 0, password: 0 }).populate('subscription')
+			.populate({
+				path: "subscription",
+				populate: { 
+					path: 'property', 
+					populate: "parentId" 
+				}
+			});
 		let pendingOrders = [];
 		if (userInfo?.subscription?.billingCycle > 0) {
 			pendingOrders = await Order.find({ user: req.user._id, paymentStatus: "Pending" });
