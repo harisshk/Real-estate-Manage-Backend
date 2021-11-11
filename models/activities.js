@@ -17,7 +17,15 @@ const activitiesSchema = new mongoose.Schema(
         message:{
             type: String,
             required:true
-        }
+        },
+		region:{
+			type: String,
+            // required:true
+		},
+		type: {
+			type: Array,
+			default: []
+		}
 	},
 	{timestamps: true},
 );

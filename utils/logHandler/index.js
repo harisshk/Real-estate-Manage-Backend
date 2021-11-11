@@ -1,9 +1,10 @@
 const Activities = require("../../models/activities")
-const addActivitiesUser = (user,updatedBy,message) =>{
+const addActivitiesUser = (user,updatedBy,region, message) =>{
     try{
         let newActivity = new Activities({
             user:user,
             message:message,
+            region:region,
             updatedBy:updatedBy,
             type:"User logs"
         })
