@@ -15,6 +15,16 @@ exports.createSupport = async (req, res) => {
             let newSupport = new Support(newSupportCount)
             newSupport.save()
                 .then((support) => {
+                    const userId = support?.user?._id
+                    const region = support?.region
+                    const adminId = req?.user?._id
+                    const message = `New support with support number ${support?.supportNo} is created by ${req?.user?.name} `
+                    addActivitiesUser(
+                        userId,
+                        adminId,
+                        region,
+                        message
+                    )
                     return res.status(StatusCodes.OK).json({
                         error: false,
                         message: "success",
