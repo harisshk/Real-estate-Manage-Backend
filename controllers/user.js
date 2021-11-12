@@ -519,7 +519,7 @@ exports.updateUser = (req, res) => {
 			if (name !== updatedUserInfo?.name) {
 				changes.push(" Name")
 			}
-			if (regions.toString() !== updatedUserInfo?.regions.toString()) {
+			if (regions?.toString() !== updatedUserInfo?.regions?.toString()) {
 				changes.push(" Region")
 			}
 			if (changes.length !== 0) {
