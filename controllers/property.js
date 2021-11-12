@@ -4,6 +4,9 @@ const Property = require("../models/property");
 const ParentProperty = require("../models/parentProperty");
 const SubProperty = require("../models/subProperty")
 const User = require("../models/user");
+const { addActivitiesUser } = require('../utils/logHandler/index')
+const { MainPropertyDiff, subPropertyDiff } = require('../utils/compareDiff/index')
+
 
 exports.addProperty = async (req, res) => {
 	const { parentProperty, subProperty } = req.body
@@ -43,6 +46,16 @@ exports.addProperty = async (req, res) => {
 		// for(let i = 0 ; i < allAdmins.length ; i++){
 		//     sendMail (allAdmins[i].email, subject ,body);
 		// }
+		const userId = ""
+		const adminId = req?.user?._id
+		const region = newProperty?.region
+		const message = `New property - ${newProperty?.name} is created by ${req?.user?.name} `
+		addActivitiesUser(
+			userId,
+			adminId,
+			region,
+			message
+		)
 		return res.status(StatusCodes.ACCEPTED).json({
 			message: "Property added",
 			error: false,
@@ -64,11 +77,23 @@ exports.updateProperty = async (req, res) => {
 	const { parentProperty, subProperty } = req.body
 	try {
 		let updatedProperty = await ParentProperty.findByIdAndUpdate({ _id: parentProperty._id }, { $set: parentProperty });
+		const changes = await (MainPropertyDiff(parentProperty,updatedProperty))
+		if (changes.length !== 0) {
+			const userId = req?.user?._id
+			const adminId = req?.user?._id
+			const region = updatedProperty?.region
+			const message = "Property - " + updatedProperty?.name + " is updated by " + req?.user?.name + "." + (changes.length !== 0 ? "\nChanges : " + changes.toString() : "");
+			addActivitiesUser(
+				userId,
+				adminId,
+				region,
+				message
+			)
+		}
 		const { _id, updatedBy } = updatedProperty
 		let childId = []
 		let successRate = 0
 		subProperty.forEach(async (property) => {
-
 			if (property?._id) {
 				const data = {
 					...property,
@@ -77,6 +102,19 @@ exports.updateProperty = async (req, res) => {
 				}
 				let updatedChild = await SubProperty.findOneAndUpdate({ _id: property?._id }, { $set: data }, { upsert: true })
 				childId.push(updatedChild._id)
+				const changes = await (subPropertyDiff(updatedChild, property))
+				if (changes.length !== 0) {
+					const userId = property?.owner
+					const adminId = req?.user?._id
+					const region = updatedProperty?.region
+					const message = "Property - " + updatedProperty?.name + " - " + property?.name + " is updated by " + req?.user?.name + "." + (changes.length !== 0 ? "\nChanges : " + changes.toString() : "");
+					addActivitiesUser(
+						userId,
+						adminId,
+						region,
+						message
+					)
+				}
 			} else {
 				const data = {
 					...property,
@@ -85,11 +123,25 @@ exports.updateProperty = async (req, res) => {
 				}
 				let updatedChild = await new SubProperty(data).save()
 				childId.push(updatedChild._id)
+				const changes = await (subPropertyDiff(updatedChild, property))
+				if (changes.length !== 0) {
+					const userId = property?.owner
+					const adminId = req?.user?._id
+					const region = updatedProperty?.region
+					const message = "Property - " + updatedProperty?.name + " - " + property?.name + " is updated by " + req?.user?.name + "." + (changes.length !== 0 ? "\nChanges : " + changes.toString() : "");
+					addActivitiesUser(
+						userId,
+						adminId,
+						region,
+						message
+					)
+				}
 			}
 			successRate += 1
 			if (successRate === subProperty?.length) {
 				await ParentProperty.findByIdAndUpdate({ _id: _id }, { subProperty: childId })
 			}
+
 		});
 
 		// let body = `<p>New Property Added</p>
@@ -110,6 +162,7 @@ exports.updateProperty = async (req, res) => {
 		// for(let i = 0 ; i < allAdmins.length ; i++){
 		//     sendMail (allAdmins[i].email, subject ,body);
 		// }
+		
 		return res.status(StatusCodes.ACCEPTED).json({
 			message: "Property updated",
 			error: false,

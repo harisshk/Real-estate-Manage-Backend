@@ -5,7 +5,7 @@ const Transaction = require('../models/transaction')
 const User = require('../models/user')
 var Subscription = require('../models/subscription');
 const  mongoose = require('mongoose');
-//const {addTransactionUser} = require("../utils/logHandler/index")
+const { addActivitiesUser } = require("../utils/logHandler/index")
 const month = ["Jan" , "Feb" , "Mar" , "Apr" , "May" , "Jun" , "Jul" , "Aug" , "Sep" , "Oct", "Nov" , "Dec"]
 exports.generateOrders = async(req,res) => {
     try {
@@ -69,6 +69,16 @@ exports.placeOrder = async(req,res) => {
             billingCycle : paymentStatus === "Done" ? 0 : billingCycle ,
             paidUntil : new Date()
         };
+        const userId = req?.user?._id
+			const adminId = req?.user?._id
+			const regions = updatedProperty?.region
+			const message = "Property - " + updatedProperty?.name + " is updated by " + req?.user?.name + "." + (changes.length !== 0 ? "\nChanges : " + changes.toString() : "");
+			addActivitiesUser(
+				userId,
+				adminId,
+				regions,
+				message
+			)
         //addTransactionUser("",`Rent payed ${amountPaid} in the region ${region}`,tenant)
         await Subscription.findOneAndUpdate({tenant : tenant , property : property},{$set : subscriptionInput},{new : true});
         let orderInput = {

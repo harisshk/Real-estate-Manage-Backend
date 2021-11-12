@@ -50,6 +50,10 @@ const supportSchema = new mongoose.Schema(
         isActive : {
             type : Boolean,
             default : true,
+        },
+        closedBy : {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: "User"
         }
     },
     { timestamps: true },
