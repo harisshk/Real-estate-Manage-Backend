@@ -14,7 +14,7 @@ const userSchema = new mongoose.Schema(
 		},
 		avatar: {
 			type: String,
-			default: "https://img.icons8.com/bubbles/2x/user-male.png",
+			default: "https://user-images.githubusercontent.com/48409160/141422418-91ed37d8-9a74-45d3-9031-75ffb22bd050.png",
 		},
 		password: {
 			type: String,
