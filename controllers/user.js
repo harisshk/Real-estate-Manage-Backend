@@ -510,16 +510,16 @@ exports.updateUser = (req, res) => {
 			// 		}
 			// 	};
 			// };
-			if (role !== updatedUserInfo?.role) {
+			if (role !== updatedUserInfo?.role && role) {
 				changes.push(" Role")
 			}
-			if (phoneNumber !== updatedUserInfo?.phoneNumber) {
+			if (phoneNumber !== updatedUserInfo?.phoneNumber && phoneNumber) {
 				changes.push(" Phone Number")
 			}
-			if (name !== updatedUserInfo?.name) {
+			if (name !== updatedUserInfo?.name && name) {
 				changes.push(" Name")
 			}
-			if (regions?.toString() !== updatedUserInfo?.regions?.toString()) {
+			if (regions?.toString() !== updatedUserInfo?.regions?.toString() && regions) {
 				changes.push(" Region")
 			}
 			if (changes.length !== 0) {
