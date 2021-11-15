@@ -664,15 +664,11 @@ exports.getAdminDashboardInfo = async (req, res) => {
 					title: "Pending Due",
 					count: pendingDueCount
 				},
-				{
-					title: "Paid Percentage",
-					count: percentage.toFixed(0)
-				},
-				{
-					title: "Support Graph",
-					count: supportGraph
-				},
-			]
+			],
+			reports: {
+				paidPercentage: percentage.toFixed(0),
+				supportGraph: supportGraph
+			}
 		})
 	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
