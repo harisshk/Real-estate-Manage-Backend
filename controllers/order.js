@@ -6,7 +6,8 @@ const User = require('../models/user')
 const SubProperty = require('../models/subProperty')
 var Subscription = require('../models/subscription');
 const mongoose = require('mongoose');
-const { addActivitiesUser } = require("../utils/logHandler/index")
+const { addActivitiesUser } = require("../utils/logHandler/index");
+const Support = require('../models/support');
 const month = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 exports.generateOrders = async (req, res) => {
     try {
@@ -536,4 +537,10 @@ exports.getTotalAmountByProperty = async (req, res) => {
             message: error.message
         })
     }
+}
+
+exports.findMonth = async (req, res) => {
+
+ 
+   
 }

@@ -599,6 +599,39 @@ exports.getAdminDashboardInfo = async (req, res) => {
 		let propertyCount = await ParentProperty.find({ isDeleted: false }).countDocuments();
 		let supportRequestCount = await Support.find({ isActive: true }).countDocuments();
 		let pendingDueCount = await Order.find({ paymentStatus: "Pending" }).countDocuments();
+		const count = await Order.aggregate([
+			{
+				$match: {
+					$expr: {
+						$eq: [{ $month: '$createdAt' }, { $month: new Date() }],
+					},
+				}
+			},
+			{
+				$group: {
+					_id: "$paymentStatus",
+					total: { $sum: "$amount" }
+				}
+			},
+		])
+		var outOff = count[0].total+count[1].total;
+		var value = count.find(x => x._id === "Done").total;
+		var percentage = (value * 100) / outOff;
+		const supportGraph = await Support.aggregate([
+			{
+			  $group: {
+				 // Group by both month and year of the support
+				_id: {
+				  month: { $month: "$createdAt" },
+				  year: { $year: new Date() }, // finds the current year
+				},
+				// Count the no of support
+				count: {
+				  $sum: 1
+				}
+			  }
+			},
+		])
 		return res.status(StatusCodes.OK).json({
 			error: false,
 			message: "success",
@@ -630,7 +663,15 @@ exports.getAdminDashboardInfo = async (req, res) => {
 				{
 					title: "Pending Due",
 					count: pendingDueCount
-				}
+				},
+				{
+					title: "Paid Percentage",
+					count: percentage.toFixed(0)
+				},
+				{
+					title: "Support Graph",
+					count: supportGraph
+				},
 			]
 		})
 	} catch (error) {
