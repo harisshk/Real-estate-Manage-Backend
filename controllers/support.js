@@ -60,16 +60,18 @@ exports.updateStatusSupport = async (req, res) => {
         let body = `#${support.supportNo} Support Number Status has changed to ${req.body.status}`;
         let subject = `(#${support.supportNo} Support Number) Status has been updated`;
         sendMail(support?.user?.email, subject, body)
-        const userId = support?.user?._id
-        const region = support?.user?.regions[0]
-        const adminId = req?.user?._id
-        const message = `Support with support number ${support?.supportNo} is closed by ${req?.user?.name} `
-        addActivitiesUser(
-            userId,
-            adminId,
-            region,
-            message
-        )
+        if (req.body?.status === "Closed") {
+            const userId = support?.user?._id
+            const region = support?.user?.regions[0]
+            const adminId = req?.user?._id
+            const message = `Support with support number ${support?.supportNo} is closed by ${req?.user?.name} `
+            addActivitiesUser(
+                userId,
+                adminId,
+                region,
+                message
+            )
+        }
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
