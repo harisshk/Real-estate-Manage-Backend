@@ -775,7 +775,7 @@ exports.getOwnerDashboardInfo = async (req, res) => {
 	try {
 		let propertyCount = await SubProperty.find({ isDeleted: false, owner: req.user._id }).countDocuments();
 		let pendingDueCount = await Order.find({ paymentStatus: "Pending", owner: req.user._id }).countDocuments();
-
+		let supportCount = await Support.find({owner:req.user._id}).countDocuments();
 		return res.status(StatusCodes.OK).json({
 			error: false,
 			message: "success",
@@ -787,6 +787,10 @@ exports.getOwnerDashboardInfo = async (req, res) => {
 				{
 					title: "Pending Due",
 					count: pendingDueCount
+				},
+				{
+					title: "Support",
+					count: supportCount
 				}
 			]
 		})

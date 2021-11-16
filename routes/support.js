@@ -1,6 +1,6 @@
 const express = require("express");
 const { isSignedIn, setUser, isRegionalAdmin, isAdmin } = require("../controllers/auth");
-const { createSupport, updateStatusSupport, getSupportList, supportDescription, getAllSupportByAdmin, getAllSupportByRegionalAdmin, addMessageSupport, getSupportByFilterAdmin, getSupportByFilterRegionalAdmin, filterByDateAdmin, filterByDateRegionalAdmin } = require("../controllers/support");
+const { createSupport, updateStatusSupport, getSupportList, supportDescription, getAllSupportByAdmin, getAllSupportByRegionalAdmin, addMessageSupport, getSupportByFilterAdmin, getSupportByFilterRegionalAdmin, filterByDateAdmin, filterByDateRegionalAdmin, getAllSupportByOwner } = require("../controllers/support");
 const router = express.Router();
 
 router.param("userId", setUser);
@@ -71,4 +71,5 @@ router.post('/support/date/admin/:userId', isSignedIn, isAdmin, filterByDateAdmi
 
 router.post('/support/date/regional-admin/:userId', isSignedIn, isRegionalAdmin, filterByDateRegionalAdmin);
 
+router.get('/support/all/owner/:userId', isSignedIn, getAllSupportByOwner)
 module.exports = router;

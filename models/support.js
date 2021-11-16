@@ -11,6 +11,10 @@ const supportSchema = new mongoose.Schema(
             type: mongoose.SchemaTypes.ObjectId,
             ref: "User",
         },
+        owner: {
+            type: mongoose.SchemaTypes.ObjectId,
+            ref: "User",
+        },
         property: {
             type: mongoose.SchemaTypes.ObjectId,
             ref: "SubProperty",

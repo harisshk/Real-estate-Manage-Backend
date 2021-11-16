@@ -270,3 +270,26 @@ exports.filterByDateAdmin = async(req,res) => {
         })
     }
 }
+
+exports.getAllSupportByOwner = async(req, res) => {
+    const {_id} = req.user
+    console.log(req.user)
+    try {
+        let supports = await Support.find({owner:_id}).populate('user').populate({
+            path:"property",
+            populate:"parentId"
+        })
+        return res.status(StatusCodes.OK).json({
+            error : false,
+            message :"success",
+            supports : supports,
+        })
+    } catch (error) {
+        console.log(error)
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            error : true,
+            err: error.message,
+            message :"Error in fetching the Supports",
+        })
+    }
+}
