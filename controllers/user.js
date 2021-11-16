@@ -451,7 +451,6 @@ exports.getUsersByRegionAdmin = async (req, res) => {
 	try {
 		const { regions } = req.user
 		const { role } = req.query
-		console.log(regions, role)
 		const results = await User.find({ role: role, regions: { $in: regions[0] } })
 		return res.status(StatusCodes.ACCEPTED).json({
 			error: false,
@@ -610,10 +609,11 @@ exports.getAdminDashboardInfo = async (req, res) => {
 			{
 				$group: {
 					_id: "$paymentStatus",
-					total: { $sum: "$amount" }
+					total: { $sum: "$amount" },
 				}
 			},
 		])
+		console.log(count)
 		var outOff = count[0].total+count[1].total;
 		var value = count.find(x => x._id === "Done").total;
 		var percentage = (value * 100) / outOff;
@@ -662,11 +662,15 @@ exports.getAdminDashboardInfo = async (req, res) => {
 				},
 				{
 					title: "Pending Due",
-					count: pendingDueCount
+					count: pendingDueCount,
 				},
 			],
 			reports: {
-				paidPercentage: percentage.toFixed(0),
+				paidPercentage: {
+					percentage:percentage.toFixed(0),
+					total:count[0].total+count[1].total,
+					paid:value
+				},
 				supportGraph: supportGraph
 			}
 		})
@@ -789,7 +793,7 @@ exports.getOwnerDashboardInfo = async (req, res) => {
 					count: pendingDueCount
 				},
 				{
-					title: "Support",
+					title: "Tickets Raised",
 					count: supportCount
 				}
 			]
