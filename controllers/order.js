@@ -22,7 +22,7 @@ exports.generateOrders = async (req, res) => {
             let property = subscription[i].property;
             let tenant = subscription[i].tenant;
             if (property) {
-                await new Order({ owner: property.owner, subscription: subscription[i]._id, region: property.parentId.region, user: tenant._id, amount: property ? property?.rent : 5500, orderMessage: `${property?.name} | Rent ${month[new Date().getMonth()]}` }).save();
+                await new Order({ owner: property.owner, subscription: subscription[i]._id, region: property.parentId.region, user: tenant._id, amount: property ? property?.rent : 5500, orderMessage: `${property?.parentId?.name} - ${property?.name} | Rent ${month[new Date().getMonth()]}` }).save();
                 // // Incrementing billing Cycle
                 await Subscription.findOneAndUpdate({ _id: subscription[i]._id }, { $inc: { billingCycle: 1 } });
                 // Sending mail 
