@@ -613,10 +613,19 @@ exports.getAdminDashboardInfo = async (req, res) => {
 				}
 			},
 		])
-		console.log(count)
-		var outOff = count[0].total+count[1].total;
-		var value = count.find(x => x._id === "Done").total;
-		var percentage = (value * 100) / outOff;
+		if (count.length > 0) {
+			if (count.length === 2) {
+				var outOff = count[0]?.total + count[1]?.total;
+			} else {
+				var outOff = count[0]?.total
+			}
+			var value = count.find(x => x._id === "Done")?.total;
+			var percentage = (value * 100) / outOff;
+		}
+		else {
+			var outOff = 0
+			var percentage = 0
+		}
 		const supportGraph = await Support.aggregate([
 			{
 			  $group: {
@@ -667,9 +676,9 @@ exports.getAdminDashboardInfo = async (req, res) => {
 			],
 			reports: {
 				paidPercentage: {
-					percentage:percentage.toFixed(0),
-					total:count[0].total+count[1].total,
-					paid:value
+					percentage: percentage.toFixed(0),
+					total: outOff,
+					paid: value ? value : 0
 				},
 				supportGraph: supportGraph
 			}
@@ -740,6 +749,61 @@ exports.getRegionalAdminInfo = async (req, res) => {
 		let propertyCount = await ParentProperty.find({ isDeleted: false, region: req.user.regions[0] }).countDocuments();
 		let supportRequestCount = await Support.find({ isActive: true, region: req.user.regions[0] }).countDocuments();
 		let pendingDueCount = await Order.find({ paymentStatus: "Pending", region: req.user.regions[0] }).countDocuments();
+		const count = await Order.aggregate([
+			{
+				$match: {
+					$expr: {
+						$eq: [{ $month: '$createdAt',  }, { $month: new Date() },],
+						$eq: ["$region",req.user.regions[0]],
+					},
+				}
+			},
+			{
+				$group: {
+					_id: "$paymentStatus",
+					total: { $sum: "$amount" },
+				}
+			},
+		])
+		if (count.length > 0) {
+			if (count.length === 2) {
+				var outOff = count[0]?.total + count[1]?.total;
+			} else {
+				var outOff = count[0]?.total
+			}
+			var value = count.find(x => x._id === "Done")?.total;
+			var percentage = (value * 100) / outOff;
+		}
+		else {
+			var outOff = 0
+			var percentage = 0
+		}
+		
+		const supportGraph = await Support.aggregate([
+			{
+				$match: {
+					$expr: {
+						$eq: ["$region",req.user.regions[0]],
+					},
+				}
+			},
+			{
+			  $group: {
+				 // Group by both month and year of the support
+				_id: {
+				  month: { $month: "$createdAt" },
+				  year: { $year: new Date() }, 
+				
+				  // finds the current year
+				},
+
+				// Count the no of support
+				count: {
+				  $sum: 1
+				}
+			  }
+			},
+		])
 		return res.status(StatusCodes.OK).json({
 			error: false,
 			message: "success",
@@ -764,7 +828,15 @@ exports.getRegionalAdminInfo = async (req, res) => {
 					title: 'Pending Due',
 					count: pendingDueCount
 				}
-			]
+			],
+			reports: {
+				paidPercentage: {
+					percentage: percentage.toFixed(0),
+					total: outOff,
+					paid: value ? value : 0
+				},
+				supportGraph: supportGraph
+			}
 		})
 	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
