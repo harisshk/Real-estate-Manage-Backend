@@ -753,8 +753,10 @@ exports.getRegionalAdminInfo = async (req, res) => {
 			{
 				$match: {
 					$expr: {
-						$eq: [{ $month: '$createdAt',  }, { $month: new Date() },],
-						$eq: ["$region",req.user.regions[0]],
+						$and: [
+							{ $eq: [{ $month: '$createdAt', }, { $month: new Date() },] },
+							{ $eq: ["$region", req.user.regions[0]] },
+						]
 					},
 				}
 			},
@@ -851,7 +853,66 @@ exports.getOwnerDashboardInfo = async (req, res) => {
 	try {
 		let propertyCount = await SubProperty.find({ isDeleted: false, owner: req.user._id }).countDocuments();
 		let pendingDueCount = await Order.find({ paymentStatus: "Pending", owner: req.user._id }).countDocuments();
-		let supportCount = await Support.find({owner:req.user._id}).countDocuments();
+		let supportCount = await Support.find({ owner: req.user._id }).countDocuments();
+		let occupiedCount = await SubProperty.find({ isDeleted: false, owner: req.user._id, isOccupied: true }).countDocuments();
+			
+		const supportGraph = await Support.aggregate([
+			{
+				$match: {
+					$expr: {
+						$eq: ["$owner",req.user._id],
+					},
+				}
+			},
+			{
+			  $group: {
+				 // Group by both month and year of the support
+				_id: {
+				  month: { $month: "$createdAt" },
+				  year: { $year: new Date() }, 
+				
+				  // finds the current year
+				},
+
+				// Count the no of support
+				count: {
+				  $sum: 1
+				}
+			  }
+			},
+		])
+		const count = await Order.aggregate([
+			{
+				$match: {
+					$expr: {
+						$and: [
+							{ $eq: [{ $month: '$createdAt', }, { $month: new Date() },] },
+							{ $eq: ["$owner", req.user._id] },
+						]
+					},
+				}
+			},
+			{
+				$group: {
+					_id: "$paymentStatus",
+					total: { $sum: "$amount" },
+				}
+			},
+		])
+		if (count.length > 0) {
+			if (count.length === 2) {
+				var outOff = count[0]?.total + count[1]?.total;
+			} else {
+				var outOff = count[0]?.total
+			}
+			var value = count.find(x => x._id === "Done")?.total;
+			var percentage = (value * 100) / outOff;
+		}
+		else {
+			var outOff = 0
+			var percentage = 0
+		}
+		
 		return res.status(StatusCodes.OK).json({
 			error: false,
 			message: "success",
@@ -868,7 +929,20 @@ exports.getOwnerDashboardInfo = async (req, res) => {
 					title: "Tickets Raised",
 					count: supportCount
 				}
-			]
+			],
+			reports:{
+				paidPercentage: {
+					percentage: percentage.toFixed(0),
+					total: outOff,
+					paid: value ? value : 0
+				},
+				occupancy: {
+					occupied: occupiedCount,
+					unoccupied: propertyCount - occupiedCount
+				},
+				supportGraph: supportGraph,
+
+			}
 		})
 	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
