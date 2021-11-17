@@ -620,7 +620,7 @@ exports.getAdminDashboardInfo = async (req, res) => {
 				var outOff = count[0]?.total
 			}
 			var value = count.find(x => x._id === "Done")?.total;
-			var percentage = (value * 100) / outOff;
+			var percentage = (value * 100) / outOff || 0;
 		}
 		else {
 			var outOff = 0
@@ -628,17 +628,17 @@ exports.getAdminDashboardInfo = async (req, res) => {
 		}
 		const supportGraph = await Support.aggregate([
 			{
-			  $group: {
-				 // Group by both month and year of the support
-				_id: {
-				  month: { $month: "$createdAt" },
-				  year: { $year: new Date() }, // finds the current year
-				},
-				// Count the no of support
-				count: {
-				  $sum: 1
+				$group: {
+					// Group by both month and year of the support
+					_id: {
+						month: { $month: "$createdAt" },
+						year: { $year: new Date() }, // finds the current year
+					},
+					// Count the no of support
+					count: {
+						$sum: 1
+					}
 				}
-			  }
 			},
 		])
 		return res.status(StatusCodes.OK).json({
@@ -774,36 +774,36 @@ exports.getRegionalAdminInfo = async (req, res) => {
 				var outOff = count[0]?.total
 			}
 			var value = count.find(x => x._id === "Done")?.total;
-			var percentage = (value * 100) / outOff;
+			var percentage = (value * 100) / outOff || 0;
 		}
 		else {
 			var outOff = 0
 			var percentage = 0
 		}
-		
+
 		const supportGraph = await Support.aggregate([
 			{
 				$match: {
 					$expr: {
-						$eq: ["$region",req.user.regions[0]],
+						$eq: ["$region", req.user.regions[0]],
 					},
 				}
 			},
 			{
-			  $group: {
-				 // Group by both month and year of the support
-				_id: {
-				  month: { $month: "$createdAt" },
-				  year: { $year: new Date() }, 
-				
-				  // finds the current year
-				},
+				$group: {
+					// Group by both month and year of the support
+					_id: {
+						month: { $month: "$createdAt" },
+						year: { $year: new Date() },
 
-				// Count the no of support
-				count: {
-				  $sum: 1
+						// finds the current year
+					},
+
+					// Count the no of support
+					count: {
+						$sum: 1
+					}
 				}
-			  }
 			},
 		])
 		return res.status(StatusCodes.OK).json({
@@ -855,30 +855,30 @@ exports.getOwnerDashboardInfo = async (req, res) => {
 		let pendingDueCount = await Order.find({ paymentStatus: "Pending", owner: req.user._id }).countDocuments();
 		let supportCount = await Support.find({ owner: req.user._id }).countDocuments();
 		let occupiedCount = await SubProperty.find({ isDeleted: false, owner: req.user._id, isOccupied: true }).countDocuments();
-			
+
 		const supportGraph = await Support.aggregate([
 			{
 				$match: {
 					$expr: {
-						$eq: ["$owner",req.user._id],
+						$eq: ["$owner", req.user._id],
 					},
 				}
 			},
 			{
-			  $group: {
-				 // Group by both month and year of the support
-				_id: {
-				  month: { $month: "$createdAt" },
-				  year: { $year: new Date() }, 
-				
-				  // finds the current year
-				},
+				$group: {
+					// Group by both month and year of the support
+					_id: {
+						month: { $month: "$createdAt" },
+						year: { $year: new Date() },
 
-				// Count the no of support
-				count: {
-				  $sum: 1
+						// finds the current year
+					},
+
+					// Count the no of support
+					count: {
+						$sum: 1
+					}
 				}
-			  }
 			},
 		])
 		const count = await Order.aggregate([
@@ -906,13 +906,13 @@ exports.getOwnerDashboardInfo = async (req, res) => {
 				var outOff = count[0]?.total
 			}
 			var value = count.find(x => x._id === "Done")?.total;
-			var percentage = (value * 100) / outOff;
+			var percentage = (value * 100) / outOff || 0;
 		}
 		else {
 			var outOff = 0
 			var percentage = 0
 		}
-		
+
 		return res.status(StatusCodes.OK).json({
 			error: false,
 			message: "success",
@@ -930,7 +930,7 @@ exports.getOwnerDashboardInfo = async (req, res) => {
 					count: supportCount
 				}
 			],
-			reports:{
+			reports: {
 				paidPercentage: {
 					percentage: percentage.toFixed(0),
 					total: outOff,
