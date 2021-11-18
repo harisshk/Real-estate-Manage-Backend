@@ -13,6 +13,7 @@ exports.createSupport = async (req, res) => {
                 role: user?.role,
                 user: user?._id,
                 message: "Support Ticket Created .",
+                date: Date()
             };
             const newSupportCount = {
                 ...req.body,
@@ -22,7 +23,7 @@ exports.createSupport = async (req, res) => {
             const newSupport = new Support(newSupportCount)
             newSupport.save()
                 .then((support) => {
-                    const userId = support?.user?._id
+                    const userId = req?.body?.owner
                     const region = support?.region
                     const adminId = user?._id
                     addActivitiesUser(
@@ -104,7 +105,8 @@ exports.addMessageSupport = async (req, res) => {
             role: user?.role,
             name: user?.name,
             attachments: attachments,
-            message: message
+            message: message,
+            date: Date()
         });
 
         const support = await Support.findOneAndUpdate(

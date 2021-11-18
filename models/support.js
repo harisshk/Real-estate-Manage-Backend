@@ -32,7 +32,6 @@ const supportSchema = new mongoose.Schema(
                 },
                 date:{
                     type: String,
-                    default: new Date(),
                 },
                 role: {
                     type: String,
