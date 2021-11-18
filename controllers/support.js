@@ -22,7 +22,7 @@ exports.createSupport = async (req, res) => {
             const newSupport = new Support(newSupportCount)
             newSupport.save()
                 .then((support) => {
-                    const userId = support?.user?._id
+                    const userId = req?.body?.owner
                     const region = support?.region
                     const adminId = user?._id
                     addActivitiesUser(

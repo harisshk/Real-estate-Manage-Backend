@@ -126,7 +126,10 @@ exports.updateSubscription = async (req, res) => {
 exports.getSubscriptionByTenantId = async (req, res) =>{
     let { id } = req.params
     try {
-        let subscription = await Subscription.findOne({tenant:id,isActive:true}) 
+        let subscription = await Subscription.findOne({tenant:id,isActive:true}).populate({
+            path:"property",
+            populate:"parentId"
+        })
         return res.status(StatusCodes.OK).json({
             error: false,
             subscription:subscription,
