@@ -13,6 +13,7 @@ exports.createSupport = async (req, res) => {
                 role: user?.role,
                 user: user?._id,
                 message: "Support Ticket Created .",
+                date: Date()
             };
             const newSupportCount = {
                 ...req.body,
@@ -104,7 +105,8 @@ exports.addMessageSupport = async (req, res) => {
             role: user?.role,
             name: user?.name,
             attachments: attachments,
-            message: message
+            message: message,
+            date: Date()
         });
 
         const support = await Support.findOneAndUpdate(
