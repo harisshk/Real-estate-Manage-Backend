@@ -7,23 +7,29 @@ exports.createSupport = async (req, res) => {
     Support.find({})
         .countDocuments()
         .then((count) => {
-            let newSupportCount = {
+            const { user } = req;
+            var message = {
+                name: user?.name,
+                role: user?.role,
+                user: user?._id,
+                message: "Support Ticket Created .",
+            };
+            const newSupportCount = {
                 ...req.body,
-                messages: [{ date: Date(), message: "Ticket created" }],
+                messages: [message],
                 supportNo: String(count + 1000 + 1)
             }
-            let newSupport = new Support(newSupportCount)
+            const newSupport = new Support(newSupportCount)
             newSupport.save()
                 .then((support) => {
                     const userId = support?.user?._id
                     const region = support?.region
-                    const adminId = req?.user?._id
-                    const message = `New support with support number ${support?.supportNo} is created by ${req?.user?.name} `
+                    const adminId = user?._id
                     addActivitiesUser(
                         userId,
                         adminId,
                         region,
-                        message
+                        `New support with support number ${support?.supportNo} is created by ${user?.name} `
                     )
                     return res.status(StatusCodes.OK).json({
                         error: false,
@@ -87,21 +93,37 @@ exports.updateStatusSupport = async (req, res) => {
 exports.addMessageSupport = async (req, res) => {
     try {
         var arr = []
-        arr.push({ date: Date(), message: req.body.message,user:req.user.id });
-        let support = await Support.findOneAndUpdate(
+        const { user } = req;
+
+        const { attachments, message } = req.body
+        
+        arr.push({
+            user: user?._id,
+            role: user?.role,
+            name: user?.name,
+            attachments: attachments,
+            message: message
+        });
+
+        const support = await Support.findOneAndUpdate(
                 { _id: req.params.supportId }, 
-                { $push:{messages:arr}  }, 
+                { $push:{ messages: arr }  }, 
                 { new: true }
             )
             .populate("user");
-        let body = `${req.body.message}`;
-        let subject = `(#${support.supportNo} Support Number) Admins Have Responded to your Request`;
+        
+        const body = `${req.body.message}`;
+        
+        const subject = `(#${support.supportNo} Support Number) Admins Have Responded to your Request`;
+        
         sendMail(support?.user?.email,subject,body)
+        
         return res.status(StatusCodes.OK).json({
             error: false,
             message: "success",
             support: support,
-        })
+        });
+
     } catch (error) {
         console.log(error);
         return res.status(StatusCodes.BAD_REQUEST).json({
