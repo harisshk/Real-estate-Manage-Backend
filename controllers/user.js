@@ -702,6 +702,63 @@ exports.getAdminDashboardFilterByRegion = async (req, res) => {
 		let propertyCount = await ParentProperty.find({ isDeleted: false, region: region }).countDocuments();
 		let supportRequestCount = await Support.find({ isActive: true, region: region }).countDocuments();
 		//let pendingDueCount = await Order.find({paymentStatus: "Pending" }).countDocuments();
+		const count = await Order.aggregate([
+			{
+				$match: {
+					$expr: {
+						$and: [
+							{ $eq: [{ $month: '$createdAt', }, { $month: new Date() },] },
+							{ $eq: ["$region", region] },
+						]
+					},
+				}
+			},
+			{
+				$group: {
+					_id: "$paymentStatus",
+					total: { $sum: "$amount" },
+				}
+			},
+		])
+		if (count.length > 0) {
+			if (count.length === 2) {
+				var outOff = count[0]?.total + count[1]?.total;
+			} else {
+				var outOff = count[0]?.total
+			}
+			var value = count.find(x => x._id === "Done")?.total;
+			var percentage = (value * 100) / outOff || 0;
+		}
+		else {
+			var outOff = 0
+			var percentage = 0
+		}
+
+		const supportGraph = await Support.aggregate([
+			{
+				$match: {
+					$expr: {
+						$eq: ["$region", region],
+					},
+				}
+			},
+			{
+				$group: {
+					// Group by both month and year of the support
+					_id: {
+						month: { $month: "$createdAt" },
+						year: { $year: new Date() },
+
+						// finds the current year
+					},
+
+					// Count the no of support
+					count: {
+						$sum: 1
+					}
+				}
+			},
+		])
 		return res.status(StatusCodes.OK).json({
 			error: false,
 			message: "success",
@@ -730,7 +787,15 @@ exports.getAdminDashboardFilterByRegion = async (req, res) => {
 					title: 'Active Tickets Raised',
 					count: supportRequestCount
 				},
-			]
+			],
+			reports: {
+				paidPercentage: {
+					percentage: percentage.toFixed(0),
+					total: outOff,
+					paid: value ? value : 0
+				},
+				supportGraph: supportGraph
+			}
 		})
 	} catch (error) {
 		return res.status(StatusCodes.BAD_REQUEST).json({
