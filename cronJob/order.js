@@ -5,17 +5,22 @@ const Order = require('../models/order');
 const Subscription = require('../models/subscription')
 
 const scheduledJobForCreatingOrderEveryMonth =async () => {
+    const month = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec",]
     try {
-        let subscription = await Subscription.find({ isActive: true }).populate('property', { rent: 1 , name : 1 , owner : 1 , region : 1 }).populate('tenant', { name: 1, email: 1 , regions : 1});
+        let subscription = await Subscription.find({ isActive: true })
+        .populate({
+            path: "property",
+            populate: "parentId"
+        }).populate('tenant', { name: 1, email: 1 , regions : 1});
         for (let i = 0; i < subscription.length; i++) {
             // Creating order
             let property = subscription[i].property;
             let tenant = subscription[i].tenant;
             if(property ){
-                await new Order({ owner : property.owner, subscription: subscription[i]._id, region : property.region , user: tenant._id, amount: property ? property?.rent : 5500 , orderMessage : `${property?.name} | Rent ${month[new Date().getMonth()]}` }).save();
+                await new Order({ owner : property?.owner, subscription: subscription[i]?._id, region : property?.parentId?.region , user: tenant?._id, amount: property ? property?.rent : 5500 , orderMessage : `${property?.name} | Rent ${month[new Date().getMonth()]}` }).save();
                
                 // Incrementing billing Cycle
-                await Subscription.findOneAndUpdate({_id : subscription[i]._id},{$inc: {billingCycle: 1}});
+                await Subscription.findOneAndUpdate({_id : subscription[i]?._id},{$inc: {billingCycle: 1}});
                
                 // Sending mail 
                 let to = subscription[i].tenant.email;
