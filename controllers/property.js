@@ -74,7 +74,7 @@ exports.addProperty = async (req, res) => {
 
 
 exports.updateProperty = async (req, res) => {
-	const { parentProperty, subProperty } = req.body
+	const { parentProperty, subProperty, deletedProperty } = req.body
 	try {
 		let updatedProperty = await ParentProperty.findByIdAndUpdate({ _id: parentProperty._id }, { $set: parentProperty });
 		const changes = await (MainPropertyDiff(parentProperty,updatedProperty))
@@ -93,7 +93,10 @@ exports.updateProperty = async (req, res) => {
 		const { _id, updatedBy } = updatedProperty
 		let childId = []
 		let successRate = 0
-		subProperty.forEach(async (property) => {
+		deletedProperty?.length > 0 && deletedProperty.forEach(async (property) => {
+			await SubProperty.findOneAndUpdate({ _id: property }, { $set: { isDeleted: true } })
+		})
+ 		subProperty.forEach(async (property) => {
 			if (property?._id) {
 				const data = {
 					...property,
@@ -128,7 +131,7 @@ exports.updateProperty = async (req, res) => {
 					const userId = property?.owner
 					const adminId = req?.user?._id
 					const region = updatedProperty?.region
-					const message = "Property - " + updatedProperty?.name + " - " + property?.name + " is updated by " + req?.user?.name + "." + (changes.length !== 0 ? "\nChanges : " + changes.toString() : "");
+					const message = "Property - " + updatedProperty?.name + " - " + property?.name + " is added by " + req?.user?.name + "." + (changes.length !== 0 ? "\nChanges : " + changes.toString() : "");
 					addActivitiesUser(
 						userId,
 						adminId,

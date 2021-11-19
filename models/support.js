@@ -27,12 +27,21 @@ const supportSchema = new mongoose.Schema(
                 },
                 message: {
                     type: String,
-                    default: '',
+                    required: [true, "Enter a valid Message ."],
+                    trim: true
                 },
                 date:{
                     type: String,
-                    default: '',
-                }
+                },
+                role: {
+                    type: String,
+                    required: [true, "Provide user role."]
+                },
+                name: {
+                    type: String,
+                    required: [true, "Provide user name."]
+                },
+                attachments: [],
             }
         ],
         subject: {

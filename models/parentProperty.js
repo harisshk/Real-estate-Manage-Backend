@@ -40,7 +40,7 @@ const parentPropertySchema = new mongoose.Schema(
         },
         region: {
             type: String,
-            required: true,
+            // required: true,
             trim: true,
         },
         state: {
