@@ -30,7 +30,9 @@ const {
 	getOwnersByRegion,
 	getAdminDashboardFilterByRegion,
 	getTenantsForAssignRegionalAdmin,
-	getUsersByRegionAdmin
+	getUsersByRegionAdmin,
+	updatePassword,
+	resetPasswordByAdmin
 } = require("../controllers/user");
 
 const {
@@ -68,6 +70,12 @@ router.get("/user/logout/:userId", isSignedIn, logout);
 // @desc Update new Password
 // @access PUBLIC
 router.post("/user/update/newPassword", updateNewPassword);
+
+// @type POST
+// @route /update/newPassword
+// @desc Update new Password
+// @access PUBLIC
+router.post("/user/updatePassword", updatePassword);
 
 // @type POST
 // @route /forgot/password
@@ -143,4 +151,6 @@ router.post('/user/regional-admin/owner/:userId',isSignedIn , isRegionalAdmin , 
 router.post('/user/regional-admin/tenant/:userId',isSignedIn , isRegionalAdmin , getTenantsForAssignRegionalAdmin)
 
 router.get("/user/owners/region/:regions", getOwnersByRegion)
+
+router.post('/user/resetPassword/:userId',isSignedIn , isAdmin, resetPasswordByAdmin)
 module.exports = router;
