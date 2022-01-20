@@ -10,14 +10,14 @@ const mailer = (email, OTP, text) => {
       pass: applicationPassword,
     },
     from : {
-      name: 'info@stglobalsolutions.com',
-      address: 'info@stglobalsolutions.com'
+      name: 'info@abmsapp',
+      address: 'info@abmsapp'
     }
 });
   var mailOptions = {
     from : {
-      name: 'info@stglobalsolutions.com',
-      address: 'info@stglobalsolutions.com'
+      name: 'info@abmsapp',
+      address: 'info@abmsapp'
     },
     to: email,
     subject: `PROPY!! LOGIN OTP`,
@@ -42,14 +42,14 @@ const sendMail = (email, body, content) => {
       pass: applicationPassword,
     },
     from : {
-      name: 'info@stglobalsolutions.com',
-      address: 'info@stglobalsolutions.com'
+      name: 'info@abmsapp',
+      address: 'info@abmsapp'
     }
   });
   var mailOptions = {
     from : {
-      name: 'info@stglobalsolutions.com',
-      address: 'info@stglobalsolutions.com'
+      name: 'info@abmsapp',
+      address: 'info@abmsapp'
     },
     to: email,
     subject: body,
@@ -72,14 +72,14 @@ const sendPasswordMailer = (email, password) => {
       pass: applicationPassword,
     },
     from : {
-      name: 'info@stglobalsolutions.com',
-      address: 'info@stglobalsolutions.com'
+      name: 'info@abmsapp',
+      address: 'info@abmsapp'
     }
   });
   var mailOptions = {
     from : {
-      name: 'info@stglobalsolutions.com',
-      address: 'info@stglobalsolutions.com'
+      name: 'info@abmsapp',
+      address: 'info@abmsapp'
     },to: email,
     subject: `PROPY Login Password`,
     html: `<p>Propy Welcome's you.Your Login password is ${password}.</p>`,

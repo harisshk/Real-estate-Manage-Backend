@@ -64,7 +64,7 @@ exports.verifyAccount = (req, res) => {
 			var OTP = generateRandom4DigitOTP();
 			let { email } = req.body;
 			var mailOptions = {
-				from: "hari.jsmith494@gmail.com",
+				from: "info@abmsapp.com",
 				to: email,
 				subject: `Verification Mail`,
 				html: `<p>your verification OTP is ${OTP}</p>`,
