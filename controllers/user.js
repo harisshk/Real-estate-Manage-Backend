@@ -55,11 +55,17 @@ exports.verifyAccount = (req, res) => {
 			let userNameMail = process.env.SENDER_EMAIL;
 			let applicationPassword = process.env.SENDER_EMAIL_PASSWORD;
 			var transporter = nodemailer.createTransport({
-				service: "gmail",
+				host: "smtpout.secureserver.net",
+				secureConnection: true, // TLS requires secureConnection to be false
+				port: 465, 
 				auth: {
-					user: userNameMail,
-					pass: applicationPassword,
+				  user: userNameMail,
+				  pass: applicationPassword,
 				},
+				from : {
+				  name: 'info@abmsapp.com',
+				  address: 'info@abmsapp.com'
+				}
 			});
 			var OTP = generateRandom4DigitOTP();
 			let { email } = req.body;

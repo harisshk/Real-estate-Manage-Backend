@@ -4,20 +4,22 @@ const mailer = (email, OTP, text) => {
   let userNameMail = process.env.SENDER_EMAIL,
     applicationPassword = process.env.SENDER_EMAIL_PASSWORD;
   var transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtpout.secureserver.net",
+    secureConnection: true, // TLS requires secureConnection to be false
+    port: 465, 
     auth: {
       user: userNameMail,
       pass: applicationPassword,
     },
     from : {
-      name: 'info@abmsapp',
-      address: 'info@abmsapp'
+      name: 'info@abmsapp.com',
+      address: 'info@abmsapp.com'
     }
 });
   var mailOptions = {
     from : {
-      name: 'info@abmsapp',
-      address: 'info@abmsapp'
+      name: 'info@abmsapp.com',
+      address: 'info@abmsapp.com'
     },
     to: email,
     subject: `PROPY!! LOGIN OTP`,
@@ -25,7 +27,7 @@ const mailer = (email, OTP, text) => {
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-
+      console.log(error , "error")
     }
 
   });
@@ -36,20 +38,22 @@ const sendMail = (email, body, content) => {
   let userNameMail = process.env.SENDER_EMAIL,
   applicationPassword = process.env.SENDER_EMAIL_PASSWORD;
   var transporter = nodemailer.createTransport({
-    service: "gmail",
+    host: "smtpout.secureserver.net",
+    secureConnection: true, // TLS requires secureConnection to be false
+    port: 465, 
     auth: {
       user: userNameMail,
       pass: applicationPassword,
     },
     from : {
-      name: 'info@abmsapp',
-      address: 'info@abmsapp'
+      name: 'info@abmsapp.com',
+      address: 'info@abmsapp.com'
     }
-  });
+});
   var mailOptions = {
     from : {
-      name: 'info@abmsapp',
-      address: 'info@abmsapp'
+      name: 'info@abmsapp.com',
+      address: 'info@abmsapp.com'
     },
     to: email,
     subject: body,
@@ -57,7 +61,7 @@ const sendMail = (email, body, content) => {
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-      throw error;
+      console.log(errro)
     }
   });
 };
@@ -65,28 +69,30 @@ const sendMail = (email, body, content) => {
 const sendPasswordMailer = (email, password) => {
   let userNameMail = process.env.SENDER_EMAIL,
     applicationPassword = process.env.SENDER_EMAIL_PASSWORD;
-  var transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: userNameMail,
-      pass: applicationPassword,
-    },
-    from : {
-      name: 'info@abmsapp',
-      address: 'info@abmsapp'
-    }
+    var transporter = nodemailer.createTransport({
+      host: "smtpout.secureserver.net",
+      secureConnection: true, // TLS requires secureConnection to be false
+      port: 465, 
+      auth: {
+        user: userNameMail,
+        pass: applicationPassword,
+      },
+      from : {
+        name: 'info@abmsapp.com',
+        address: 'info@abmsapp.com'
+      }
   });
   var mailOptions = {
     from : {
-      name: 'info@abmsapp',
-      address: 'info@abmsapp'
+      name: 'info@abmsapp.com',
+      address: 'info@abmsapp.com'
     },to: email,
     subject: `PROPY Login Password`,
     html: `<p>Propy Welcome's you.Your Login password is ${password}.</p>`,
   };
   transporter.sendMail(mailOptions, function (error, info) {
     if (error) {
-
+      console.log(error)
     }
 
   });
