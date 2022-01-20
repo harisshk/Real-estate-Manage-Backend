@@ -40,7 +40,7 @@ exports.generateOrders = async (req, res) => {
         })
     } catch (error) {
         // If Error Send email to Admin
-        let to = `hari.jsmith494@gmail.com`
+        let to = `info@abmsapp.com`
         let mailSubject = `Error in creating the Order Invoice`
         let mailBody = `Hello Admin , Sorry due to some issue order invoice could not be created. Issue : ${error.message}`
         sendMail(to, mailSubject, mailBody)
