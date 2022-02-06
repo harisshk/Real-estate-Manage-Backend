@@ -45,7 +45,6 @@ const parentPropertySchema = new mongoose.Schema(
         },
         state: {
             type: String,
-            required: true,
             trim: true,
         },
         geoLocation: {
