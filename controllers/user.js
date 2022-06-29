@@ -55,16 +55,22 @@ exports.verifyAccount = (req, res) => {
 			let userNameMail = process.env.SENDER_EMAIL;
 			let applicationPassword = process.env.SENDER_EMAIL_PASSWORD;
 			var transporter = nodemailer.createTransport({
-				service: "gmail",
+				host: "smtpout.secureserver.net",
+				secureConnection: true, // TLS requires secureConnection to be false
+				port: 465, 
 				auth: {
-					user: userNameMail,
-					pass: applicationPassword,
+				  user: userNameMail,
+				  pass: applicationPassword,
 				},
+				from : {
+				  name: 'info@abmsapp.com',
+				  address: 'info@abmsapp.com'
+				}
 			});
 			var OTP = generateRandom4DigitOTP();
 			let { email } = req.body;
 			var mailOptions = {
-				from: "hari.jsmith494@gmail.com",
+				from: "info@abmsapp.com",
 				to: email,
 				subject: `Verification Mail`,
 				html: `<p>your verification OTP is ${OTP}</p>`,
@@ -292,6 +298,59 @@ exports.updateNewPassword = (req, res) => {
 		);
 	});
 };
+exports.updatePassword = async (req, res) => {
+	try {
+		const userInfo = await User.findOne({ _id: req.body.userId, isActive: true })
+		if (!userInfo) {
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				error: true,
+				message: "No account found using this email Id",
+			});
+		}
+		const check = await bcrypt.compare(req.body.oldPassword, userInfo.password)
+		if (!check) {
+			return res.status(StatusCodes.BAD_REQUEST).json({
+				error: true,
+				message: "Mismatch old password",
+			});
+		} 
+		else
+		{
+			bcrypt.hash(req.body.newPassword, 10, function (err, hash) {
+				if (err) {
+					return res.status(400).json({
+						error: true,
+						message: `Error in updating the password`,
+					});
+				}
+				User.findByIdAndUpdate(
+					{ _id: req.body.userId },
+					{ password: hash },
+					(e, updateUserInfo) => {
+						if (e) {
+							return res.status(StatusCodes.BAD_REQUEST).json({
+								error: true,
+								message: "Error in updating the Password",
+							});
+						}
+
+						//Hiding the password
+						updateUserInfo.password = undefined;
+
+						return res.status(StatusCodes.ACCEPTED).json({
+							error: false,
+							message: "Password updated successfully",
+							user: updateUserInfo,
+						});
+					},
+				);
+			});
+		}
+	}
+	catch (error) {
+		console.log(error)
+	}
+};
 
 exports.getOTPForPassword = async (req, res) => {
 	const { email } = req.body;
@@ -369,7 +428,7 @@ exports.createAccountByAdmins = async (req, res) => {
 			payoutsContactId: razorPayCustomerDetails?.id
 		};
 		let newUser = await new User(user).save();
-		// 	sendPasswordMailer(email, password);
+		sendPasswordMailer(email, password);
 		// 	let body = `<p>New User Created</p>
 		// 	<p>Name: ${newUser.name}</p>
 		// 	<p>Role: ${newUser.role}</p>
@@ -405,6 +464,26 @@ exports.createAccountByAdmins = async (req, res) => {
 		});
 	}
 };
+
+exports.resetPasswordByAdmin = async (req, res) => {
+	const { email } = req?.body
+	try {
+		const password = generatePassword(8, false);
+		const hashPassword = await bcrypt.hash(password, 10)
+		const newData = await User.findOneAndUpdate({ email: email }, { $set: { password: hashPassword } });
+		sendPasswordMailer(email, password);
+		return res.status(StatusCodes.ACCEPTED).json({
+			error: false,
+			message: "Password reset is done Successfully",
+		});
+	} catch (error) {
+		return res.status(StatusCodes.BAD_REQUEST).json({
+			message: "Error in password reset",
+			error: true,
+			err: error.message,
+		});
+	}
+}
 
 exports.getAllUsersByRoles = async (req, res) => {
 	try {

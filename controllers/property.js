@@ -47,15 +47,16 @@ exports.addProperty = async (req, res) => {
 		//     sendMail (allAdmins[i].email, subject ,body);
 		// }
 		const userId = ""
-		const adminId = req?.user?._id
 		const region = newProperty?.region
 		const message = `New property - ${newProperty?.name} is created by ${req?.user?.name} `
 		addActivitiesUser(
-			userId,
-			adminId,
+			createdBy,
+			createdBy,
 			region,
 			message
 		)
+		console.log("----OK----")
+
 		return res.status(StatusCodes.ACCEPTED).json({
 			message: "Property added",
 			error: false,
